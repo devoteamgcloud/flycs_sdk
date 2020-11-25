@@ -3,7 +3,6 @@
 # pylint: disable=redefined-outer-name
 
 import pytest
-import logging
 from flycs_sdk.entities import (
     Entity,
     BaseLayerEntity,
@@ -92,11 +91,11 @@ class TestBaseLayerEntity(TestEntity):
             "name": entity_name,
             "version": entity_version,
             "stage_config": [
-                {"name": "datalake", "versions": {},},
-                {"name": "preamble", "versions": {},},
-                {"name": "staging", "versions": {},},
-                {"name": "data_warehouse", "versions": {},},
-                {"name": "data_mart", "versions": {},},
+                {"name": "datalake", "versions": {}},
+                {"name": "preamble", "versions": {}},
+                {"name": "staging", "versions": {}},
+                {"name": "data_warehouse", "versions": {}},
+                {"name": "data_mart", "versions": {}},
             ],
         }
 
