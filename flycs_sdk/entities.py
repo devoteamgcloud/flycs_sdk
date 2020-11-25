@@ -55,11 +55,13 @@ class Entity:
 class BaseLayerEntity(Entity):
     """Class that is used for converting an entity class to an Airflow DAG."""
 
+    stages = ["datalake", "preamble", "staging", "data_warehouse", "data_mart"]
+
     def __init__(
         self,
         name: str,
         version: str,
-        parameters: Dict[str, str],
+        parameters: Dict[str, str] = None,
         datalake_versions: Dict[str, str] = None,
         preamble_versions: Dict[str, str] = None,
         staging_versions: Dict[str, str] = None,
@@ -79,12 +81,21 @@ class BaseLayerEntity(Entity):
         :param stage_config: a dictionary with the name of the stage as key and a dictionary of query names
         and their versions as value.
         """
+        super().__init__(name, version, parameters)
         self.datalake_versions = datalake_versions
         self.preamble_versions = preamble_versions
         self.staging_versions = staging_versions
         self.data_warehouse_versions = data_warehouse_versions
         self.data_mart_versions = data_mart_versions
-        super().__init__(name, version, parameters)
+        self.stage_config = self.get_stage_config()
+
+    def get_stage_config(self):
+        """
+        Get the stage config for a base layer entity based on the fixed stages in the BaseLayerEntity.
+
+        :return: a dictionary in the form of a stage config
+        """
+        return {stage: self.get_stage_versions(stage) for stage in self.stages}
 
     def get_stage_versions(self, stage: str) -> Dict[str, str]:
         """
