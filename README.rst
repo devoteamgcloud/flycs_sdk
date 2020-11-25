@@ -30,7 +30,7 @@ Flycs SDK contains the Python SDK to interact with the Flycs data framework.
 Features
 --------
 
-* TODO
+* Allows you to create the data objects needed to interact with Flycs.
 
 Credits
 -------

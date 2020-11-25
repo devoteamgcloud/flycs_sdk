@@ -25,6 +25,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "*"
+"ruamel.yaml" = "^0.16.12"
 
 [tool.poetry.dev-dependencies]
 bumpversion = "*"

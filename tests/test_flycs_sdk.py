@@ -3,23 +3,33 @@
 # pylint: disable=redefined-outer-name
 
 import pytest
+from flycs_sdk.entities import Entity
 
 
+class TestEntity:
+    def test_init(self):
+        name = "test"
+        version = "1.0.0"
+        my_entity = Entity(name, version)
+        assert my_entity.name == name
+        assert my_entity.version == version
 
-
-
-@pytest.fixture
-def response():
-    """Sample pytest fixture.
-
-    See more at: http://doc.pytest.org/en/latest/fixture.html
-    """
-    # import requests
-    # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
-
-
-def test_content(response):
-    """Sample pytest test function with the pytest fixture as an argument."""
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
-    del response
+    def test_to_dict(self):
+        name = "test"
+        version = "1.0.0"
+        stage_config = {
+            "raw": {"table_1": "1.0.0", "table_2": "1.0.0",},
+            "staging": {"table_1": "1.0.0", "table_2": "1.0.0",},
+        }
+        my_entity = Entity(name, version, stage_config=stage_config)
+        assert my_entity.to_dict() == {
+            "name": name,
+            "version": version,
+            "stage_config": [
+                {"name": "raw", "versions": {"table_1": "1.0.0", "table_2": "1.0.0",}},
+                {
+                    "name": "staging",
+                    "versions": {"table_1": "1.0.0", "table_2": "1.0.0",},
+                },
+            ],
+        }
