@@ -24,7 +24,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "*"
+python = ">=3.5"
 "ruamel.yaml" = "^0.16.12"
 
 [tool.poetry.dev-dependencies]
@@ -38,6 +38,7 @@ pytest = "*"
 sphinx = "*"
 tox = "*"
 yapf = "*"
+deepdiff = "^5.0.2"
 
 
 

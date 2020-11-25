@@ -3,6 +3,7 @@
 # pylint: disable=redefined-outer-name
 
 import pytest
+from deepdiff import DeepDiff
 from flycs_sdk.entities import (
     Entity,
     BaseLayerEntity,
@@ -28,17 +29,24 @@ class TestEntity:
         assert my_entity.version == entity_version
 
     def test_to_dict(self, my_entity):
-        assert my_entity.to_dict() == {
-            "name": entity_name,
-            "version": entity_version,
-            "stage_config": [
-                {"name": "raw", "versions": {"table_1": "1.0.0", "table_2": "1.0.0"}},
-                {
-                    "name": "staging",
-                    "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
-                },
-            ],
-        }
+        assert not DeepDiff(
+            my_entity.to_dict(),
+            {
+                "name": entity_name,
+                "version": entity_version,
+                "stage_config": [
+                    {
+                        "name": "raw",
+                        "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                    },
+                    {
+                        "name": "staging",
+                        "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                    },
+                ],
+            },
+            ignore_order=True,
+        )
 
 
 class TestBaseLayerEntity(TestEntity):
@@ -59,45 +67,53 @@ class TestBaseLayerEntity(TestEntity):
         )
 
     def test_to_dict(self, my_entity):
-        assert my_entity.to_dict() == {
-            "name": entity_name,
-            "version": entity_version,
-            "stage_config": [
-                {
-                    "name": "datalake",
-                    "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
-                },
-                {
-                    "name": "preamble",
-                    "versions": {"table_3": "1.0.0", "table_4": "1.0.0"},
-                },
-                {
-                    "name": "staging",
-                    "versions": {"table_5": "1.0.0", "table_6": "1.0.0"},
-                },
-                {
-                    "name": "data_warehouse",
-                    "versions": {"table_7": "1.0.0", "table_8": "1.0.0"},
-                },
-                {
-                    "name": "data_mart",
-                    "versions": {"table_9": "1.0.0", "table_10": "1.0.0"},
-                },
-            ],
-        }
+        assert not DeepDiff(
+            my_entity.to_dict(),
+            {
+                "name": entity_name,
+                "version": entity_version,
+                "stage_config": [
+                    {
+                        "name": "datalake",
+                        "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                    },
+                    {
+                        "name": "preamble",
+                        "versions": {"table_3": "1.0.0", "table_4": "1.0.0"},
+                    },
+                    {
+                        "name": "staging",
+                        "versions": {"table_5": "1.0.0", "table_6": "1.0.0"},
+                    },
+                    {
+                        "name": "data_warehouse",
+                        "versions": {"table_7": "1.0.0", "table_8": "1.0.0"},
+                    },
+                    {
+                        "name": "data_mart",
+                        "versions": {"table_9": "1.0.0", "table_10": "1.0.0"},
+                    },
+                ],
+            },
+            ignore_order=True,
+        )
 
     def test_to_dict_empty(self, empty_entity):
-        assert empty_entity.to_dict() == {
-            "name": entity_name,
-            "version": entity_version,
-            "stage_config": [
-                {"name": "datalake", "versions": {}},
-                {"name": "preamble", "versions": {}},
-                {"name": "staging", "versions": {}},
-                {"name": "data_warehouse", "versions": {}},
-                {"name": "data_mart", "versions": {}},
-            ],
-        }
+        assert not DeepDiff(
+            empty_entity.to_dict(),
+            {
+                "name": entity_name,
+                "version": entity_version,
+                "stage_config": [
+                    {"name": "datalake", "versions": {}},
+                    {"name": "preamble", "versions": {}},
+                    {"name": "staging", "versions": {}},
+                    {"name": "data_warehouse", "versions": {}},
+                    {"name": "data_mart", "versions": {}},
+                ],
+            },
+            ignore_order=True,
+        )
 
 
 class TestParametrizedEntity(TestEntity):
