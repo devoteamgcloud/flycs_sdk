@@ -20,7 +20,7 @@ class TestEntity:
     def my_entity(self):
         stage_config = {
             "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
-            "staging": {"table_1": "1.0.0", "table_2": "1.0.0"},
+            "staging": {"table_3": "1.0.0", "table_4": "1.0.0"},
         }
         return Entity(entity_name, entity_version, stage_config)
 
@@ -41,7 +41,7 @@ class TestEntity:
                     },
                     {
                         "name": "staging",
-                        "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        "versions": {"table_3": "1.0.0", "table_4": "1.0.0"},
                     },
                 ],
             },
@@ -121,7 +121,7 @@ class TestParametrizedEntity(TestEntity):
     def my_entity(self):
         stage_config = {
             "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
-            "staging": {"table_1": "1.0.0", "table_2": "1.0.0"},
+            "staging": {"table_3": "1.0.0", "table_4": "1.0.0"},
         }
         return ParametrizedEntity(entity_name, entity_version, stage_config)
 
