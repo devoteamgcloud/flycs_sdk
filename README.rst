@@ -6,8 +6,9 @@ Flycs SDK
 .. image:: https://img.shields.io/pypi/v/flycs_sdk.svg
         :target: https://pypi.python.org/pypi/flycs_sdk
 
-.. image:: https://img.shields.io/travis/Fourcast/flycs_sdk.svg
-        :target: https://travis-ci.org/Fourcast/flycs_sdk
+.. image:: https://github.com/Fourcast/flycs_sdk/workflows/Test%20package/badge.svg
+        :target: https://github.com/Fourcast/flycs_sdk/actions?query=workflow%3A%22Test+package%22
+        :alt: Test status
 
 .. image:: https://readthedocs.org/projects/flycs-sdk/badge/?version=latest
         :target: https://flycs-sdk.readthedocs.io/en/latest/?badge=latest
