@@ -76,7 +76,7 @@ class Pipeline:
         """
         return self.entities.append(entity)
 
-    def to_dict(self) -> Dict:
+    def serialize(self) -> Dict:
         """
         Serialize the pipeline to a dictionary object.
 
@@ -142,7 +142,8 @@ class ParametrizedPipeline:
         return self._start_time
 
     def add_entity(
-        self, entity: Union[ParametrizedEntity, ParametrizedBaseLayerEntity],
+        self,
+        entity: Union[ParametrizedEntity, ParametrizedBaseLayerEntity],
     ):
         """
         Add entity to the list of entities contained in this pipeline.
