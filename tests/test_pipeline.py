@@ -14,7 +14,7 @@ pipeline_kind = PipelineKind.VANILLA
 pipeline_start_time = 1606923514
 
 
-class TestEntity:
+class TestPipeline:
     @pytest.fixture
     def my_entity(self):
         stage_config = {
