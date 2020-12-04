@@ -7,7 +7,10 @@ class Entity:
     """Class that serves as a version configuration for a logical subset of a Pipeline."""
 
     def __init__(
-        self, name: str, version: str, stage_config: Dict[str, Dict[str, str]] = None,
+        self,
+        name: str,
+        version: str,
+        stage_config: Dict[str, Dict[str, str]] = None,
     ):
         """
         Create an Entity object.
@@ -178,7 +181,7 @@ class ParametrizedEntity:
         """
         Create a ParametrizedEntity object.
 
-        A parametrized entity should be combined with a parametrized pipeline. This allows developers to make behaviour
+        A parametrized entity should be combined with a parametrized pipeline. This allows developers to make behavior
         of the entity dynamic based on the parameters from the pipeline.
 
         :param name: the name of the entity
@@ -211,7 +214,7 @@ class ParametrizedEntity:
         :return: the entity as a dictionary object.
         """
         return {
-            "name": self.name,
+            "name": _parametrized_entity_name(self.name, parameters),
             "version": self.version,
             "stage_config": [
                 {"name": stage, "versions": self.get_stage_versions(stage, parameters)}
@@ -355,3 +358,24 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
             return {}
         else:
             return self.data_mart_versions
+
+
+def _parametrized_entity_name(name: str, parameters: Dict[str, str]) -> str:
+    """generate a unique entity name that includes the parameters value
+
+    :param name: name of the entity
+    :type name: str
+    :param parameters: parameters applied to the entity
+    :type parameters: dict
+    :return: parametrized entity name
+    :rtype: str
+    """
+    if not parameters:
+        return name
+    key, value = list(parameters.items())[0]
+    new_name = f"{name}_{key}_{value}"  # must follow https://cloud.google.com/bigquery/docs/datasets#dataset-naming
+    if len(new_name) > 1024:
+        raise ValueError(
+            f"the size of the entity name ({new_name}) is to big, maximum size is 1024 characters"
+        )
+    return new_name

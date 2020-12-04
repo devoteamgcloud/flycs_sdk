@@ -9,6 +9,7 @@ from flycs_sdk.entities import (
     BaseLayerEntity,
     ParametrizedEntity,
     ParametrizedBaseLayerEntity,
+    _parametrized_entity_name,
 )
 
 entity_name = "test"
@@ -52,7 +53,10 @@ class TestEntity:
 class TestBaseLayerEntity(TestEntity):
     @pytest.fixture
     def empty_entity(self):
-        return BaseLayerEntity(entity_name, entity_version,)
+        return BaseLayerEntity(
+            entity_name,
+            entity_version,
+        )
 
     @pytest.fixture
     def my_entity(self):
@@ -129,7 +133,10 @@ class TestParametrizedEntity(TestEntity):
 class TestParametrizedBaseLayerEntity(TestParametrizedEntity, TestBaseLayerEntity):
     @pytest.fixture
     def empty_entity(self):
-        return ParametrizedBaseLayerEntity(entity_name, entity_version,)
+        return ParametrizedBaseLayerEntity(
+            entity_name,
+            entity_version,
+        )
 
     @pytest.fixture
     def my_entity(self):
@@ -142,3 +149,8 @@ class TestParametrizedBaseLayerEntity(TestParametrizedEntity, TestBaseLayerEntit
             data_warehouse_versions={"table_7": "1.0.0", "table_8": "1.0.0"},
             data_mart_versions={"table_9": "1.0.0", "table_10": "1.0.0"},
         )
+
+
+class TestParametrizedEntityName:
+    def test_parametrized_entity_name(self):
+        assert _parametrized_entity_name("name", {"key": "value"}) == "name_key_value"
