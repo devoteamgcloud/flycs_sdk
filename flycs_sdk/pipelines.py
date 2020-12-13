@@ -1,5 +1,6 @@
 """Module containing pipeline classes."""
 
+import itertools
 import time
 from enum import Enum
 from typing import Dict, List, Union
@@ -74,7 +75,7 @@ class Pipeline:
         """
         return self.entities.append(entity)
 
-    def serialize(self) -> Dict:
+    def to_dict(self) -> Dict:
         """
         Serialize the pipeline to a dictionary object.
 
@@ -92,6 +93,8 @@ class Pipeline:
 
 
 class ParametrizedPipeline:
+    """Class ParametrizedPipeline represents a dynamic pipeline configuration."""
+
     def __init__(
         self,
         name: str,
@@ -129,8 +132,7 @@ class ParametrizedPipeline:
         self.parameters = parameters
 
     def add_entity(
-        self,
-        entity: Union[ParametrizedEntity, ParametrizedBaseLayerEntity],
+        self, entity: Union[ParametrizedEntity, ParametrizedBaseLayerEntity],
     ):
         """
         Add entity to the list of entities contained in this pipeline.
@@ -144,30 +146,38 @@ class ParametrizedPipeline:
             )
         return self.entities.append(entity)
 
-    def serialize(self) -> List[Dict]:
+    def to_dict(self) -> Dict:
         """
         Serialize the pipeline to a dictionary object.
 
         :return: the pipeline as a dictionary object.
         :rtype: Dict
         """
-        output = []
-        for key, values in self.parameters.items():
-            for value in values:
-                output.append(
-                    {
-                        "name": self.name,
-                        "version": self.version,
-                        "schedule": self.schedule,
-                        "start_time": self.start_time,
-                        "kind": self.kind.value,
-                        "entities": [
-                            e.to_dict(parameters={key: value}) for e in self.entities
-                        ],
-                    }
-                )
+        # creates a list of all possible combination of parameter
+        # for a self.parameters like: {"language": ["nl", "fr"], "country": ["be", "en"]}
+        # it creates a list like:
+        # [
+        #     {"language": "nl", "country": "be"},
+        #     {"language": "nl", "country": "en"},
+        #     {"language": "fr", "country": "be"},
+        #     {"language": "fr", "country": "en"},
+        # ]
+        parameters = [
+            dict(zip(self.parameters.keys(), x))
+            for x in itertools.product(*self.parameters.values())
+        ]
 
-        return output
+        d = {
+            "name": self.name,
+            "version": self.version,
+            "schedule": self.schedule,
+            "start_time": self.start_time,
+            "kind": self.kind.value,
+            "entities": [
+                e.to_dict(parameters=p) for p in parameters for e in self.entities
+            ],
+        }
+        return d
 
 
 def _is_valid_version(version: str) -> bool:
