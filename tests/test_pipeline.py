@@ -58,25 +58,36 @@ class TestPipeline:
         my_pipeline.add_entity(my_entity)
         assert my_pipeline.entities == [my_entity]
 
-    def test_serialize(self, my_pipeline, my_entity):
+    def test_to_dict(self, my_pipeline, my_entity):
         my_pipeline.add_entity(my_entity)
-        actual = my_pipeline.serialize()
+        actual = my_pipeline.to_dict()
         expected = {
             "name": pipeline_name,
             "version": pipeline_version,
             "schedule": pipeline_schedule,
             "kind": pipeline_kind.value,
             "start_time": pipeline_start_time,
-            "entities": [my_entity.to_dict()],
+            "entities": [
+                {
+                    "name": "test",
+                    "version": "1.0.0",
+                    "stage_config": [
+                        {
+                            "name": "raw",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                        {
+                            "name": "staging",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                    ],
+                }
+            ],
         }
-        assert not DeepDiff(
-            actual,
-            expected,
-            ignore_order=True,
-        )
+        assert expected == actual
 
 
-pipeline_parameters = {"key1": ["val1", "val2", "val3"], "key2": ["val1", "val2"]}
+pipeline_parameters = {"language": ["nl", "fr"], "country": ["be", "en"]}
 
 
 class TestParametrizedPipeline(TestPipeline):
@@ -117,32 +128,80 @@ class TestParametrizedPipeline(TestPipeline):
         ):
             my_pipeline.add_entity(my_non_parameterized_entity)
 
-    def test_serialize(self, my_pipeline, my_entity):
+    def test_to_dict(self, my_pipeline, my_entity):
         my_pipeline.add_entity(my_entity)
-        actual = my_pipeline.serialize()
-        expected = []
-        for key, values in my_pipeline.parameters.items():
-            for value in values:
-                expected.append(
-                    {
-                        "name": pipeline_name,
-                        "version": pipeline_version,
-                        "schedule": pipeline_schedule,
-                        "kind": pipeline_kind.value,
-                        "start_time": pipeline_start_time,
-                        "entities": [
-                            e.to_dict(parameters={key: value})
-                            for e in my_pipeline.entities
-                        ],
-                    }
-                )
-        assert not DeepDiff(
-            actual,
-            expected,
-            ignore_order=True,
-        )
+        actual = my_pipeline.to_dict()
+        expected = {
+            "name": "test",
+            "version": "1.0.0",
+            "schedule": "* 12 * * *",
+            "start_time": 1606923514,
+            "kind": "vanilla",
+            "entities": [
+                {
+                    "name": "test_nl_be",
+                    "version": "1.0.0",
+                    "stage_config": [
+                        {
+                            "name": "raw",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                        {
+                            "name": "staging",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                    ],
+                },
+                {
+                    "name": "test_nl_en",
+                    "version": "1.0.0",
+                    "stage_config": [
+                        {
+                            "name": "raw",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                        {
+                            "name": "staging",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                    ],
+                },
+                {
+                    "name": "test_fr_be",
+                    "version": "1.0.0",
+                    "stage_config": [
+                        {
+                            "name": "raw",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                        {
+                            "name": "staging",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                    ],
+                },
+                {
+                    "name": "test_fr_en",
+                    "version": "1.0.0",
+                    "stage_config": [
+                        {
+                            "name": "raw",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                        {
+                            "name": "staging",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                    ],
+                },
+            ],
+        }
+        assert expected == actual
 
     def test_entity_name_container_parameters(self, my_pipeline, my_entity):
         my_pipeline.add_entity(my_entity)
-        d = my_pipeline.serialize()
-        assert d[0]["entities"][0]["name"] == "test_key1_val1"
+        d = my_pipeline.to_dict()
+        assert len(d["entities"]) == 4
+        assert sorted(
+            ["test_nl_be", "test_nl_en", "test_fr_be", "test_fr_en"]
+        ) == sorted([e["name"] for e in d["entities"]])
