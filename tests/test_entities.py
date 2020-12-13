@@ -153,4 +153,7 @@ class TestParametrizedBaseLayerEntity(TestParametrizedEntity, TestBaseLayerEntit
 
 class TestParametrizedEntityName:
     def test_parametrized_entity_name(self):
-        assert _parametrized_entity_name("name", {"key": "value"}) == "name_key_value"
+        assert (
+            _parametrized_entity_name("name", {"language": "fr", "country": "be"})
+            == "name_fr_be"
+        )

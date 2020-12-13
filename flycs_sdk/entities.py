@@ -372,8 +372,11 @@ def _parametrized_entity_name(name: str, parameters: Dict[str, str]) -> str:
     """
     if not parameters:
         return name
-    key, value = list(parameters.items())[0]
-    new_name = f"{name}_{key}_{value}"  # must follow https://cloud.google.com/bigquery/docs/datasets#dataset-naming
+
+    # must follow https://cloud.google.com/bigquery/docs/datasets#dataset-naming
+    parts = [name, *parameters.values()]
+    new_name = "_".join(parts)
+
     if len(new_name) > 1024:
         raise ValueError(
             f"the size of the entity name ({new_name}) is to big, maximum size is 1024 characters"
