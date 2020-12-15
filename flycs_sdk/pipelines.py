@@ -63,6 +63,26 @@ class Pipeline:
             self.start_time = start_time or datetime.now()
         self.entities = entities
 
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create a Pipeline object form a dictionnary created with the to_dict method.
+
+        :param d: source dictionary
+        :type d: dict
+        :return: Pipeline
+        :rtype: Pipeline
+        """
+        return cls(
+            name=d["name"],
+            version=d["version"],
+            schedule=d["schedule"],
+            start_time=d["start_time"],
+            kind=PipelineKind(d["kind"]),
+            entities=[
+                Entity.from_dict(e) for e in d["entities"]
+            ],  # TODO: detect type of entity
+        )
+
     def add_entity(
         self,
         entity: Union[
@@ -76,7 +96,7 @@ class Pipeline:
         """
         return self.entities.append(entity)
 
-    def serialize(self) -> Dict:
+    def to_dict(self) -> Dict:
         """
         Serialize the pipeline to a dictionary object.
 
@@ -91,6 +111,17 @@ class Pipeline:
             "kind": self.kind.value,
             "entities": [e.to_dict() for e in self.entities],
         }
+
+    def __eq__(self, other):
+        """Implement __eq__ method."""
+        return (
+            self.name == other.name
+            and self.version == other.version
+            and self.schedule == other.schedule
+            and self.kind.value == other.kind.value
+            and self.start_time == other.start_time
+            and self.entities == other.entities
+        )
 
 
 class ParametrizedPipeline:
@@ -142,8 +173,7 @@ class ParametrizedPipeline:
         return self._start_time
 
     def add_entity(
-        self,
-        entity: Union[ParametrizedEntity, ParametrizedBaseLayerEntity],
+        self, entity: Union[ParametrizedEntity, ParametrizedBaseLayerEntity],
     ):
         """
         Add entity to the list of entities contained in this pipeline.

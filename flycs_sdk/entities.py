@@ -22,6 +22,18 @@ class Entity:
         self.version = version
         self.stage_config = stage_config
 
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create an Entity object form a dictionnary created with the to_dict method.
+
+        :param d: source dictionary
+        :type d: dict
+        :return: Entity
+        :rtype: Entity
+        """
+        stage_config = {stage["name"]: stage["versions"] for stage in d["stage_config"]}
+        return cls(name=d["name"], version=d["version"], stage_config=stage_config)
+
     def get_stage_versions(self, stage: str) -> Dict[str, str]:
         """
         Get the versions of the queries in the given stage.
@@ -47,6 +59,14 @@ class Entity:
             if self.stage_config is not None
             else [],
         }
+
+    def __eq__(self, other):
+        """Implement the __eq__ method."""
+        return (
+            self.name == other.name
+            and self.version == other.version
+            and self.stage_config == other.stage_config
+        )
 
 
 class BaseLayerEntity(Entity):
@@ -86,6 +106,30 @@ class BaseLayerEntity(Entity):
         self.data_warehouse_versions = data_warehouse_versions
         self.data_mart_versions = data_mart_versions
         self.stage_config = self.get_stage_config()
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create an BaseLayerEntity object form a dictionnary created with the to_dict method.
+
+        :param d: source dictionary
+        :type d: dict
+        :return: BaseLayerEntity
+        :rtype: BaseLayerEntity
+        """
+        entity = cls(name=d["name"], version=d["version"])
+        for stage in d.get("stage_config", {}):
+            if stage["name"] == "datalake":
+                entity.datalake_versions = stage["versions"]
+            elif stage["name"] == "preamble":
+                entity.preamble_versions = stage["versions"]
+            if stage["name"] == "staging":
+                entity.staging_versions = stage["versions"]
+            if stage["name"] == "data_warehouse":
+                entity.data_warehouse_versions = stage["versions"]
+            if stage["name"] == "data_mart":
+                entity.data_mart_versions = stage["versions"]
+        entity.stage_config = entity.get_stage_config()
+        return entity
 
     def get_stage_config(self):
         """
@@ -191,6 +235,18 @@ class ParametrizedEntity:
         self.version = version
         self.stage_config = stage_config
 
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create an ParametrizedEntity object form a dictionnary created with the to_dict method.
+
+        :param d: source dictionary
+        :type d: dict
+        :return: ParametrizedEntity
+        :rtype: ParametrizedEntity
+        """
+        stage_config = {stage["name"]: stage["versions"] for stage in d["stage_config"]}
+        return cls(name=d["name"], version=d["version"], stage_config=stage_config)
+
     def get_stage_versions(
         self, stage: str, parameters: Dict[str, str] = None
     ) -> Dict[str, str]:
@@ -218,6 +274,14 @@ class ParametrizedEntity:
                 for stage in self.stage_config.keys()
             ],
         }
+
+    def __eq__(self, other):
+        """Implement the __eq__ method."""
+        return (
+            self.name == other.name
+            and self.version == other.version
+            and self.stage_config == other.stage_config
+        )
 
 
 class ParametrizedBaseLayerEntity(ParametrizedEntity):
@@ -257,6 +321,27 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
         self.data_warehouse_versions = data_warehouse_versions
         self.data_mart_versions = data_mart_versions
         self.stage_config = self.get_stage_config()
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create an ParametrizedBaseLayerEntity object form a dictionnary created with the to_dict method.
+
+        :param d: source dictionary
+        :type d: dict
+        :return: ParametrizedBaseLayerEntity
+        :rtype: ParametrizedBaseLayerEntity
+        """
+        entity = cls(
+            name=d["name"],
+            version=d["version"],
+            datalake_versions=d["stage_config"],
+            preamble_versions=d["preamble_versions"],
+            staging_versions=d["staging_versions"],
+            data_warehouse_versions=d["data_warehouse_versions"],
+            data_mart_versions=d["data_mart_versions"],
+        )
+        entity.stage_config = entity.get_stage_config()
+        return entity
 
     def get_stage_config(self, parameters: Dict[str, str] = None):
         """
