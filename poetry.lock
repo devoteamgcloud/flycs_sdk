@@ -82,22 +82,11 @@ d = ["aiohttp (>=3.3.2)", "aiohttp-cors"]
 
 [[package]]
 name = "bump2version"
-version = "0.5.10"
+version = "1.0.1"
 description = "Version-bump your software with a single command!"
 category = "dev"
 optional = false
-python-versions = "*"
-
-[[package]]
-name = "bumpversion"
-version = "0.6.0"
-description = "Version-bump your software with a single command!"
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-bump2version = "*"
+python-versions = ">=3.5"
 
 [[package]]
 name = "certifi"
@@ -643,7 +632,7 @@ testing = ["pathlib2", "unittest2", "jaraco.itertools", "func-timeout"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6"
-content-hash = "a719e93c8dd07aabec7cd83578d66caa7f5218481e86e056305f06d9047c6418"
+content-hash = "8bbab32dea22aefa2318085fb14b2636de95b2d918eb319f4745d910250f34bc"
 
 [metadata.files]
 alabaster = [
@@ -675,11 +664,8 @@ black = [
     {file = "black-19.10b0.tar.gz", hash = "sha256:c2edb73a08e9e0e6f65a0e6af18b059b8b1cdd5bef997d7a0b181df93dc81539"},
 ]
 bump2version = [
-    {file = "bump2version-0.5.10-py2.py3-none-any.whl", hash = "sha256:185abfd0d8321ec5059424d8b670aa82f7385948ff7ddd986981b4ed04dc819a"},
-]
-bumpversion = [
-    {file = "bumpversion-0.6.0-py2.py3-none-any.whl", hash = "sha256:4eb3267a38194d09f048a2179980bb4803701969bff2c85fa8f6d1ce050be15e"},
-    {file = "bumpversion-0.6.0.tar.gz", hash = "sha256:4ba55e4080d373f80177b4dabef146c07ce73c7d1377aabf9d3c3ae1f94584a6"},
+    {file = "bump2version-1.0.1-py2.py3-none-any.whl", hash = "sha256:37f927ea17cde7ae2d7baf832f8e80ce3777624554a653006c9144f8017fe410"},
+    {file = "bump2version-1.0.1.tar.gz", hash = "sha256:762cb2bfad61f4ec8e2bdf452c7c267416f8c70dd9ecb1653fd0bbb01fa936e6"},
 ]
 certifi = [
     {file = "certifi-2020.11.8-py2.py3-none-any.whl", hash = "sha256:1f422849db327d534e3d0c5f02a263458c3955ec0aae4ff09b95f195c59f4edd"},
