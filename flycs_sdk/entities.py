@@ -34,6 +34,11 @@ class Entity:
         stage_config = {stage["name"]: stage["versions"] for stage in d["stage_config"]}
         return cls(name=d["name"], version=d["version"], stage_config=stage_config)
 
+    @property
+    def stages(self):
+        """Return a list of all the stages defined in this entity."""
+        return list(self.stage_config.keys())
+
     def get_stage_versions(self, stage: str) -> Dict[str, str]:
         """
         Get the versions of the queries in the given stage.
@@ -130,6 +135,11 @@ class BaseLayerEntity(Entity):
                 entity.data_mart_versions = stage["versions"]
         entity.stage_config = entity.get_stage_config()
         return entity
+
+    @property
+    def stages(self):
+        """Return a list of all the stages defined in this entity."""
+        return self.stages.copy()
 
     def get_stage_config(self):
         """
@@ -247,6 +257,11 @@ class ParametrizedEntity:
         stage_config = {stage["name"]: stage["versions"] for stage in d["stage_config"]}
         return cls(name=d["name"], version=d["version"], stage_config=stage_config)
 
+    @property
+    def stages(self):
+        """Return a list of all the stages defined in this entity."""
+        return list(self.stage_config.keys())
+
     def get_stage_versions(
         self, stage: str, parameters: Dict[str, str] = None
     ) -> Dict[str, str]:
@@ -342,6 +357,11 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
         )
         entity.stage_config = entity.get_stage_config()
         return entity
+
+    @property
+    def stages(self):
+        """Return a list of all the stages defined in this entity."""
+        return self.stages.copy()
 
     def get_stage_config(self, parameters: Dict[str, str] = None):
         """
