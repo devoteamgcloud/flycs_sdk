@@ -25,6 +25,20 @@ class TestEntity:
         }
         return Entity(entity_name, entity_version, stage_config)
 
+    @pytest.fixture
+    def my_dict(self):
+        return {
+            "name": entity_name,
+            "version": entity_version,
+            "stage_config": [
+                {"name": "raw", "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},},
+                {
+                    "name": "staging",
+                    "versions": {"table_3": "1.0.0", "table_4": "1.0.0"},
+                },
+            ],
+        }
+
     def test_init(self, my_entity):
         assert my_entity.name == entity_name
         assert my_entity.version == entity_version
@@ -49,14 +63,25 @@ class TestEntity:
             ignore_order=True,
         )
 
+    def test_from_dict(self, my_dict):
+        e = Entity.from_dict(my_dict)
+        assert e.name == entity_name
+        assert e.version == entity_version
+        assert e.stage_config == {
+            "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
+            "staging": {"table_3": "1.0.0", "table_4": "1.0.0"},
+        }
+
+    def test_serialize_deserialize(self, my_entity):
+        d = my_entity.to_dict()
+        loaded = Entity.from_dict(d)
+        assert loaded == my_entity
+
 
 class TestBaseLayerEntity(TestEntity):
     @pytest.fixture
     def empty_entity(self):
-        return BaseLayerEntity(
-            entity_name,
-            entity_version,
-        )
+        return BaseLayerEntity(entity_name, entity_version,)
 
     @pytest.fixture
     def my_entity(self):
@@ -69,6 +94,35 @@ class TestBaseLayerEntity(TestEntity):
             data_warehouse_versions={"table_7": "1.0.0", "table_8": "1.0.0"},
             data_mart_versions={"table_9": "1.0.0", "table_10": "1.0.0"},
         )
+
+    @pytest.fixture
+    def my_dict(self):
+        return {
+            "name": entity_name,
+            "version": entity_version,
+            "stage_config": [
+                {
+                    "name": "datalake",
+                    "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                },
+                {
+                    "name": "preamble",
+                    "versions": {"table_3": "1.0.0", "table_4": "1.0.0"},
+                },
+                {
+                    "name": "staging",
+                    "versions": {"table_5": "1.0.0", "table_6": "1.0.0"},
+                },
+                {
+                    "name": "data_warehouse",
+                    "versions": {"table_7": "1.0.0", "table_8": "1.0.0"},
+                },
+                {
+                    "name": "data_mart",
+                    "versions": {"table_9": "1.0.0", "table_10": "1.0.0"},
+                },
+            ],
+        }
 
     def test_to_dict(self, my_entity):
         assert not DeepDiff(
@@ -119,6 +173,28 @@ class TestBaseLayerEntity(TestEntity):
             ignore_order=True,
         )
 
+    def test_from_dict(self, my_dict):
+        e = BaseLayerEntity.from_dict(my_dict)
+        assert e.name == entity_name
+        assert e.version == entity_version
+        assert e.datalake_versions == {"table_1": "1.0.0", "table_2": "1.0.0"}
+        assert e.preamble_versions == {"table_3": "1.0.0", "table_4": "1.0.0"}
+        assert e.staging_versions == {"table_5": "1.0.0", "table_6": "1.0.0"}
+        assert e.data_warehouse_versions == {"table_7": "1.0.0", "table_8": "1.0.0"}
+        assert e.data_mart_versions == {"table_9": "1.0.0", "table_10": "1.0.0"}
+        assert e.stage_config == {
+            "datalake": {"table_1": "1.0.0", "table_2": "1.0.0"},
+            "preamble": {"table_3": "1.0.0", "table_4": "1.0.0"},
+            "staging": {"table_5": "1.0.0", "table_6": "1.0.0"},
+            "data_warehouse": {"table_7": "1.0.0", "table_8": "1.0.0"},
+            "data_mart": {"table_9": "1.0.0", "table_10": "1.0.0"},
+        }
+
+    def test_serialize_deserialize(self, my_entity):
+        d = my_entity.to_dict()
+        loaded = BaseLayerEntity.from_dict(d)
+        assert loaded == my_entity
+
 
 class TestParametrizedEntity(TestEntity):
     @pytest.fixture
@@ -133,10 +209,7 @@ class TestParametrizedEntity(TestEntity):
 class TestParametrizedBaseLayerEntity(TestParametrizedEntity, TestBaseLayerEntity):
     @pytest.fixture
     def empty_entity(self):
-        return ParametrizedBaseLayerEntity(
-            entity_name,
-            entity_version,
-        )
+        return ParametrizedBaseLayerEntity(entity_name, entity_version,)
 
     @pytest.fixture
     def my_entity(self):

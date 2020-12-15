@@ -58,9 +58,9 @@ class TestPipeline:
         my_pipeline.add_entity(my_entity)
         assert my_pipeline.entities == [my_entity]
 
-    def test_serialize(self, my_pipeline, my_entity):
+    def test_to_dict(self, my_pipeline, my_entity):
         my_pipeline.add_entity(my_entity)
-        actual = my_pipeline.serialize()
+        actual = my_pipeline.to_dict()
         expected = {
             "name": pipeline_name,
             "version": pipeline_version,
@@ -85,6 +85,14 @@ class TestPipeline:
             ],
         }
         assert expected == actual
+
+    def test_serialize_deserialize(self, my_pipeline, my_entity):
+        my_pipeline.add_entity(my_entity)
+        d = my_pipeline.to_dict()
+        loaded = Pipeline.from_dict(d)
+        loaded.entities = []
+        my_pipeline.entities = []
+        assert loaded == my_pipeline
 
 
 pipeline_parameters = {"language": ["nl", "fr"], "country": ["be", "en"]}
