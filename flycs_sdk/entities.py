@@ -77,7 +77,7 @@ class Entity:
 class BaseLayerEntity(Entity):
     """Class that serves as a version configuration for a logical subset of a Pipeline with fixed layers."""
 
-    stages = ["datalake", "preamble", "staging", "data_warehouse", "data_mart"]
+    _stages = ["datalake", "preamble", "staging", "data_warehouse", "data_mart"]
 
     def __init__(
         self,
@@ -147,7 +147,7 @@ class BaseLayerEntity(Entity):
 
         :return: a dictionary in the form of a stage config
         """
-        return {stage: self.get_stage_versions(stage) for stage in self.stages}
+        return {stage: self.get_stage_versions(stage) for stage in self._stages}
 
     def get_stage_versions(self, stage: str) -> Dict[str, str]:
         """
@@ -302,7 +302,7 @@ class ParametrizedEntity:
 class ParametrizedBaseLayerEntity(ParametrizedEntity):
     """Class that serves as a version configuration for a logical subset of a ParametrizedPipeline with fixed layers."""
 
-    stages = ["datalake", "preamble", "staging", "data_warehouse", "data_mart"]
+    _stages = ["datalake", "preamble", "staging", "data_warehouse", "data_mart"]
 
     def __init__(
         self,
@@ -370,7 +370,7 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
         :param parameters: the pipeline parameters to get the config for
         :return: a dictionary in the form of a stage config
         """
-        return {stage: self.get_stage_versions(stage) for stage in self.stages}
+        return {stage: self.get_stage_versions(stage) for stage in self._stages}
 
     def get_stage_versions(
         self, stage: str, parameters: Dict[str, str] = None
