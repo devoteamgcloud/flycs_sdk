@@ -12,6 +12,7 @@ from .entities import (
     Entity,
     ParametrizedBaseLayerEntity,
     ParametrizedEntity,
+    _parametrized_name,
 )
 
 
@@ -146,12 +147,14 @@ class ParametrizedPipeline:
             )
         return self.entities.append(entity)
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> List[Dict]:
         """
-        Serialize the pipeline to a dictionary object.
+        Serialize the pipeline to a list of dictionary object.
 
-        :return: the pipeline as a dictionary object.
-        :rtype: Dict
+        for each possible combination of the parameters a new item in the list is created
+
+        :return: the list of parametrized pipeline.
+        :rtype: List
         """
         # creates a list of all possible combination of parameter
         # for a self.parameters like: {"language": ["nl", "fr"], "country": ["be", "en"]}
@@ -167,17 +170,17 @@ class ParametrizedPipeline:
             for x in itertools.product(*self.parameters.values())
         ]
 
-        d = {
-            "name": self.name,
-            "version": self.version,
-            "schedule": self.schedule,
-            "start_time": self.start_time,
-            "kind": self.kind.value,
-            "entities": [
-                e.to_dict(parameters=p) for p in parameters for e in self.entities
-            ],
-        }
-        return d
+        return [
+            {
+                "name": _parametrized_name(self.name, p),
+                "version": self.version,
+                "schedule": self.schedule,
+                "start_time": self.start_time,
+                "kind": self.kind.value,
+                "entities": [e.to_dict(parameters=p) for e in self.entities],
+            }
+            for p in parameters
+        ]
 
 
 def _is_valid_version(version: str) -> bool:
