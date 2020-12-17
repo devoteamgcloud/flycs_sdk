@@ -97,7 +97,7 @@ class TestParametrizedPipeline(TestPipeline):
             "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
             "staging": {"table_1": "1.0.0", "table_2": "1.0.0"},
         }
-        return ParametrizedEntity("test", "1.0.0", stage_config)
+        return ParametrizedEntity("entity1", "1.0.0", stage_config)
 
     @pytest.fixture
     def my_non_parameterized_entity(self):
@@ -105,7 +105,7 @@ class TestParametrizedPipeline(TestPipeline):
             "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
             "staging": {"table_1": "1.0.0", "table_2": "1.0.0"},
         }
-        return Entity("test", "1.0.0", stage_config)
+        return Entity("entity1", "1.0.0", stage_config)
 
     @pytest.fixture
     def my_pipeline(self, my_entity):
@@ -131,77 +131,114 @@ class TestParametrizedPipeline(TestPipeline):
     def test_to_dict(self, my_pipeline, my_entity):
         my_pipeline.add_entity(my_entity)
         actual = my_pipeline.to_dict()
-        expected = {
-            "name": "test",
-            "version": "1.0.0",
-            "schedule": "* 12 * * *",
-            "start_time": 1606923514,
-            "kind": "vanilla",
-            "entities": [
-                {
-                    "name": "test_nl_be",
-                    "version": "1.0.0",
-                    "stage_config": [
-                        {
-                            "name": "raw",
-                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
-                        },
-                        {
-                            "name": "staging",
-                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
-                        },
-                    ],
-                },
-                {
-                    "name": "test_nl_en",
-                    "version": "1.0.0",
-                    "stage_config": [
-                        {
-                            "name": "raw",
-                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
-                        },
-                        {
-                            "name": "staging",
-                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
-                        },
-                    ],
-                },
-                {
-                    "name": "test_fr_be",
-                    "version": "1.0.0",
-                    "stage_config": [
-                        {
-                            "name": "raw",
-                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
-                        },
-                        {
-                            "name": "staging",
-                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
-                        },
-                    ],
-                },
-                {
-                    "name": "test_fr_en",
-                    "version": "1.0.0",
-                    "stage_config": [
-                        {
-                            "name": "raw",
-                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
-                        },
-                        {
-                            "name": "staging",
-                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
-                        },
-                    ],
-                },
-            ],
-        }
+        expected = [
+            {
+                "name": "test_nl_be",
+                "version": "1.0.0",
+                "schedule": "* 12 * * *",
+                "start_time": 1606923514,
+                "kind": "vanilla",
+                "entities": [
+                    {
+                        "name": "entity1_nl_be",
+                        "version": "1.0.0",
+                        "stage_config": [
+                            {
+                                "name": "raw",
+                                "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                            },
+                            {
+                                "name": "staging",
+                                "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                "name": "test_nl_en",
+                "version": "1.0.0",
+                "schedule": "* 12 * * *",
+                "start_time": 1606923514,
+                "kind": "vanilla",
+                "entities": [
+                    {
+                        "name": "entity1_nl_en",
+                        "version": "1.0.0",
+                        "stage_config": [
+                            {
+                                "name": "raw",
+                                "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                            },
+                            {
+                                "name": "staging",
+                                "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                "name": "test_fr_be",
+                "version": "1.0.0",
+                "schedule": "* 12 * * *",
+                "start_time": 1606923514,
+                "kind": "vanilla",
+                "entities": [
+                    {
+                        "name": "entity1_fr_be",
+                        "version": "1.0.0",
+                        "stage_config": [
+                            {
+                                "name": "raw",
+                                "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                            },
+                            {
+                                "name": "staging",
+                                "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                "name": "test_fr_en",
+                "version": "1.0.0",
+                "schedule": "* 12 * * *",
+                "start_time": 1606923514,
+                "kind": "vanilla",
+                "entities": [
+                    {
+                        "name": "entity1_fr_en",
+                        "version": "1.0.0",
+                        "stage_config": [
+                            {
+                                "name": "raw",
+                                "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                            },
+                            {
+                                "name": "staging",
+                                "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                            },
+                        ],
+                    },
+                ],
+            },
+        ]
         assert expected == actual
 
-    def test_entity_name_container_parameters(self, my_pipeline, my_entity):
+    def test_name_parameters(self, my_pipeline, my_entity):
         my_pipeline.add_entity(my_entity)
         d = my_pipeline.to_dict()
-        assert len(d["entities"]) == 4
+        entity_names = []
+        pipeline_names = []
+        for p in d:
+            pipeline_names.append(p["name"])
+            entity_names.extend([e["name"] for e in p["entities"]])
+
+        assert sorted(
+            ["entity1_nl_be", "entity1_nl_en", "entity1_fr_be", "entity1_fr_en"]
+        ) == sorted(entity_names)
         assert sorted(
             ["test_nl_be", "test_nl_en", "test_fr_be", "test_fr_en"]
-        ) == sorted([e["name"] for e in d["entities"]])
+        ) == sorted(pipeline_names)

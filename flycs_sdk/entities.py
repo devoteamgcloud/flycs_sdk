@@ -7,10 +7,7 @@ class Entity:
     """Class that serves as a version configuration for a logical subset of a Pipeline."""
 
     def __init__(
-        self,
-        name: str,
-        version: str,
-        stage_config: Dict[str, Dict[str, str]] = None,
+        self, name: str, version: str, stage_config: Dict[str, Dict[str, str]] = None,
     ):
         """
         Create an Entity object.
@@ -214,7 +211,7 @@ class ParametrizedEntity:
         :return: the entity as a dictionary object.
         """
         return {
-            "name": _parametrized_entity_name(self.name, parameters),
+            "name": _parametrized_name(self.name, parameters),
             "version": self.version,
             "stage_config": [
                 {"name": stage, "versions": self.get_stage_versions(stage, parameters)}
@@ -360,14 +357,14 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
             return self.data_mart_versions
 
 
-def _parametrized_entity_name(name: str, parameters: Dict[str, str]) -> str:
-    """generate a unique entity name that includes the parameters value
+def _parametrized_name(name: str, parameters: Dict[str, str]) -> str:
+    """Generate a unique entity name that includes the parameters value.
 
-    :param name: name of the entity
+    :param name: original name
     :type name: str
-    :param parameters: parameters applied to the entity
+    :param parameters: parameters applied to apply
     :type parameters: dict
-    :return: parametrized entity name
+    :return: parametrized parametrized name
     :rtype: str
     """
     if not parameters:
