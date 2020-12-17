@@ -483,6 +483,6 @@ def _parametrized_name(name: str, parameters: Dict[str, str]) -> str:
 
     if len(new_name) > 1024:
         raise ValueError(
-            f"the size of the entity name ({new_name}) is to big, maximum size is 1024 characters"
+            f"the size of the name ({new_name}) is to big, maximum size is 1024 characters"
         )
     return new_name

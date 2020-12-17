@@ -23,7 +23,7 @@ class TestPipeline:
             "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
             "staging": {"table_1": "1.0.0", "table_2": "1.0.0"},
         }
-        return Entity("test", "1.0.0", stage_config)
+        return Entity("entity1", "1.0.0", stage_config)
 
     @pytest.fixture
     def my_pipeline(self, my_entity):
@@ -80,7 +80,7 @@ class TestPipeline:
             "start_time": "2020-12-02T15:38:34+00:00",
             "entities": [
                 {
-                    "name": "test",
+                    "name": "entity1",
                     "version": "1.0.0",
                     "stage_config": [
                         {
@@ -99,11 +99,11 @@ class TestPipeline:
 
     def test_serialize_deserialize(self, my_pipeline, my_entity):
         my_pipeline.add_entity(my_entity)
-        d = my_pipeline.to_dict()
-        loaded = Pipeline.from_dict(d)
-        loaded.entities = []
-        my_pipeline.entities = []
-        assert loaded == my_pipeline
+        serialized = my_pipeline.to_dict()
+        if not isinstance(serialized, list):
+            serialized = [serialized]
+        for d in serialized:
+            loaded = Pipeline.from_dict(d)
 
 
 pipeline_parameters = {"language": ["nl", "fr"], "country": ["be", "en"]}
