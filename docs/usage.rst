@@ -2,37 +2,40 @@
 Usage
 =====
 
-The first step is to define entities using the Flycs SDK
+Getting started
+###############
+
+.. literalinclude:: examples/basic.py
+  :language: python
+
+How to use parametrized pipeline to keep the code DRY ?
+#######################################################
+
+It can happens that you end up with a lot of pipelines that looks nearly exactly the same.
+To avoid this, the SDK offers the *ParametrizePipeline* and *ParametrizeEntity* class. With it, you can pass some parameters to your pipeline. The SDK would then generate automatically a new
+pipeline for each possible combination of each parameters.
+
+A set of parameters looks like this:
 
 .. code-block:: python
 
-    from flycs_sdk.entities import Entity
-
-    stage_config = {
-        "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
-        "staging": {"table_3": "1.0.0", "table_4": "1.0.0"},
-        "data_warehouse": {"table_5": "1.1.0"},
+    pipeline_parameters = {
+        "language": ["nl", "fr"],
+        "country": ["be", "en"],
     }
-    entity = Entity(entity_name, entity_version, stage_config)
 
-Once the entities are defined, we can create pipelines.
-To be able to be discovered, the pipelines needs to be aggregated into a list called 'pipelines' located at the root of the module.
+Such a parameters would generate 4 pipelines, one for each possible combination of parameter:
 
 .. code-block:: python
 
-    from flycs_sdk.pipelines import Pipeline, PipelineKind
+    {"language": "nl", "country": "be"},
+    {"language": "nl", "country": "en"},
+    {"language": "fr", "country": "be"},
+    {"language": "fr", "country": "en"},
 
-    # import entities defined in another module
-    from .entities import entities
 
-    p1 = Pipeline(
-        name="my_pipeline",
-        version="1.0.0",
-        schedule="* 12 * * *", # this is using cron notation
-        entities=entities,
-        kind=PipelineKind.VANILLA,
-        start_time=1607507618, # this is a UNIX timestamp
-    )
 
-    # make the pipelines available to be discovered by the rest of the Flycs ecosystem
-    pipelines = [p1]
+Parameterized pipeline and entity also allow to introduce custom logic. Here is an example how to use it:
+
+.. literalinclude:: examples/parametrize_pipeline.py
+  :language: python
