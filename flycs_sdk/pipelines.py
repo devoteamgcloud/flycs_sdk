@@ -125,12 +125,22 @@ class ParametrizedPipeline:
         self.name = name
         if _is_valid_version(version):
             self.version = version
-        self.schedule = schedule  # TODO: validate format
+        self._schedule = schedule  # TODO: validate format
         self.kind = kind
         if _is_valid_start_time(start_time):
-            self.start_time = start_time or int(time.time())
+            self._start_time = start_time or int(time.time())
         self.entities = entities
         self.parameters = parameters
+
+    @property
+    def schedule(self):
+        """Property used by sub-class to modify the schedule value based on the parameters of the pipeline."""
+        return self._schedule
+
+    @property
+    def start_time(self):
+        """Property used by sub-class to modify the start_time value based on the parameters of the pipeline."""
+        return self._start_time
 
     def add_entity(
         self, entity: Union[ParametrizedEntity, ParametrizedBaseLayerEntity],
