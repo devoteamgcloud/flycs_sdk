@@ -1,7 +1,7 @@
 """Module containing pipeline classes."""
 
 import itertools
-import time
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, List, Union
 
@@ -38,7 +38,7 @@ class Pipeline:
             ]
         ] = None,
         kind: PipelineKind = PipelineKind.VANILLA,
-        start_time: int = None,
+        start_time: datetime = None,
     ):
         """
         Create a Pipeline object.
@@ -51,8 +51,8 @@ class Pipeline:
         :kind schedule: str
         :param kind: the type of the pipeline. the type determines what actions will be taken aside from just running the queries
         :type type: PipelineKind, default to vanilla
-        :param start_time: timestamp at which the pipeline should start to be processed, defaults to None
-        :type start_time: int, optional
+        :param start_time: timestamp at which the pipeline should start to be processed. The time MUST always be expressed using UTC timezone, defaults to None
+        :type start_time: datetime, optional
         """
         self.name = name
         if _is_valid_version(version):
@@ -60,7 +60,7 @@ class Pipeline:
         self.schedule = schedule  # TODO: validate format
         self.kind = kind
         if _is_valid_start_time(start_time):
-            self.start_time = start_time or int(time.time())
+            self.start_time = start_time or datetime.now()
         self.entities = entities
 
     def add_entity(
@@ -87,7 +87,7 @@ class Pipeline:
             "name": self.name,
             "version": self.version,
             "schedule": self.schedule,
-            "start_time": self.start_time,
+            "start_time": _format_datetime(self.start_time),
             "kind": self.kind.value,
             "entities": [e.to_dict() for e in self.entities],
         }
@@ -103,7 +103,7 @@ class ParametrizedPipeline:
         schedule: str,
         entities: List[Union[ParametrizedEntity, ParametrizedBaseLayerEntity]] = None,
         kind: PipelineKind = PipelineKind.VANILLA,
-        start_time: int = None,
+        start_time: datetime = None,
         parameters: Dict[str, List[str]] = None,
     ):
         """
@@ -117,8 +117,8 @@ class ParametrizedPipeline:
         :kind schedule: str
         :param kind: the type of the pipeline. the type determines what actions will be taken aside from just running the queries
         :type type: PipelineKind, default to vanilla
-        :param start_time: timestamp at which the pipeline should start to be processed, defaults to None
-        :type start_time: int, optional
+        :param start_time: timestamp at which the pipeline should start to be processed. The time MUST always be expressed using UTC timezone, defaults to None
+        :type start_time: datetime, optional
         :param parameters: pipeline parameters that will be passed to each entities contained in the pipeline during rendering
         :type parameters: dict, optional
         """
@@ -127,8 +127,7 @@ class ParametrizedPipeline:
             self.version = version
         self._schedule = schedule  # TODO: validate format
         self.kind = kind
-        if _is_valid_start_time(start_time):
-            self._start_time = start_time or int(time.time())
+        self._start_time = start_time or datetime.now()
         self.entities = entities
         self.parameters = parameters
 
@@ -185,7 +184,7 @@ class ParametrizedPipeline:
                 "name": _parametrized_name(self.name, p),
                 "version": self.version,
                 "schedule": self.schedule,
-                "start_time": self.start_time,
+                "start_time": _format_datetime(self.start_time),
                 "kind": self.kind.value,
                 "entities": [e.to_dict(parameters=p) for e in self.entities],
             }
@@ -206,7 +205,7 @@ def _is_valid_version(version: str) -> bool:
     return True
 
 
-def _is_valid_start_time(start_time: int) -> bool:
+def _is_valid_start_time(start_time: datetime) -> bool:
     """Test if start_time is a valid timestamp value.
 
     :param start_time: timestamp to validate
@@ -215,6 +214,14 @@ def _is_valid_start_time(start_time: int) -> bool:
     :return: True is start_time is valid
     :rtype: bool
     """
-    if start_time < 0:
-        raise ValueError("start_time can not be a negative value")
+    if not isinstance(start_time, datetime):
+        raise TypeError("start_time must be a a valid datetime object")
+
+    if start_time.tzinfo != timezone.utc:
+        raise ValueError("start_time timezone must be UTC")
+
     return True
+
+
+def _format_datetime(t: datetime) -> str:
+    return t.isoformat(timespec="seconds")

@@ -2,6 +2,8 @@
 """Tests for `flycs_sdk` package."""
 # pylint: disable=redefined-outer-name
 
+from datetime import datetime, timezone, timedelta
+
 import pytest
 from deepdiff import DeepDiff
 from flycs_sdk.entities import Entity, ParametrizedEntity
@@ -11,7 +13,7 @@ pipeline_name = "test"
 pipeline_version = "1.0.0"
 pipeline_schedule = "* 12 * * *"
 pipeline_kind = PipelineKind.VANILLA
-pipeline_start_time = 1606923514
+pipeline_start_time = datetime.fromtimestamp(1606923514, tz=timezone.utc)
 
 
 class TestPipeline:
@@ -43,13 +45,22 @@ class TestPipeline:
         assert my_pipeline.entities == []
 
     def test_invalid_start_time(self):
+        with pytest.raises(TypeError):
+            return Pipeline(
+                name=pipeline_name,
+                version=pipeline_version,
+                schedule=pipeline_schedule,
+                kind=pipeline_kind,
+                start_time=1234,
+                entities=[],
+            )
         with pytest.raises(ValueError):
             return Pipeline(
                 name=pipeline_name,
                 version=pipeline_version,
                 schedule=pipeline_schedule,
                 kind=pipeline_kind,
-                start_time=-1,
+                start_time=datetime.fromtimestamp(1606923514, tz=timezone(timedelta(1))),
                 entities=[],
             )
 
@@ -66,7 +77,7 @@ class TestPipeline:
             "version": pipeline_version,
             "schedule": pipeline_schedule,
             "kind": pipeline_kind.value,
-            "start_time": pipeline_start_time,
+            "start_time": "2020-12-02T15:38:34+00:00",
             "entities": [
                 {
                     "name": "test",
@@ -136,7 +147,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_nl_be",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": 1606923514,
+                "start_time": "2020-12-02T15:38:34+00:00",
                 "kind": "vanilla",
                 "entities": [
                     {
@@ -159,7 +170,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_nl_en",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": 1606923514,
+                "start_time": "2020-12-02T15:38:34+00:00",
                 "kind": "vanilla",
                 "entities": [
                     {
@@ -182,7 +193,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_fr_be",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": 1606923514,
+                "start_time": "2020-12-02T15:38:34+00:00",
                 "kind": "vanilla",
                 "entities": [
                     {
@@ -205,7 +216,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_fr_en",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": 1606923514,
+                "start_time": "2020-12-02T15:38:34+00:00",
                 "kind": "vanilla",
                 "entities": [
                     {
