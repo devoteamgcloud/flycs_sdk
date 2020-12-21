@@ -7,7 +7,13 @@ from datetime import datetime, timezone, timedelta
 import pytest
 from deepdiff import DeepDiff
 from flycs_sdk.entities import Entity, ParametrizedEntity
-from flycs_sdk.pipelines import Pipeline, ParametrizedPipeline, PipelineKind
+from flycs_sdk.pipelines import (
+    Pipeline,
+    ParametrizedPipeline,
+    PipelineKind,
+    _parse_datetime,
+    _format_datetime,
+)
 
 pipeline_name = "test"
 pipeline_version = "1.0.0"
@@ -23,7 +29,7 @@ class TestPipeline:
             "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
             "staging": {"table_1": "1.0.0", "table_2": "1.0.0"},
         }
-        return Entity("test", "1.0.0", stage_config)
+        return Entity("entity1", "1.0.0", stage_config)
 
     @pytest.fixture
     def my_pipeline(self, my_entity):
@@ -60,7 +66,9 @@ class TestPipeline:
                 version=pipeline_version,
                 schedule=pipeline_schedule,
                 kind=pipeline_kind,
-                start_time=datetime.fromtimestamp(1606923514, tz=timezone(timedelta(1))),
+                start_time=datetime.fromtimestamp(
+                    1606923514, tz=timezone(timedelta(1))
+                ),
                 entities=[],
             )
 
@@ -77,10 +85,10 @@ class TestPipeline:
             "version": pipeline_version,
             "schedule": pipeline_schedule,
             "kind": pipeline_kind.value,
-            "start_time": "2020-12-02T15:38:34+00:00",
+            "start_time": "2020-12-02T15:38:34+0000",
             "entities": [
                 {
-                    "name": "test",
+                    "name": "entity1",
                     "version": "1.0.0",
                     "stage_config": [
                         {
@@ -96,6 +104,19 @@ class TestPipeline:
             ],
         }
         assert expected == actual
+
+    def test_serialize_deserialize(self, my_pipeline, my_entity):
+        my_pipeline.add_entity(my_entity)
+        serialized = my_pipeline.to_dict()
+        if not isinstance(serialized, list):
+            serialized = [serialized]
+        for d in serialized:
+            loaded = Pipeline.from_dict(d)
+
+    def test_parse_datetime(self):
+        tstr = _format_datetime(pipeline_start_time)
+        parsed = _parse_datetime(tstr)
+        assert parsed == pipeline_start_time
 
 
 pipeline_parameters = {"language": ["nl", "fr"], "country": ["be", "en"]}
@@ -147,7 +168,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_nl_be",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+00:00",
+                "start_time": "2020-12-02T15:38:34+0000",
                 "kind": "vanilla",
                 "entities": [
                     {
@@ -170,7 +191,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_nl_en",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+00:00",
+                "start_time": "2020-12-02T15:38:34+0000",
                 "kind": "vanilla",
                 "entities": [
                     {
@@ -193,7 +214,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_fr_be",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+00:00",
+                "start_time": "2020-12-02T15:38:34+0000",
                 "kind": "vanilla",
                 "entities": [
                     {
@@ -216,7 +237,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_fr_en",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+00:00",
+                "start_time": "2020-12-02T15:38:34+0000",
                 "kind": "vanilla",
                 "entities": [
                     {

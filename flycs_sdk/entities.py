@@ -21,6 +21,24 @@ class Entity:
         self.name = name
         self.version = version
         self.stage_config = stage_config
+        self.queries = {}
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create an Entity object form a dictionnary created with the to_dict method.
+
+        :param d: source dictionary
+        :type d: dict
+        :return: Entity
+        :rtype: Entity
+        """
+        stage_config = {stage["name"]: stage["versions"] for stage in d["stage_config"]}
+        return cls(name=d["name"], version=d["version"], stage_config=stage_config)
+
+    @property
+    def stages(self):
+        """Return a list of all the stages defined in this entity."""
+        return list(self.stage_config.keys())
 
     def get_stage_versions(self, stage: str) -> Dict[str, str]:
         """
@@ -48,11 +66,19 @@ class Entity:
             else [],
         }
 
+    def __eq__(self, other):
+        """Implement the __eq__ method."""
+        return (
+            self.name == other.name
+            and self.version == other.version
+            and self.stage_config == other.stage_config
+        )
+
 
 class BaseLayerEntity(Entity):
     """Class that serves as a version configuration for a logical subset of a Pipeline with fixed layers."""
 
-    stages = ["datalake", "preamble", "staging", "data_warehouse", "data_mart"]
+    _stages = ["datalake", "preamble", "staging", "data_warehouse", "data_mart"]
 
     def __init__(
         self,
@@ -87,13 +113,42 @@ class BaseLayerEntity(Entity):
         self.data_mart_versions = data_mart_versions
         self.stage_config = self.get_stage_config()
 
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create an BaseLayerEntity object form a dictionnary created with the to_dict method.
+
+        :param d: source dictionary
+        :type d: dict
+        :return: BaseLayerEntity
+        :rtype: BaseLayerEntity
+        """
+        entity = cls(name=d["name"], version=d["version"])
+        for stage in d.get("stage_config", {}):
+            if stage["name"] == "datalake":
+                entity.datalake_versions = stage["versions"]
+            elif stage["name"] == "preamble":
+                entity.preamble_versions = stage["versions"]
+            if stage["name"] == "staging":
+                entity.staging_versions = stage["versions"]
+            if stage["name"] == "data_warehouse":
+                entity.data_warehouse_versions = stage["versions"]
+            if stage["name"] == "data_mart":
+                entity.data_mart_versions = stage["versions"]
+        entity.stage_config = entity.get_stage_config()
+        return entity
+
+    @property
+    def stages(self):
+        """Return a list of all the stages defined in this entity."""
+        return self.stages.copy()
+
     def get_stage_config(self):
         """
         Get the stage config for a base layer entity based on the fixed stages in the BaseLayerEntity.
 
         :return: a dictionary in the form of a stage config
         """
-        return {stage: self.get_stage_versions(stage) for stage in self.stages}
+        return {stage: self.get_stage_versions(stage) for stage in self._stages}
 
     def get_stage_versions(self, stage: str) -> Dict[str, str]:
         """
@@ -190,6 +245,24 @@ class ParametrizedEntity:
         self.name = name
         self.version = version
         self.stage_config = stage_config
+        self.queries = {}
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create an ParametrizedEntity object form a dictionnary created with the to_dict method.
+
+        :param d: source dictionary
+        :type d: dict
+        :return: ParametrizedEntity
+        :rtype: ParametrizedEntity
+        """
+        stage_config = {stage["name"]: stage["versions"] for stage in d["stage_config"]}
+        return cls(name=d["name"], version=d["version"], stage_config=stage_config)
+
+    @property
+    def stages(self):
+        """Return a list of all the stages defined in this entity."""
+        return list(self.stage_config.keys())
 
     def get_stage_versions(
         self, stage: str, parameters: Dict[str, str] = None
@@ -219,11 +292,19 @@ class ParametrizedEntity:
             ],
         }
 
+    def __eq__(self, other):
+        """Implement the __eq__ method."""
+        return (
+            self.name == other.name
+            and self.version == other.version
+            and self.stage_config == other.stage_config
+        )
+
 
 class ParametrizedBaseLayerEntity(ParametrizedEntity):
     """Class that serves as a version configuration for a logical subset of a ParametrizedPipeline with fixed layers."""
 
-    stages = ["datalake", "preamble", "staging", "data_warehouse", "data_mart"]
+    _stages = ["datalake", "preamble", "staging", "data_warehouse", "data_mart"]
 
     def __init__(
         self,
@@ -258,6 +339,32 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
         self.data_mart_versions = data_mart_versions
         self.stage_config = self.get_stage_config()
 
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create an ParametrizedBaseLayerEntity object form a dictionnary created with the to_dict method.
+
+        :param d: source dictionary
+        :type d: dict
+        :return: ParametrizedBaseLayerEntity
+        :rtype: ParametrizedBaseLayerEntity
+        """
+        entity = cls(
+            name=d["name"],
+            version=d["version"],
+            datalake_versions=d["stage_config"],
+            preamble_versions=d["preamble_versions"],
+            staging_versions=d["staging_versions"],
+            data_warehouse_versions=d["data_warehouse_versions"],
+            data_mart_versions=d["data_mart_versions"],
+        )
+        entity.stage_config = entity.get_stage_config()
+        return entity
+
+    @property
+    def stages(self):
+        """Return a list of all the stages defined in this entity."""
+        return self.stages.copy()
+
     def get_stage_config(self, parameters: Dict[str, str] = None):
         """
         Get the stage config for a base layer entity based on the fixed stages in the BaseLayerEntity.
@@ -265,7 +372,7 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
         :param parameters: the pipeline parameters to get the config for
         :return: a dictionary in the form of a stage config
         """
-        return {stage: self.get_stage_versions(stage) for stage in self.stages}
+        return {stage: self.get_stage_versions(stage) for stage in self._stages}
 
     def get_stage_versions(
         self, stage: str, parameters: Dict[str, str] = None
@@ -376,6 +483,6 @@ def _parametrized_name(name: str, parameters: Dict[str, str]) -> str:
 
     if len(new_name) > 1024:
         raise ValueError(
-            f"the size of the entity name ({new_name}) is to big, maximum size is 1024 characters"
+            f"the size of the name ({new_name}) is to big, maximum size is 1024 characters"
         )
     return new_name

@@ -63,6 +63,26 @@ class Pipeline:
             self.start_time = start_time or datetime.now()
         self.entities = entities
 
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create a Pipeline object form a dictionnary created with the to_dict method.
+
+        :param d: source dictionary
+        :type d: dict
+        :return: Pipeline
+        :rtype: Pipeline
+        """
+        return cls(
+            name=d["name"],
+            version=d["version"],
+            schedule=d["schedule"],
+            start_time=_parse_datetime(d["start_time"]),
+            kind=PipelineKind(d["kind"]),
+            entities=[
+                Entity.from_dict(e) for e in d["entities"]
+            ],  # TODO: detect type of entity
+        )
+
     def add_entity(
         self,
         entity: Union[
@@ -91,6 +111,17 @@ class Pipeline:
             "kind": self.kind.value,
             "entities": [e.to_dict() for e in self.entities],
         }
+
+    def __eq__(self, other):
+        """Implement __eq__ method."""
+        return (
+            self.name == other.name
+            and self.version == other.version
+            and self.schedule == other.schedule
+            and self.kind.value == other.kind.value
+            and self.start_time == other.start_time
+            and self.entities == other.entities
+        )
 
 
 class ParametrizedPipeline:
@@ -223,5 +254,18 @@ def _is_valid_start_time(start_time: datetime) -> bool:
     return True
 
 
+# sine we support python3.6 we cannot use datetime fromisoformat and isoformat methods
+# instead we use this
+_time_format = "%Y-%m-%dT%H:%M:%S%z"
+
+
 def _format_datetime(t: datetime) -> str:
-    return t.isoformat(timespec="seconds")
+    return t.strftime(_time_format)
+
+
+def _parse_datetime(tstr: str) -> datetime:
+
+    # ensure we always have the UTC timezone information
+    if not tstr.endswith("+0000"):
+        tstr += "+0000"
+    return datetime.strptime(tstr, _time_format)
