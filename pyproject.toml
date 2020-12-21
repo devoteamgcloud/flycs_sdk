@@ -26,6 +26,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.6"
 "ruamel.yaml" = "^0.16.12"
+semver = "^2.13.0"
 
 [tool.poetry.dev-dependencies]
 bumpversion = "*"
