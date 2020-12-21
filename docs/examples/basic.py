@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from flycs_sdk.entities import Entity
 from flycs_sdk.pipelines import Pipeline, PipelineKind
 
@@ -16,7 +18,7 @@ p1 = Pipeline(
     schedule="* 12 * * *",  # this is using cron notation
     entities=[entity1],
     kind=PipelineKind.VANILLA,
-    start_time="2020-12-30 08:00:00",
+    start_time=datetime.now(tz=timezone.utc),
 )
 
 # To be able to be discovered, the pipelines needs to be aggregated into a list called 'pipelines' located at the root of the module.

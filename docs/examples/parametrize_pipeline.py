@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from flycs_sdk.entities import ParametrizedEntity
 from flycs_sdk.pipelines import ParametrizedPipeline, PipelineKind
 
@@ -50,7 +52,7 @@ p1 = MyPipeline(
     schedule="* 12 * * *",
     entities=[entity1],
     kind=PipelineKind.VANILLA,
-    start_time="2020-12-30 08:00:00",
+    start_time=datetime.now(tz=timezone.utc),
     parameters={
         "language": ["fr", "en"],
         "country": {"be", "nl"},
