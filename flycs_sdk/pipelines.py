@@ -76,7 +76,7 @@ class Pipeline:
             name=d["name"],
             version=d["version"],
             schedule=d["schedule"],
-            start_time=d["start_time"],
+            start_time=_parse_datetime(d["start_time"]),
             kind=PipelineKind(d["kind"]),
             entities=[
                 Entity.from_dict(e) for e in d["entities"]
@@ -254,5 +254,18 @@ def _is_valid_start_time(start_time: datetime) -> bool:
     return True
 
 
+# sine we support python3.6 we cannot use datetime fromisoformat and isoformat methods
+# instead we use this
+_time_format = "%Y-%m-%dT%H:%M:%S%z"
+
+
 def _format_datetime(t: datetime) -> str:
-    return t.isoformat(timespec="seconds")
+    return t.strftime(_time_format)
+
+
+def _parse_datetime(tstr: str) -> datetime:
+
+    # ensure we always have the UTC timezone information
+    if not tstr.endswith("+0000"):
+        tstr += "+0000"
+    return datetime.strptime(tstr, _time_format)

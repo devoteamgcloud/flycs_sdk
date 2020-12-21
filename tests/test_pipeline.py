@@ -7,7 +7,13 @@ from datetime import datetime, timezone, timedelta
 import pytest
 from deepdiff import DeepDiff
 from flycs_sdk.entities import Entity, ParametrizedEntity
-from flycs_sdk.pipelines import Pipeline, ParametrizedPipeline, PipelineKind
+from flycs_sdk.pipelines import (
+    Pipeline,
+    ParametrizedPipeline,
+    PipelineKind,
+    _parse_datetime,
+    _format_datetime,
+)
 
 pipeline_name = "test"
 pipeline_version = "1.0.0"
@@ -60,7 +66,9 @@ class TestPipeline:
                 version=pipeline_version,
                 schedule=pipeline_schedule,
                 kind=pipeline_kind,
-                start_time=datetime.fromtimestamp(1606923514, tz=timezone(timedelta(1))),
+                start_time=datetime.fromtimestamp(
+                    1606923514, tz=timezone(timedelta(1))
+                ),
                 entities=[],
             )
 
@@ -77,7 +85,7 @@ class TestPipeline:
             "version": pipeline_version,
             "schedule": pipeline_schedule,
             "kind": pipeline_kind.value,
-            "start_time": "2020-12-02T15:38:34+00:00",
+            "start_time": "2020-12-02T15:38:34+0000",
             "entities": [
                 {
                     "name": "entity1",
@@ -104,6 +112,11 @@ class TestPipeline:
             serialized = [serialized]
         for d in serialized:
             loaded = Pipeline.from_dict(d)
+
+    def test_parse_datetime(self):
+        tstr = _format_datetime(pipeline_start_time)
+        parsed = _parse_datetime(tstr)
+        assert parsed == pipeline_start_time
 
 
 pipeline_parameters = {"language": ["nl", "fr"], "country": ["be", "en"]}
@@ -155,7 +168,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_nl_be",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+00:00",
+                "start_time": "2020-12-02T15:38:34+0000",
                 "kind": "vanilla",
                 "entities": [
                     {
@@ -178,7 +191,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_nl_en",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+00:00",
+                "start_time": "2020-12-02T15:38:34+0000",
                 "kind": "vanilla",
                 "entities": [
                     {
@@ -201,7 +214,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_fr_be",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+00:00",
+                "start_time": "2020-12-02T15:38:34+0000",
                 "kind": "vanilla",
                 "entities": [
                     {
@@ -224,7 +237,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_fr_en",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+00:00",
+                "start_time": "2020-12-02T15:38:34+0000",
                 "kind": "vanilla",
                 "entities": [
                     {
