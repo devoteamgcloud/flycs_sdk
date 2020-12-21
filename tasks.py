@@ -72,7 +72,7 @@ def lint(c):
 @task
 def test(c):
     """Run tests."""
-    _run(c, "pytest")
+    _run(c, "pytest -vvv")
 
 
 @task(help={"publish": "Publish the result via coveralls"})

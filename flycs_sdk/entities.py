@@ -178,7 +178,7 @@ class ParametrizedEntity:
         """
         Create a ParametrizedEntity object.
 
-        A parametrized entity should be combined with a parametrized pipeline. This allows developers to make behaviour
+        A parametrized entity should be combined with a parametrized pipeline. This allows developers to make behavior
         of the entity dynamic based on the parameters from the pipeline.
 
         :param name: the name of the entity
@@ -211,7 +211,7 @@ class ParametrizedEntity:
         :return: the entity as a dictionary object.
         """
         return {
-            "name": self.name,
+            "name": _parametrized_name(self.name, parameters),
             "version": self.version,
             "stage_config": [
                 {"name": stage, "versions": self.get_stage_versions(stage, parameters)}
@@ -355,3 +355,27 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
             return {}
         else:
             return self.data_mart_versions
+
+
+def _parametrized_name(name: str, parameters: Dict[str, str]) -> str:
+    """Generate a unique entity name that includes the parameters value.
+
+    :param name: original name
+    :type name: str
+    :param parameters: parameters applied to apply
+    :type parameters: dict
+    :return: parametrized parametrized name
+    :rtype: str
+    """
+    if not parameters:
+        return name
+
+    # must follow https://cloud.google.com/bigquery/docs/datasets#dataset-naming
+    parts = [name, *parameters.values()]
+    new_name = "_".join(parts)
+
+    if len(new_name) > 1024:
+        raise ValueError(
+            f"the size of the entity name ({new_name}) is to big, maximum size is 1024 characters"
+        )
+    return new_name

@@ -9,6 +9,7 @@ from flycs_sdk.entities import (
     BaseLayerEntity,
     ParametrizedEntity,
     ParametrizedBaseLayerEntity,
+    _parametrized_name,
 )
 
 entity_name = "test"
@@ -141,4 +142,12 @@ class TestParametrizedBaseLayerEntity(TestParametrizedEntity, TestBaseLayerEntit
             staging_versions={"table_5": "1.0.0", "table_6": "1.0.0"},
             data_warehouse_versions={"table_7": "1.0.0", "table_8": "1.0.0"},
             data_mart_versions={"table_9": "1.0.0", "table_10": "1.0.0"},
+        )
+
+
+class TestParametrizedEntityName:
+    def test_parametrized_entity_name(self):
+        assert (
+            _parametrized_name("name", {"language": "fr", "country": "be"})
+            == "name_fr_be"
         )
