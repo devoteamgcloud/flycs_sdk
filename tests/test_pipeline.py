@@ -112,6 +112,8 @@ class TestPipeline:
             serialized = [serialized]
         for d in serialized:
             loaded = Pipeline.from_dict(d)
+            if isinstance(my_pipeline, ParametrizedPipeline):
+                assert loaded.params  # ensure the params area loaded
 
     def test_parse_datetime(self):
         tstr = _format_datetime(pipeline_start_time)
@@ -170,6 +172,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "schedule": "* 12 * * *",
                 "start_time": "2020-12-02T15:38:34+0000",
                 "kind": "vanilla",
+                "params": {"language": "nl", "country": "be"},
                 "entities": [
                     {
                         "name": "entity1_nl_be",
@@ -193,6 +196,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "schedule": "* 12 * * *",
                 "start_time": "2020-12-02T15:38:34+0000",
                 "kind": "vanilla",
+                "params": {"language": "nl", "country": "en"},
                 "entities": [
                     {
                         "name": "entity1_nl_en",
@@ -216,6 +220,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "schedule": "* 12 * * *",
                 "start_time": "2020-12-02T15:38:34+0000",
                 "kind": "vanilla",
+                "params": {"language": "fr", "country": "be"},
                 "entities": [
                     {
                         "name": "entity1_fr_be",
@@ -239,6 +244,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "schedule": "* 12 * * *",
                 "start_time": "2020-12-02T15:38:34+0000",
                 "kind": "vanilla",
+                "params": {"language": "fr", "country": "en"},
                 "entities": [
                     {
                         "name": "entity1_fr_en",
