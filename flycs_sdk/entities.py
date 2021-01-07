@@ -21,7 +21,7 @@ class Entity:
         self.name = name
         self.version = version
         self.stage_config = stage_config
-        self.queries = {}
+        self.transformations = {}
 
     @classmethod
     def from_dict(cls, d: dict):
