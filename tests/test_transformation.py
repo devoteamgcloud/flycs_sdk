@@ -5,6 +5,7 @@ from flycs_sdk.transformations import (
 )
 import pytest
 
+transformation_name = "my_tranformation"
 transformation_query = "SELECT * FROM TABLE;"
 transformation_version = "1.0.0"
 transformation_static = False
@@ -21,6 +22,7 @@ class TestTranformations:
     @pytest.fixture()
     def my_transformation(self):
         return Transformation(
+            name=transformation_name,
             query=transformation_query,
             version=transformation_version,
             static=transformation_static,
@@ -50,6 +52,7 @@ class TestTranformations:
 
     def test_to_dict(self, my_transformation):
         assert my_transformation.to_dict() == {
+            "NAME": "my_tranformation",
             "QUERY": "SELECT * FROM TABLE;",
             "VERSION": "1.0.0",
             "STATIC": False,
@@ -60,6 +63,7 @@ class TestTranformations:
             "CLUSTER_FIELDS": ["field1", "field2"],
             "SCHEMA_UPDATE_OPTIONS": ["ALLOW_FIELD_ADDITION"],
             "DEPENDS_ON": [],
+            "TABLES": None,
         }
 
     def test_from_dict(self, my_transformation):

@@ -39,3 +39,15 @@ Parameterized pipeline and entity also allow to introduce custom logic. Here is 
 
 .. literalinclude:: examples/parametrize_pipeline.py
   :language: python
+
+
+How to apply the same query on multiple tables ?
+################################################
+
+If you want to apply the same query on different tables and avoid copying the query files around to just change the table name in the query,
+you can use the *tables* field on the *Transformation* class. By specifying a list of tables to the transformation, Flycs will automatically generate
+a BigQueryOperator for this transformation for each table specified.
+
+
+.. literalinclude:: examples/template_query.py
+  :language: python

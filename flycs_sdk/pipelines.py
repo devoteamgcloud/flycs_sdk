@@ -64,7 +64,7 @@ class Pipeline:
         self.kind = kind
         if _is_valid_start_time(start_time):
             self.start_time = start_time or datetime.now()
-        self.entities = entities
+        self.entities = entities or []
         self.params = params or {}
 
     @classmethod
@@ -112,6 +112,7 @@ class Pipeline:
             "schedule": self.schedule,
             "start_time": _format_datetime(self.start_time),
             "kind": self.kind.value,
+            "params": self.params,
             "entities": [e.to_dict() for e in self.entities],
         }
 
