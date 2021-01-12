@@ -15,6 +15,8 @@ from .entities import (
     _parametrized_name,
 )
 
+from .triggers import PipelineTrigger, PubSubTrigger
+
 
 class PipelineKind(Enum):
     """This enumeration contains all the supported pipeline type."""
@@ -31,14 +33,15 @@ class Pipeline:
         self,
         name: str,
         version: str,
-        schedule: str,
         entities: List[
             Union[
                 Entity, BaseLayerEntity, ParametrizedEntity, ParametrizedBaseLayerEntity
             ]
         ] = None,
+        schedule: str = None,
         kind: PipelineKind = PipelineKind.VANILLA,
         start_time: datetime = None,
+        trigger: PipelineTrigger = None,
         params: Dict[str, str] = None,
     ):
         """
@@ -54,6 +57,8 @@ class Pipeline:
         :type type: PipelineKind, default to vanilla
         :param start_time: timestamp at which the pipeline should start to be processed. The time MUST always be expressed using UTC timezone, defaults to None
         :type start_time: datetime, optional
+        :param trigger: special pipeline trigger. If specified, the pipeline can will be automatically triggered by different events like a PubSub message or a Google Storage event
+        :type trigger: PipelineTrigger, optional
         :param params: parameters that can be used as template input data for the queries of this pipelines
         :type params: dict, optional
         """
@@ -64,6 +69,7 @@ class Pipeline:
         self.kind = kind
         if _is_valid_start_time(start_time):
             self.start_time = start_time or datetime.now()
+        self.trigger = trigger if _is_valid_trigger(trigger) else None
         self.entities = entities or []
         self.params = params or {}
 
@@ -76,7 +82,7 @@ class Pipeline:
         :return: Pipeline
         :rtype: Pipeline
         """
-        return cls(
+        obj = cls(
             name=d["name"],
             version=d["version"],
             schedule=d["schedule"],
@@ -85,6 +91,13 @@ class Pipeline:
             params=d.get("params", {}),
             entities=[Entity.from_dict(e) for e in d["entities"]],
         )
+
+        if d.get("trigger"):
+            typ = d["trigger"].get("type")
+            if typ == "pubsub":
+                obj.trigger = PubSubTrigger.from_dict(d["trigger"])
+
+        return obj
 
     def add_entity(
         self,
@@ -111,6 +124,7 @@ class Pipeline:
             "version": self.version,
             "schedule": self.schedule,
             "start_time": _format_datetime(self.start_time),
+            "trigger": self.trigger.to_dict() if self.trigger else None,
             "kind": self.kind.value,
             "params": self.params,
             "entities": [e.to_dict() for e in self.entities],
@@ -124,6 +138,7 @@ class Pipeline:
             and self.schedule == other.schedule
             and self.kind.value == other.kind.value
             and self.start_time == other.start_time
+            and self.trigger == other.trigger
             and self.entities == other.entities
         )
 
@@ -135,10 +150,11 @@ class ParametrizedPipeline:
         self,
         name: str,
         version: str,
-        schedule: str,
         entities: List[Union[ParametrizedEntity, ParametrizedBaseLayerEntity]] = None,
+        schedule: str = None,
         kind: PipelineKind = PipelineKind.VANILLA,
         start_time: datetime = None,
+        trigger: PipelineTrigger = None,
         parameters: Dict[str, List[str]] = None,
     ):
         """
@@ -146,7 +162,7 @@ class ParametrizedPipeline:
 
         :param name: the name of the pipeline
         :type name: str
-        :param version: the version of the pipeline
+        :param version: the version of thself.trigger = trigger if _is_valid_trigger(trigger) else Nonee pipeline
         :type version: str
         :param schedule: the scheduler definition using cron format
         :kind schedule: str
@@ -154,6 +170,8 @@ class ParametrizedPipeline:
         :type type: PipelineKind, default to vanilla
         :param start_time: timestamp at which the pipeline should start to be processed. The time MUST always be expressed using UTC timezone, defaults to None
         :type start_time: datetime, optional
+        :param trigger: special pipeline trigger. If specified, the pipeline can will be automatically triggered by different events like a PubSub message or a Google Storage event
+        :type trigger: PipelineTrigger, optional
         :param parameters: pipeline parameters that will be passed to each entities contained in the pipeline during rendering
         :type parameters: dict, optional
         """
@@ -163,6 +181,7 @@ class ParametrizedPipeline:
         self._schedule = schedule  # TODO: validate format
         self.kind = kind
         self._start_time = start_time or datetime.now()
+        self.trigger = trigger if _is_valid_trigger(trigger) else None
         self.entities = entities
         self.parameters = parameters
 
@@ -244,6 +263,7 @@ class ParametrizedPipeline:
                 "version": self.version,
                 "schedule": self.schedule,
                 "start_time": _format_datetime(self.start_time),
+                "trigger": self.trigger.to_dict() if self.trigger else None,
                 "kind": self.kind.value,
                 "params": p,
                 "entities": [e.to_dict(parameters=p) for e in self.entities],
@@ -275,11 +295,19 @@ def _is_valid_start_time(start_time: datetime) -> bool:
     :rtype: bool
     """
     if not isinstance(start_time, datetime):
-        raise TypeError("start_time must be a a valid datetime object")
+        raise TypeError("start_time must be a valid datetime object")
 
     if start_time.tzinfo != timezone.utc:
         raise ValueError("start_time timezone must be UTC")
 
+    return True
+
+
+def _is_valid_trigger(trigger: PipelineTrigger) -> bool:
+    if trigger is None:
+        return True
+    if not isinstance(trigger, PipelineTrigger):
+        raise TypeError("trigger must be a valid PipelineTrigger subclass")
     return True
 
 
