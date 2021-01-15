@@ -191,6 +191,30 @@ class ParametrizedPipeline:
             )
         return self.entities.append(entity)
 
+    def unrolled_pipelines(self) -> List[Pipeline]:
+        """Return a list of Pipeline object, one for each parameters combination.
+
+        :return: List of Pipeline object
+        :rtype: List[Pipeline]
+        """
+        parameters = [
+            dict(zip(self.parameters.keys(), x))
+            for x in itertools.product(*self.parameters.values())
+        ]
+
+        return [
+            Pipeline(
+                name=_parametrized_name(self.name, p),
+                version=self.version,
+                schedule=self.schedule,
+                entities=self.entities,
+                kind=self.kind,
+                start_time=self.start_time,
+                params=p,
+            )
+            for p in parameters
+        ]
+
     def to_dict(self) -> List[Dict]:
         """
         Serialize the pipeline to a list of dictionary object.
