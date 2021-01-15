@@ -39,6 +39,7 @@ class Pipeline:
         ] = None,
         kind: PipelineKind = PipelineKind.VANILLA,
         start_time: datetime = None,
+        params: Dict[str, str] = None,
     ):
         """
         Create a Pipeline object.
@@ -53,6 +54,8 @@ class Pipeline:
         :type type: PipelineKind, default to vanilla
         :param start_time: timestamp at which the pipeline should start to be processed. The time MUST always be expressed using UTC timezone, defaults to None
         :type start_time: datetime, optional
+        :param params: parameters that can be used as template input data for the queries of this pipelines
+        :type params: dict, optional
         """
         self.name = name
         if _is_valid_version(version):
@@ -61,7 +64,8 @@ class Pipeline:
         self.kind = kind
         if _is_valid_start_time(start_time):
             self.start_time = start_time or datetime.now()
-        self.entities = entities
+        self.entities = entities or []
+        self.params = params or {}
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -78,9 +82,8 @@ class Pipeline:
             schedule=d["schedule"],
             start_time=_parse_datetime(d["start_time"]),
             kind=PipelineKind(d["kind"]),
-            entities=[
-                Entity.from_dict(e) for e in d["entities"]
-            ],  # TODO: detect type of entity
+            params=d.get("params", {}),
+            entities=[Entity.from_dict(e) for e in d["entities"]],
         )
 
     def add_entity(
@@ -109,6 +112,7 @@ class Pipeline:
             "schedule": self.schedule,
             "start_time": _format_datetime(self.start_time),
             "kind": self.kind.value,
+            "params": self.params,
             "entities": [e.to_dict() for e in self.entities],
         }
 
@@ -217,6 +221,7 @@ class ParametrizedPipeline:
                 "schedule": self.schedule,
                 "start_time": _format_datetime(self.start_time),
                 "kind": self.kind.value,
+                "params": p,
                 "entities": [e.to_dict(parameters=p) for e in self.entities],
             }
             for p in parameters
