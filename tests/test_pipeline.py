@@ -86,6 +86,7 @@ class TestPipeline:
             "schedule": pipeline_schedule,
             "kind": pipeline_kind.value,
             "start_time": "2020-12-02T15:38:34+0000",
+            "params": {},
             "entities": [
                 {
                     "name": "entity1",

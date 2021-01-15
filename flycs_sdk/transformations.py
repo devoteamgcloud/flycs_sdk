@@ -22,6 +22,7 @@ class Transformation:
 
     def __init__(
         self,
+        name: str,
         query: str,
         version: str,
         static: bool = False,
@@ -34,9 +35,12 @@ class Transformation:
             SchemaUpdateOptions.ALLOW_FIELD_ADDITION
         ],
         dependencies: List[dict] = None,
+        tables: List[dict] = None,
     ):
         """Class representing a transformation.
 
+        :param name: name of the transformation
+        :type name: str
         :param query: SQL query
         :type query: str
         :param version: version of the tranformation
@@ -57,7 +61,11 @@ class Transformation:
         :type schema_update_options: List[SchemaUpdateOptions], optional
         :param dependencies: This allows you to set hard dependencies on your queries, defaults to None
         :type dependencies: List[dict], optional
+        :param tables: If specified, this transformation will generate multiple BigQueryOperator during Airflow generation, one for each table name in this list.
+                       The name of the transformation then becomes `{transformation_name}_{table_name}`
+        :type tables: List[str], optional
         """
+        self.name = name
         self.query = query
         self.version = version
         self.static = static
@@ -68,6 +76,7 @@ class Transformation:
         self.cluster_fields = cluster_fields
         self.schema_update_options = schema_update_options
         self.dependencies = dependencies
+        self.tables = tables
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -79,6 +88,7 @@ class Transformation:
         :rtype: Transformation
         """
         return Transformation(
+            name=d["NAME"],
             query=d["QUERY"],
             version=d["VERSION"],
             static=d.get("STATIC", False),
@@ -91,6 +101,7 @@ class Transformation:
                 SchemaUpdateOptions(x) for x in d["SCHEMA_UPDATE_OPTIONS"]
             ],
             dependencies=d.get("DEPENDS_ON", []),
+            tables=d.get("TABLES"),
         )
 
     def to_dict(self) -> dict:
@@ -101,6 +112,7 @@ class Transformation:
         :rtype: Dict
         """
         return {
+            "NAME": self.name,
             "QUERY": self.query,
             "VERSION": self.version,
             "STATIC": self.static,
@@ -111,12 +123,14 @@ class Transformation:
             "CLUSTER_FIELDS": self.cluster_fields,
             "SCHEMA_UPDATE_OPTIONS": [o.value for o in self.schema_update_options],
             "DEPENDS_ON": self.dependencies,
+            "TABLES": self.tables,
         }
 
     def __eq__(self, other):
         """Implement __eq__ method."""
         return (
-            self.query == other.query
+            self.name == other.name
+            and self.query == other.query
             and self.version == other.version
             and self.static == other.static
             and self.has_output == other.has_output
@@ -126,4 +140,5 @@ class Transformation:
             and self.cluster_fields == other.cluster_fields
             and self.schema_update_options == other.schema_update_options
             and self.dependencies == other.dependencies
+            and self.tables == other.tables
         )
