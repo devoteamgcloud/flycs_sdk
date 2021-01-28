@@ -145,7 +145,9 @@ class Transformation:
             "WRITE_DISPOSITION": self.write_disposition.value,
             "TIME_PARTITIONING": self.time_partitioning,
             "CLUSTER_FIELDS": self.cluster_fields,
-            "SCHEMA_UPDATE_OPTIONS": [o.value for o in self.schema_update_options],
+            "SCHEMA_UPDATE_OPTIONS": [
+                o.value for o in self.schema_update_options or []
+            ],
             "DESTINATION_DATA_MART": self.destination_data_mart,
             "DEPENDS_ON": self.dependencies,
             "PARSING_DEPENDS_ON": self.parsing_dependencies,
