@@ -116,7 +116,7 @@ class Transformation:
                 d.get("WRITE_DISPOSITION", "WRITE_APPEND")
             ),
             time_partitioning=d.get("TIME_PARTITIONING"),
-            cluster_fields=d.get("CLUSTER_FIELDS", []),
+            cluster_fields=d.get("CLUSTER_FIELDS"),
             schema_update_options=[
                 SchemaUpdateOptions(x) for x in d.get("SCHEMA_UPDATE_OPTIONS", [])
             ],
