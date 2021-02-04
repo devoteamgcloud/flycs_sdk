@@ -11,11 +11,14 @@ transformation_version = "1.0.0"
 transformation_static = False
 transformation_has_output = False
 transformation_destination_table = None
+transformation_keep_old_columns = True
+transformation_persist_backup = True
 transformation_write_disposition = WriteDisposition.APPEND
 transformation_time_partitioning = None
 transformation_cluster_fields = ["field1", "field2"]
 transformation_schema_update_options = [SchemaUpdateOptions.ALLOW_FIELD_ADDITION]
 transformation_dependencies = []
+transformation_parsing_dependencies = []
 
 
 class TestTranformations:
@@ -28,11 +31,14 @@ class TestTranformations:
             static=transformation_static,
             has_output=transformation_has_output,
             destination_table=transformation_destination_table,
+            keep_old_columns=transformation_keep_old_columns,
+            persist_backup=transformation_persist_backup,
             write_disposition=transformation_write_disposition,
             time_partitioning=transformation_time_partitioning,
             cluster_fields=transformation_cluster_fields,
             schema_update_options=transformation_schema_update_options,
             dependencies=transformation_dependencies,
+            parsing_dependencies=transformation_parsing_dependencies,
         )
 
     def test_init(self, my_transformation):
@@ -40,6 +46,8 @@ class TestTranformations:
         assert my_transformation.version == transformation_version
         assert my_transformation.static == transformation_static
         assert my_transformation.has_output == transformation_has_output
+        assert my_transformation.keep_old_columns == transformation_keep_old_columns
+        assert my_transformation.persist_backup == transformation_persist_backup
         assert my_transformation.destination_table == transformation_destination_table
         assert my_transformation.write_disposition == transformation_write_disposition
         assert my_transformation.time_partitioning == transformation_time_partitioning
@@ -58,11 +66,15 @@ class TestTranformations:
             "STATIC": False,
             "HAS_OUTPUT": False,
             "DESTINATION_TABLE": None,
+            "KEEP_OLD_COLUMNS": True,
+            "PERSIST_BACKUP": True,
             "WRITE_DISPOSITION": "WRITE_APPEND",
             "TIME_PARTITIONING": None,
             "CLUSTER_FIELDS": ["field1", "field2"],
             "SCHEMA_UPDATE_OPTIONS": ["ALLOW_FIELD_ADDITION"],
+            "DESTINATION_DATA_MART": None,
             "DEPENDS_ON": [],
+            "PARSING_DEPENDS_ON": [],
             "TABLES": None,
         }
 
