@@ -11,10 +11,11 @@ from pathlib import Path
 import webbrowser
 
 
+PACKAGE_NAME = "flycs_sdk"
 ROOT_DIR = Path(__file__).parent
 SETUP_FILE = ROOT_DIR.joinpath("setup.py")
 TEST_DIR = ROOT_DIR.joinpath("tests")
-SOURCE_DIR = ROOT_DIR.joinpath("flycs_sdk")
+SOURCE_DIR = ROOT_DIR.joinpath(PACKAGE_NAME)
 TOX_DIR = ROOT_DIR.joinpath(".tox")
 COVERAGE_FILE = ROOT_DIR.joinpath(".coverage")
 COVERAGE_DIR = ROOT_DIR.joinpath("htmlcov")
@@ -37,60 +38,47 @@ def _delete_file(file):
 
 
 def _run(c, command):
-    return c.run(command, pty=platform.system() != 'Windows')
+    return c.run(command, pty=platform.system() != "Windows")
 
 
-@task(help={'check': "Checks if source is formatted without applying changes"})
+@task(help={"check": "Checks if source is formatted without applying changes"})
 def format(c, check=False):
-    """
-    Format code
-    """
+    """Format code."""
     python_dirs_string = " ".join(PYTHON_DIRS)
     # Run yapf
-    yapf_options = '--recursive {}'.format('--diff' if check else '--in-place')
+    yapf_options = "--recursive {}".format("--diff" if check else "--in-place")
     _run(c, "yapf {} {}".format(yapf_options, python_dirs_string))
     # Run isort
-    isort_options = '--recursive {}'.format(
-        '--check-only --diff' if check else '')
+    isort_options = "--recursive {}".format("--check-only --diff" if check else "")
     _run(c, "isort {} {}".format(isort_options, python_dirs_string))
 
 
 @task
 def lint_flake8(c):
-    """
-    Lint code with flake8
-    """
+    """Lint code with flake8."""
     _run(c, "flake8 {}".format(" ".join(PYTHON_DIRS)))
 
 
 @task
 def lint_pylint(c):
-    """
-    Lint code with pylint
-    """
+    """Lint code with pylint."""
     _run(c, "pylint {}".format(" ".join(PYTHON_DIRS)))
 
 
 @task(lint_flake8, lint_pylint)
 def lint(c):
-    """
-    Run all linting
-    """
+    """Run all linting."""
 
 
 @task
 def test(c):
-    """
-    Run tests
-    """
-    _run(c, "pytest")
+    """Run tests."""
+    _run(c, "pytest -vvv")
 
 
-@task(help={'publish': "Publish the result via coveralls"})
+@task(help={"publish": "Publish the result via coveralls"})
 def coverage(c, publish=False):
-    """
-    Create coverage report
-    """
+    """Create coverage report."""
     _run(c, "coverage run --source {} -m pytest".format(SOURCE_DIR))
     _run(c, "coverage report")
     if publish:
@@ -102,11 +90,10 @@ def coverage(c, publish=False):
         webbrowser.open(COVERAGE_REPORT.as_uri())
 
 
-@task(help={'launch': "Launch documentation in the web browser"})
+@task(help={"launch": "Launch documentation in the web browser"})
 def docs(c, launch=True):
-    """
-    Generate documentation
-    """
+    """Generate documentation."""
+    _run(c, "sphinx-apidoc -o {} {}".format(DOCS_DIR, PACKAGE_NAME))
     _run(c, "sphinx-build -b html {} {}".format(DOCS_DIR, DOCS_BUILD_DIR))
     if launch:
         webbrowser.open(DOCS_INDEX.as_uri())
@@ -114,17 +101,13 @@ def docs(c, launch=True):
 
 @task
 def clean_docs(c):
-    """
-    Clean up files from documentation builds
-    """
+    """Clean up files from documentation builds."""
     _run(c, "rm -fr {}".format(DOCS_BUILD_DIR))
 
 
 @task
 def clean_build(c):
-    """
-    Clean up files from package building
-    """
+    """Clean up files from package building."""
     _run(c, "rm -fr build/")
     _run(c, "rm -fr dist/")
     _run(c, "rm -fr .eggs/")
@@ -134,9 +117,7 @@ def clean_build(c):
 
 @task
 def clean_python(c):
-    """
-    Clean up python file artifacts
-    """
+    """Clean up python file artifacts."""
     _run(c, "find . -name '*.pyc' -exec rm -f {} +")
     _run(c, "find . -name '*.pyo' -exec rm -f {} +")
     _run(c, "find . -name '*~' -exec rm -f {} +")
@@ -145,9 +126,7 @@ def clean_python(c):
 
 @task
 def clean_tests(c):
-    """
-    Clean up files from testing
-    """
+    """Clean up files from testing."""
     _delete_file(COVERAGE_FILE)
     shutil.rmtree(TOX_DIR, ignore_errors=True)
     shutil.rmtree(COVERAGE_DIR, ignore_errors=True)
@@ -155,23 +134,17 @@ def clean_tests(c):
 
 @task(pre=[clean_build, clean_python, clean_tests, clean_docs])
 def clean(c):
-    """
-    Runs all clean sub-tasks
-    """
+    """Run all clean sub-tasks."""
     pass
 
 
 @task(clean)
 def dist(c):
-    """
-    Build source and wheel packages
-    """
+    """Build source and wheel packages."""
     _run(c, "poetry build")
 
 
 @task(pre=[clean, dist])
 def release(c):
-    """
-    Make a release of the python package to pypi
-    """
+    """Make a release of the python package to pypi."""
     _run(c, "poetry publish")

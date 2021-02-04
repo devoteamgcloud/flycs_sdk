@@ -1,0 +1,28 @@
+name: Publish package to Pypi
+
+on:
+  push:
+    tags:
+      - v*
+  
+
+jobs:
+  publish:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install poetry
+    - name: Build and publish
+      env:
+        POETRY_HTTP_BASIC_PYPI_USERNAME: ${{ secrets.PYPI_USER }}
+        POETRY_HTTP_BASIC_PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: poetry publish --build
