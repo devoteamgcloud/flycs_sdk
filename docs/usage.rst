@@ -5,8 +5,62 @@ Usage
 Getting started
 ###############
 
+The simplest way to use the SDK is to define your pipeline, entities and transformations into the same python file:
+
 .. literalinclude:: examples/basic.py
   :language: python
+
+While this is very easy to use, usually you will want to put a bit more structure into the different types of object you create.
+For example we could image to have a file per pipeline and one file per entity. This layout would look like:
+
+::
+
+  |── pipelines
+  │   ├── entity.py
+  │   ├── __init__.py
+  │   └── pipeline.py
+
+
+Let's go over the content of each file:
+
+- **entity.py**: in this file we define one entity.
+
+.. code-block:: python
+
+  from flycs_sdk.entities import Entity
+
+  stage_config = {
+      "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
+      "staging": {"table_3": "1.0.0", "table_4": "1.0.0"},
+      "data_warehouse": {"table_5": "1.1.0"},
+  }
+  entity = Entity("entity", "1.0.0", stage_config)
+
+- **pipeline.py**: In this file we define one pipeline and import the entity defined in the *entity.py* file
+
+.. code-block:: python
+
+  from datetime import datetime, timezone
+  from flycs_sdk.pipelines import Pipeline, PipelineKind
+
+  from .entity import entity
+
+  my_pipeline = Pipeline(
+      name="my_pipeline",
+      version="1.0.0",
+      schedule="* 12 * * *",  # this is using cron notation
+      entities=[entity],
+      kind=PipelineKind.VANILLA,
+      start_time=datetime.now(tz=timezone.utc),
+  )
+
+- **__init__.py**: In this file, we create the *pipelines* list and import the pipelines define in *pipeline.py*.
+
+.. code-block:: python
+
+  from .pipeline import my_pipeline
+  pipelines = [my_pipeline]
+
 
 How to use parametrized pipeline to keep the code DRY ?
 #######################################################
