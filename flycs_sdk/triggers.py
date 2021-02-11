@@ -48,3 +48,114 @@ class PubSubTrigger(PipelineTrigger):
             self.topic == other.topic
             and self.subscription_project == other.subscription_project
         )
+
+
+class GCSPrefixWatchTrigger(PipelineTrigger):
+    """Class used to define a pipeline trigger by watching a prefix on Google Cloud Storage."""
+
+    def __init__(self, bucket: str, prefix: str = None, object: str = None):
+        """Create a new GCSPrefixWatchTrigger object.
+
+        :param bucket: bucket name
+        :type bucket: str
+        :param prefix: prefix to watch in the bucket, if not specified, the full bucket is watched
+        :type prefix: str
+        """
+        self.bucket = bucket
+        self.prefix = prefix
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create a GCSPrefixWatchTrigger object form a dictionnary created with the to_dict method."""
+        return cls(bucket=d["bucket"], prefix=d.get("prefix"))
+
+    def to_dict(self):
+        """
+        Serialize the GCSPrefixWatchTrigger to a dictionary object.
+
+        :return: the GCSPrefixWatchTrigger as a dictionary object.
+        :rtype: Dict
+        """
+        return {
+            "type": "gcs_watch_prefix",
+            "bucket": self.bucket,
+            "prefix": self.prefix,
+        }
+
+    def __eq__(self, other) -> bool:
+        """Implement __eq__ method."""
+        return self.bucket == other.bucket and self.prefix == other.prefix
+
+
+class GCSObjectExistTrigger(PipelineTrigger):
+    """Class used to define a pipeline trigger by watching if an object exists on Google Cloud Storage."""
+
+    def __init__(self, bucket: str, object: str = None):
+        """Create a new GCSTrigger object.
+
+        :param bucket: bucket name
+        :type bucket: str
+        :param object: object name, if specified, the trigger will watch for existence of this object
+        :type object: str
+        """
+        self.bucket = bucket
+        self.object = object
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create a GCSObjectExistTrigger object form a dictionnary created with the to_dict method."""
+        return cls(bucket=d["bucket"], object=d.get("object"))
+
+    def to_dict(self):
+        """
+        Serialize the GCSObjectExistTrigger to a dictionary object.
+
+        :return: the GCSObjectExistTrigger as a dictionary object.
+        :rtype: Dict
+        """
+        return {
+            "type": "gcs_object_exist",
+            "bucket": self.bucket,
+            "object": self.object,
+        }
+
+    def __eq__(self, other) -> bool:
+        """Implement __eq__ method."""
+        return self.bucket == other.bucket and self.object == other.object
+
+
+class GCSObjectChangeTrigger(PipelineTrigger):
+    """Class used to define a pipeline trigger by watching if an object changes on Google Cloud Storage."""
+
+    def __init__(self, bucket: str, prefix: str = None, object: str = None):
+        """Create a new GCSObjectChangeTrigger object.
+
+        :param bucket: bucket name
+        :type bucket: str
+        :param object: object name, if specified, the trigger will watch for existence of this object
+        :type object: str
+        """
+        self.bucket = bucket
+        self.object = object
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create a GCSObjectChangeTrigger object form a dictionnary created with the to_dict method."""
+        return cls(bucket=d["bucket"], prefix=d.get("prefix"), object=d.get("object"))
+
+    def to_dict(self):
+        """
+        Serialize the GCSObjectChangeTrigger to a dictionary object.
+
+        :return: the GCSObjectChangeTrigger as a dictionary object.
+        :rtype: Dict
+        """
+        return {
+            "type": "gcs_object_change",
+            "bucket": self.bucket,
+            "object": self.object,
+        }
+
+    def __eq__(self, other) -> bool:
+        """Implement __eq__ method."""
+        return self.bucket == other.bucket and self.object == other.object
