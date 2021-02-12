@@ -1,17 +1,22 @@
 """This module contains different type of Pipeline triggers."""
 
 
-from abc import ABC
+from abc import ABC, abstractclassmethod
 
 
 class PipelineTrigger(ABC):
     """Base class for all pipeline trigger."""
 
-    pass
+    @abstractclassmethod
+    def from_dict(self, d: dict):
+        """Create a PipelineTrigger object form a dictionnary created with the to_dict method."""
+        pass
 
 
 class PubSubTrigger(PipelineTrigger):
     """Class used to define a pipeline trigger using a PubSub topic."""
+
+    _kind = "pubsub"
 
     def __init__(self, topic: str, subscription_project: str = None):
         """Create a new PubSubTrigger object.
@@ -37,7 +42,7 @@ class PubSubTrigger(PipelineTrigger):
         :rtype: Dict
         """
         return {
-            "type": "pubsub",
+            "type": self._kind,
             "topic": self.topic,
             "subscription_project": self.subscription_project,
         }
@@ -52,6 +57,8 @@ class PubSubTrigger(PipelineTrigger):
 
 class GCSPrefixWatchTrigger(PipelineTrigger):
     """Class used to define a pipeline trigger by watching a prefix on Google Cloud Storage."""
+
+    _kind = "gcs_watch_prefix"
 
     def __init__(self, bucket: str, prefix: str = None, object: str = None):
         """Create a new GCSPrefixWatchTrigger object.
@@ -77,7 +84,7 @@ class GCSPrefixWatchTrigger(PipelineTrigger):
         :rtype: Dict
         """
         return {
-            "type": "gcs_watch_prefix",
+            "type": self._kind,
             "bucket": self.bucket,
             "prefix": self.prefix,
         }
@@ -89,6 +96,8 @@ class GCSPrefixWatchTrigger(PipelineTrigger):
 
 class GCSObjectExistTrigger(PipelineTrigger):
     """Class used to define a pipeline trigger by watching if an object exists on Google Cloud Storage."""
+
+    _kind = "gcs_object_exist"
 
     def __init__(self, bucket: str, object: str = None):
         """Create a new GCSTrigger object.
@@ -114,7 +123,7 @@ class GCSObjectExistTrigger(PipelineTrigger):
         :rtype: Dict
         """
         return {
-            "type": "gcs_object_exist",
+            "type": self._kind,
             "bucket": self.bucket,
             "object": self.object,
         }
@@ -126,6 +135,8 @@ class GCSObjectExistTrigger(PipelineTrigger):
 
 class GCSObjectChangeTrigger(PipelineTrigger):
     """Class used to define a pipeline trigger by watching if an object changes on Google Cloud Storage."""
+
+    _kind = "gcs_object_change"
 
     def __init__(self, bucket: str, prefix: str = None, object: str = None):
         """Create a new GCSObjectChangeTrigger object.
@@ -151,7 +162,7 @@ class GCSObjectChangeTrigger(PipelineTrigger):
         :rtype: Dict
         """
         return {
-            "type": "gcs_object_change",
+            "type": self._kind,
             "bucket": self.bucket,
             "object": self.object,
         }
@@ -159,3 +170,19 @@ class GCSObjectChangeTrigger(PipelineTrigger):
     def __eq__(self, other) -> bool:
         """Implement __eq__ method."""
         return self.bucket == other.bucket and self.object == other.object
+
+
+_triggers = [
+    PubSubTrigger,
+    GCSPrefixWatchTrigger,
+    GCSObjectExistTrigger,
+    GCSObjectChangeTrigger,
+]
+
+
+def trigger_factory(typ: str) -> PipelineTrigger:
+    """Return the correct trigger type based on its kind."""
+    for trigger in _triggers:
+        if typ == trigger._kind:
+            return trigger
+    raise TypeError(f"unsupported trigger type: {typ}")
