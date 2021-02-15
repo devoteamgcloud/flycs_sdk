@@ -10,8 +10,8 @@ Flycs SDK
         :target: https://github.com/Fourcast/flycs_sdk/actions?query=workflow%3A%22Test+package%22
         :alt: Test status
 
-.. image:: https://readthedocs.org/projects/flycs-sdk/badge/?version=latest
-        :target: https://flycs-sdk.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/flycs-sdk/badge/?version=stable
+        :target: https://flycs-sdk.readthedocs.io/en/stable/?badge=stable
         :alt: Documentation Status
 
 
