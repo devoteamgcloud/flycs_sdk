@@ -5,7 +5,8 @@ Pipeline triggers
 Flycs let you configure some triggers for your pipeline. A Trigger allow your pipeline to be triggered by an external event.
 The supported type of triggers are:
 
-- `PubSub topic`_
+- `PubSub topic`
+- `Google Cloud Storage`
 
 PubSub topic
 ############
@@ -72,3 +73,63 @@ The same pipeline defined using the Flycs SDK:
 
 Note how the **schedule** property is not required on the pipeline definition when you specify a trigger.
 The reason for this is that Flycs will automatically configure your pipeline to be schedule every seconds so that it is always running and waiting on the trigger event to occur.
+
+
+`Google Cloud Storage`
+######################
+
+The event sent from GCS can actually be of 3 types:
+
+- **Trigger when an object exists**: As soon as the watched object is created and for as long as the object exists, the DAG is triggered.
+- **Trigger when an update change**: When the update time of an object change, the DAG is triggered.
+- **Trigger by watching a prefix in a bucket**: As soon as the prefix or any object under this prefix exists, the DAG is triggered.
+
+Here are the YAML example how to define these GSC triggers. For brevity , only the `trigger` block is shown here.
+
+Object exist trigger:
+
+.. code-block:: yaml
+
+    trigger:
+        type: "gcs_object_exist"
+        bucket: "gcs-trigger"
+        object: "subdir/my_object"
+
+.. code-block:: python
+
+    GCSObjectExistTrigger(
+        bucket="gcs-trigger",
+        object="subdir/my_object"
+    )
+
+Object update trigger:
+
+.. code-block:: yaml
+
+    trigger:
+        type: "gcs_object_change"
+        bucket: "gcs-trigger"
+        object: "subdir/my_object"
+
+.. code-block:: python
+
+    GCSObjectChangeTrigger(
+        bucket="gcs-trigger",
+        object="subdir/my_object"
+    )
+
+Prefix watch trigger:
+
+.. code-block:: yaml
+
+    trigger:
+        type: "gcs_watch_prefix"
+        bucket: "gcs-trigger"
+        prefix: "my_prefix"
+
+.. code-block:: python
+
+    GCSPrefixWatchTrigger(
+        bucket="gcs-trigger",
+        prefix="my_prefix"
+    )

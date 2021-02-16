@@ -60,7 +60,7 @@ class GCSPrefixWatchTrigger(PipelineTrigger):
 
     _kind = "gcs_watch_prefix"
 
-    def __init__(self, bucket: str, prefix: str = None, object: str = None):
+    def __init__(self, bucket: str, prefix: str = None):
         """Create a new GCSPrefixWatchTrigger object.
 
         :param bucket: bucket name
