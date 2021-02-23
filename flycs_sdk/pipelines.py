@@ -15,7 +15,7 @@ from .entities import (
     _parametrized_name,
 )
 
-from .triggers import PipelineTrigger, PubSubTrigger
+from .triggers import PipelineTrigger, trigger_factory
 
 
 class PipelineKind(Enum):
@@ -93,9 +93,8 @@ class Pipeline:
         )
 
         if d.get("trigger"):
-            typ = d["trigger"].get("type")
-            if typ == "pubsub":
-                obj.trigger = PubSubTrigger.from_dict(d["trigger"])
+            trigger_class = trigger_factory(d["trigger"].get("type"))
+            obj.trigger = trigger_class.from_dict(d["trigger"])
 
         return obj
 
