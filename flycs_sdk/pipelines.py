@@ -3,7 +3,7 @@
 import itertools
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple
 
 from semver import VersionInfo
 
@@ -118,10 +118,14 @@ class Pipeline:
         :return: the pipeline as a dictionary object.
         :rtype: Dict
         """
+        schedule = self.schedule
+        if isinstance(self.schedule, Pipeline):
+            schedule = format_target_pipeline(self.schedule)
+
         return {
             "name": self.name,
             "version": self.version,
-            "schedule": self.schedule,
+            "schedule": schedule,
             "start_time": _format_datetime(self.start_time),
             "trigger": self.trigger.to_dict() if self.trigger else None,
             "kind": self.kind.value,
@@ -161,7 +165,7 @@ class ParametrizedPipeline:
 
         :param name: the name of the pipeline
         :type name: str
-        :param version: the version of thself.trigger = trigger if _is_valid_trigger(trigger) else Nonee pipeline
+        :param version: the version of the pipeline
         :type version: str
         :param schedule: the scheduler definition using cron format
         :kind schedule: str
@@ -256,11 +260,15 @@ class ParametrizedPipeline:
             for x in itertools.product(*self.parameters.values())
         ]
 
+        schedule = self.schedule
+        if isinstance(self.schedule, ParametrizedPipeline):
+            schedule = format_target_pipeline(self.schedule)
+
         return [
             {
                 "name": _parametrized_name(self.name, p),
                 "version": self.version,
-                "schedule": self.schedule,
+                "schedule": schedule,
                 "start_time": _format_datetime(self.start_time),
                 "trigger": self.trigger.to_dict() if self.trigger else None,
                 "kind": self.kind.value,
@@ -303,9 +311,7 @@ def _is_valid_start_time(start_time: datetime) -> bool:
 
 
 def _is_valid_trigger(trigger: PipelineTrigger) -> bool:
-    if trigger is None:
-        return True
-    if not isinstance(trigger, PipelineTrigger):
+    if trigger is not None and not isinstance(trigger, PipelineTrigger):
         raise TypeError("trigger must be a valid PipelineTrigger subclass")
     return True
 
@@ -325,3 +331,18 @@ def _parse_datetime(tstr: str) -> datetime:
     if not tstr.endswith("+0000"):
         tstr += "+0000"
     return datetime.strptime(tstr, _time_format)
+
+
+def format_target_pipeline(p: Pipeline) -> str:
+    """Format the name of a pipeline to be used in the schedule field."""
+    return f"{p.name}_{p.version}"
+
+
+def parse_target_pipeline(target: str) -> Tuple:
+    """Parse a pipeline name generated from format_target_pipeline and return both name and version."""
+    ss = target.split("_")
+    if len(ss) < 2:
+        raise ValueError(f"pipeline target name is not valid: {target}")
+    name = "_".join(ss[: len(ss) - 1])  # support for name containing underscore already
+    version = ss[-1]
+    return (name, version)
