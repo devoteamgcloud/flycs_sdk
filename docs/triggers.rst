@@ -7,6 +7,7 @@ The supported type of triggers are:
 
 - `PubSub topic`
 - `Google Cloud Storage`
+- `Other pipeline`
 
 PubSub topic
 ############
@@ -132,4 +133,57 @@ Prefix watch trigger:
     GCSPrefixWatchTrigger(
         bucket="gcs-trigger",
         prefix="my_prefix"
+    )
+
+
+
+`Other pipeline`
+################
+
+This type of trigger is a bit different from the other one because it does not involve an external event. Instead, the pipeline is triggered whenever another pipeline is done.
+
+The way to configure this trigger is also a bit different, here is an example. Here we define 2 pipelines called master and child. Master is responsible to trigger child.
+
+.. code-block:: yaml
+
+    # Pipeline master
+    name: master
+    kind: vanilla
+    version: 1.0.0
+    entities:
+        ... # removed for brevity
+    schedule: "10 10 * * *"
+    start_time: "2021-01-01T00:00:00"
+
+    # Pipeline child
+    name: child
+    kind: vanilla
+    version: 1.0.0
+    entities:
+        ... # removed for brevity
+    schedule: "master_1.0.0" # this is where the magic happens, by specifying the name + version of another pipeline, this pipeline will be automatically triggered.
+    start_time: "2021-01-01T00:00:00"
+
+
+Same example with the python SDK:
+
+
+.. code-block:: python
+
+    master = Pipeline(
+        name="master",
+        version="1.0.0",
+        entities=[entity],
+        kind=PipelineKind.VANILLA,
+        start_time=datetime.now(tz=timezone.utc),
+        schedule="10 10 * * *",
+    )
+
+    child = Pipeline(
+        name="child",
+        version="1.0.0",
+        entities=[entity],
+        kind=PipelineKind.VANILLA,
+        start_time=datetime.now(tz=timezone.utc)
+        schedule=master, # Here we pass the master Pipeline object directly into the `schedule` field.
     )
