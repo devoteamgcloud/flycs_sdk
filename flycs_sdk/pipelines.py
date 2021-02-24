@@ -85,7 +85,7 @@ class Pipeline:
         obj = cls(
             name=d["name"],
             version=d["version"],
-            schedule=d["schedule"],
+            schedule=d.get("schedule"),
             start_time=_parse_datetime(d["start_time"]),
             kind=PipelineKind(d["kind"]),
             params=d.get("params", {}),
@@ -340,6 +340,8 @@ def format_target_pipeline(p: Pipeline) -> str:
 
 def parse_target_pipeline(target: str) -> Tuple:
     """Parse a pipeline name generated from format_target_pipeline and return both name and version."""
+    if not target:
+        raise ValueError(f"pipeline target name is not valid: {target}")
     ss = target.split("_")
     if len(ss) < 2:
         raise ValueError(f"pipeline target name is not valid: {target}")

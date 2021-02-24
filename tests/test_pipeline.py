@@ -65,6 +65,16 @@ class TestPipeline:
         assert my_pipeline.kind == pipeline_kind
         assert my_pipeline.entities == []
 
+    def test_init_none_schedule(self, my_pipeline):
+        p = Pipeline(
+            name=pipeline_name,
+            version=pipeline_version,
+            schedule=None,
+            kind=pipeline_kind,
+            start_time=pipeline_start_time,
+            entities=[],
+        )
+
     def test_init_pubsub(self, my_pipeline_pubsub):
         assert my_pipeline_pubsub.name == pipeline_name
         assert my_pipeline_pubsub.version == pipeline_version
