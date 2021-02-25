@@ -8,6 +8,7 @@ Welcome to Flycs SDK's documentation!
    readme
    installation
    usage
+   triggers
    modules
    contributing
    authors

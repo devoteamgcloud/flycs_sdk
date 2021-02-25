@@ -15,11 +15,14 @@ from flycs_sdk.pipelines import (
     _format_datetime,
 )
 
+from flycs_sdk.triggers import PubSubTrigger
+
 pipeline_name = "test"
 pipeline_version = "1.0.0"
 pipeline_schedule = "* 12 * * *"
 pipeline_kind = PipelineKind.VANILLA
 pipeline_start_time = datetime.fromtimestamp(1606923514, tz=timezone.utc)
+pipeline_pubsub_topic = "my_topic"
 
 
 class TestPipeline:
@@ -42,6 +45,18 @@ class TestPipeline:
             entities=[],
         )
 
+    @pytest.fixture
+    def my_pipeline_pubsub(self, my_entity):
+        return Pipeline(
+            name=pipeline_name,
+            version=pipeline_version,
+            schedule=pipeline_schedule,
+            kind=pipeline_kind,
+            start_time=pipeline_start_time,
+            trigger=PubSubTrigger(pipeline_pubsub_topic),
+            entities=[],
+        )
+
     def test_init(self, my_pipeline):
         assert my_pipeline.name == pipeline_name
         assert my_pipeline.version == pipeline_version
@@ -50,9 +65,28 @@ class TestPipeline:
         assert my_pipeline.kind == pipeline_kind
         assert my_pipeline.entities == []
 
+    def test_init_none_schedule(self, my_pipeline):
+        p = Pipeline(
+            name=pipeline_name,
+            version=pipeline_version,
+            schedule=None,
+            kind=pipeline_kind,
+            start_time=pipeline_start_time,
+            entities=[],
+        )
+
+    def test_init_pubsub(self, my_pipeline_pubsub):
+        assert my_pipeline_pubsub.name == pipeline_name
+        assert my_pipeline_pubsub.version == pipeline_version
+        assert my_pipeline_pubsub.schedule == pipeline_schedule
+        assert my_pipeline_pubsub.start_time == pipeline_start_time
+        assert my_pipeline_pubsub.kind == pipeline_kind
+        assert my_pipeline_pubsub.entities == []
+        assert my_pipeline_pubsub.trigger.topic == pipeline_pubsub_topic
+
     def test_invalid_start_time(self):
         with pytest.raises(TypeError):
-            return Pipeline(
+            Pipeline(
                 name=pipeline_name,
                 version=pipeline_version,
                 schedule=pipeline_schedule,
@@ -61,7 +95,7 @@ class TestPipeline:
                 entities=[],
             )
         with pytest.raises(ValueError):
-            return Pipeline(
+            Pipeline(
                 name=pipeline_name,
                 version=pipeline_version,
                 schedule=pipeline_schedule,
@@ -86,6 +120,41 @@ class TestPipeline:
             "schedule": pipeline_schedule,
             "kind": pipeline_kind.value,
             "start_time": "2020-12-02T15:38:34+0000",
+            "trigger": None,
+            "params": {},
+            "entities": [
+                {
+                    "name": "entity1",
+                    "version": "1.0.0",
+                    "stage_config": [
+                        {
+                            "name": "raw",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                        {
+                            "name": "staging",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                    ],
+                }
+            ],
+        }
+        assert expected == actual
+
+    def test_to_dict_pubsub(self, my_pipeline_pubsub, my_entity):
+        my_pipeline_pubsub.add_entity(my_entity)
+        actual = my_pipeline_pubsub.to_dict()
+        expected = {
+            "name": pipeline_name,
+            "version": pipeline_version,
+            "schedule": pipeline_schedule,
+            "kind": pipeline_kind.value,
+            "start_time": "2020-12-02T15:38:34+0000",
+            "trigger": {
+                "type": "pubsub",
+                "topic": "my_topic",
+                "subscription_project": None,
+            },
             "params": {},
             "entities": [
                 {
@@ -114,6 +183,16 @@ class TestPipeline:
         for d in serialized:
             loaded = Pipeline.from_dict(d)
             if isinstance(my_pipeline, ParametrizedPipeline):
+                assert loaded.params  # ensure the params area loaded
+
+    def test_serialize_deserialize(self, my_pipeline_pubsub, my_entity):
+        my_pipeline_pubsub.add_entity(my_entity)
+        serialized = my_pipeline_pubsub.to_dict()
+        if not isinstance(serialized, list):
+            serialized = [serialized]
+        for d in serialized:
+            loaded = Pipeline.from_dict(d)
+            if isinstance(my_pipeline_pubsub, ParametrizedPipeline):
                 assert loaded.params  # ensure the params area loaded
 
     def test_parse_datetime(self):
@@ -172,6 +251,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
                 "start_time": "2020-12-02T15:38:34+0000",
+                "trigger": None,
                 "kind": "vanilla",
                 "params": {"language": "nl", "country": "be"},
                 "entities": [
@@ -196,6 +276,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
                 "start_time": "2020-12-02T15:38:34+0000",
+                "trigger": None,
                 "kind": "vanilla",
                 "params": {"language": "nl", "country": "en"},
                 "entities": [
@@ -220,6 +301,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
                 "start_time": "2020-12-02T15:38:34+0000",
+                "trigger": None,
                 "kind": "vanilla",
                 "params": {"language": "fr", "country": "be"},
                 "entities": [
@@ -244,6 +326,7 @@ class TestParametrizedPipeline(TestPipeline):
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
                 "start_time": "2020-12-02T15:38:34+0000",
+                "trigger": None,
                 "kind": "vanilla",
                 "params": {"language": "fr", "country": "en"},
                 "entities": [
