@@ -3,6 +3,8 @@
 from enum import Enum
 from typing import List
 
+from .custom_code import Dependency
+
 
 class WriteDisposition(Enum):
     """Transformation write dispositions."""
@@ -57,7 +59,9 @@ class Transformation:
         :type version: str
         :param static: Whether or not the version should be appended to the table name, defaults to False
         :type static: bool, optional
-        :param has_output: Whether or not this query has a result that should be written into a table (false can be used to run DML or stored procedures for example), defaults to False
+        :param has_ou - name: data_warehouse
+        versions:
+          simple_copy: "1.0.0"tput: Whether or not this query has a result that should be written into a table (false can be used to run DML or stored procedures for example), defaults to False
         :type has_output: bool, optional
         :param destination_table: [description], defaults to None
         :type destination_table: str, optional

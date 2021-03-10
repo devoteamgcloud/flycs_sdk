@@ -185,7 +185,7 @@ class ParametrizedPipeline:
         self.kind = kind
         self._start_time = start_time or datetime.now()
         self.trigger = trigger if _is_valid_trigger(trigger) else None
-        self.entities = entities
+        self.entities = entities or []
         self.parameters = parameters
 
     @property
