@@ -19,6 +19,7 @@ transformation_cluster_fields = ["field1", "field2"]
 transformation_schema_update_options = [SchemaUpdateOptions.ALLOW_FIELD_ADDITION]
 transformation_dependencies = []
 transformation_parsing_dependencies = []
+transformation_destroy_table = False
 
 
 class TestTranformations:
@@ -39,6 +40,7 @@ class TestTranformations:
             schema_update_options=transformation_schema_update_options,
             dependencies=transformation_dependencies,
             parsing_dependencies=transformation_parsing_dependencies,
+            destroy_table=transformation_destroy_table,
         )
 
     def test_init(self, my_transformation):
@@ -57,6 +59,7 @@ class TestTranformations:
             == transformation_schema_update_options
         )
         assert my_transformation.dependencies == transformation_dependencies
+        assert my_transformation.destroy_table == transformation_destroy_table
 
     def test_to_dict(self, my_transformation):
         assert my_transformation.to_dict() == {
@@ -75,6 +78,7 @@ class TestTranformations:
             "DESTINATION_DATA_MART": None,
             "DEPENDS_ON": [],
             "PARSING_DEPENDS_ON": [],
+            "DESTROY_TABLE": False,
             "TABLES": None,
         }
 

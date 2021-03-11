@@ -39,6 +39,7 @@ class Transformation:
         destination_data_mart: str = None,
         dependencies: List[dict] = None,
         parsing_dependencies: List[dict] = None,
+        destroy_table: bool = False,
         tables: List[dict] = None,
     ):
         """Class representing a transformation.
@@ -73,6 +74,8 @@ class Transformation:
         :type dependencies: List[dict], optional
         :param parsing_dependencies:
         :type parsing_dependencies: List[dict], optional
+        :param destroy_table: If True, the resulting table of this transformation will be destroy and recreated automatically. Only works in sandbox environment.
+        :type destroy_table: bool, default to False
         :param tables: If specified, this transformation will generate multiple BigQueryOperator during Airflow generation, one for each table name in this list.
                        The name of the transformation then becomes `{transformation_name}_{table_name}`
         :type tables: List[str], optional
@@ -92,6 +95,7 @@ class Transformation:
         self.destination_data_mart = destination_data_mart
         self.dependencies = dependencies
         self.parsing_dependencies = parsing_dependencies
+        self.destroy_table = destroy_table
         self.tables = tables
 
     @classmethod
@@ -123,6 +127,7 @@ class Transformation:
             destination_data_mart=d.get("DESTINATION_DATA_MART"),
             dependencies=d.get("DEPENDS_ON", []),
             parsing_dependencies=d.get("PARSING_DEPENDS_ON", []),
+            destroy_table=d.get("DESTROY_TABLE", False),
             tables=d.get("TABLES"),
         )
 
@@ -151,6 +156,7 @@ class Transformation:
             "DESTINATION_DATA_MART": self.destination_data_mart,
             "DEPENDS_ON": self.dependencies,
             "PARSING_DEPENDS_ON": self.parsing_dependencies,
+            "DESTROY_TABLE": self.destroy_table,
             "TABLES": self.tables,
         }
 
@@ -172,5 +178,6 @@ class Transformation:
             and self.destination_data_mart == other.destination_data_mart
             and self.dependencies == other.dependencies
             and self.parsing_dependencies == other.parsing_dependencies
+            and self.destroy_table == other.destroy_table
             and self.tables == other.tables
         )
