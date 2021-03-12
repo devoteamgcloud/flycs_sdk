@@ -1,7 +1,9 @@
 """Module containing class used to inject custom Airflow operator into pipelines definitions."""
 
-from typing import List, Callable
+import ast
 import inspect
+import textwrap
+from typing import Callable, List
 
 
 class WrongSignatureError(TypeError):
@@ -50,16 +52,32 @@ class CustomCode:
                              The dependencies are used to define where in the DAG this operation should be inserted, defaults to None
         :type dependencies: List[Dependency], optional
         """
-        self._ensure_builder_signature(operator_builder)
 
         self.name = name
         self.version = version
         self.operator_builder = operator_builder
         self.dependencies = dependencies or []
 
+        self._ensure_builder_signature(operator_builder)
+
+    @property
+    def imported_modules(self) -> List[str]:
+        """return a list of module that are imported build the operator_builder code."""
+        source = textwrap.dedent(inspect.getsource(self.operator_builder))
+        modules = []
+        for node in ast.walk(ast.parse(source)):
+            if isinstance(node, ast.ImportFrom):
+                if not node.names[0].asname:  # excluding the 'as' part of import
+                    modules.append(node.module)
+            elif (
+                isinstance(node, ast.Import) and not node.names[0].asname
+            ):  # excluding the 'as' part of import
+                modules.append(node.names[0].name)
+        return modules
+
     def _ensure_builder_signature(self, f: Callable):
         signature = inspect.Signature.from_callable(f)
-        if "dag" not in signature.parameters:
+        if ["dag", "env", "user"] != list(signature.parameters.keys()):
             raise WrongSignatureError(
-                f"the builder function of the custom code {self.name}_{self.version} does not accept the mandatory `dag` argument"
+                f"the builder function of the custom code {self.name}_{self.version} does not accept the mandatory ('dag', 'env', 'user') arguments"
             )
