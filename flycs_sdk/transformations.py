@@ -7,8 +7,10 @@ from typing import List
 class WriteDisposition(Enum):
     """Transformation write dispositions."""
 
-    APPEND = "WRITE_APPEND"
+    UNSPECIFIED = "UNSPECIFIED"
+    WRITE_EMPTY = "WRITE_EMPTY"
     TRUNCATE = "WRITE_TRUNCATE"
+    APPEND = "WRITE_APPEND"
 
 
 class SchemaUpdateOptions(Enum):
