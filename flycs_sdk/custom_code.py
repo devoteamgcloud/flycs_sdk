@@ -52,7 +52,6 @@ class CustomCode:
                              The dependencies are used to define where in the DAG this operation should be inserted, defaults to None
         :type dependencies: List[Dependency], optional
         """
-
         self.name = name
         self.version = version
         self.operator_builder = operator_builder
@@ -62,7 +61,7 @@ class CustomCode:
 
     @property
     def imported_modules(self) -> List[str]:
-        """return a list of module that are imported build the operator_builder code."""
+        """Return a list of module that are imported build the operator_builder code."""
         source = textwrap.dedent(inspect.getsource(self.operator_builder))
         modules = []
         for node in ast.walk(ast.parse(source)):
@@ -77,7 +76,7 @@ class CustomCode:
 
     def _ensure_builder_signature(self, f: Callable):
         signature = inspect.Signature.from_callable(f)
-        if ["dag", "env", "user"] != list(signature.parameters.keys()):
+        if ["dag", "env"] != list(signature.parameters.keys()):
             raise WrongSignatureError(
                 f"the builder function of the custom code {self.name}_{self.version} does not accept the mandatory ('dag', 'env', 'user') arguments"
             )

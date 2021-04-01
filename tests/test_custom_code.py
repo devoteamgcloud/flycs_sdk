@@ -5,7 +5,7 @@ from flycs_sdk.custom_code import CustomCode, WrongSignatureError
 
 class TestCustomCode:
     def test_imported_modules(self):
-        def build(dag, env, user):
+        def build(dag, env=None):
             from airflow.operators.dummy_operator import DummyOperator
             import os
 
@@ -23,7 +23,7 @@ class TestCustomCode:
         with pytest.raises(WrongSignatureError):
             cc = CustomCode("mycode", "1.0.0", build)
 
-        def build(dag, env, user):
+        def build(dag, env=None):
             from airflow.operators.dummy_operator import DummyOperator
 
             return DummyOperator()

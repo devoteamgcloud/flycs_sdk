@@ -12,7 +12,7 @@ class Entity:
         name: str,
         version: str,
         stage_config: Dict[str, Dict[str, str]] = None,
-        custom_operators: List[CustomCode] = None,
+        custom_operators: Dict[str, List[CustomCode]] = None,
     ):
         """
         Create an Entity object.
@@ -21,7 +21,9 @@ class Entity:
         :param version: the version of the entity, this can be used for table naming this entity belongs to.
         :param stage_config: a dictionary with the name of the stage as key and a dictionary of query names
         and their versions as value.
-        :param custom_operators: list of CustomCode objects allowing to inject custom Airflow operator into the pipeline
+        :param custom_operators: a dictionary with the name of the stage as key and a list
+                                 of CustomCode objects allowing to inject custom Airflow operator
+                                 into the pipeline as value
         :type custom_operators: list
         """
         self.name = name
