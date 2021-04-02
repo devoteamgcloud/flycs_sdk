@@ -1,8 +1,6 @@
 """Module containing class used to inject custom Airflow operator into pipelines definitions."""
 
-import ast
 import inspect
-import textwrap
 from typing import Callable, List
 
 
@@ -39,6 +37,7 @@ class CustomCode:
         version: str,
         operator_builder: Callable,
         dependencies: List[Dependency] = None,
+        requirements: List[str] = None,
     ):
         """Represent a custom Airflow code that needs to be injected into a DAG.
 
@@ -51,28 +50,17 @@ class CustomCode:
         :param dependencies: list of dependencies for this operation.
                              The dependencies are used to define where in the DAG this operation should be inserted, defaults to None
         :type dependencies: List[Dependency], optional
+        :param requirements: list of python package required by this code, use the same format as normal python requirements.txt files.
+                             These package will be installed on the composer instance.
+        :type requirements: List[str]
         """
         self.name = name
         self.version = version
         self.operator_builder = operator_builder
         self.dependencies = dependencies or []
+        self.requirements = requirements or []
 
         self._ensure_builder_signature(operator_builder)
-
-    @property
-    def imported_modules(self) -> List[str]:
-        """Return a list of module that are imported build the operator_builder code."""
-        source = textwrap.dedent(inspect.getsource(self.operator_builder))
-        modules = []
-        for node in ast.walk(ast.parse(source)):
-            if isinstance(node, ast.ImportFrom):
-                if not node.names[0].asname:  # excluding the 'as' part of import
-                    modules.append(node.module)
-            elif (
-                isinstance(node, ast.Import) and not node.names[0].asname
-            ):  # excluding the 'as' part of import
-                modules.append(node.names[0].name)
-        return modules
 
     def _ensure_builder_signature(self, f: Callable):
         signature = inspect.Signature.from_callable(f)

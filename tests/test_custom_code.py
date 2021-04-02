@@ -11,8 +11,8 @@ class TestCustomCode:
 
             return DummyOperator(dag=dag)
 
-        cc = CustomCode("mycode", "1.0.0", build)
-        assert cc.imported_modules == ["airflow.operators.dummy_operator", "os"]
+        cc = CustomCode("mycode", "1.0.0", build, requirements=["airflow==1.10.0"])
+        assert cc.requirements == ["airflow==1.10.0"]
 
     def test_validation_signature_builder(self):
         def build():

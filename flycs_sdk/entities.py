@@ -237,7 +237,11 @@ class ParametrizedEntity:
     """Class that serves as a version configuration for a logical subset of a ParametrizedPipeline."""
 
     def __init__(
-        self, name: str, version: str, stage_config: Dict[str, Dict[str, str]] = None
+        self,
+        name: str,
+        version: str,
+        stage_config: Dict[str, Dict[str, str]] = None,
+        custom_operators: Dict[str, List[CustomCode]] = None,
     ):
         """
         Create a ParametrizedEntity object.
@@ -255,6 +259,7 @@ class ParametrizedEntity:
         self.version = version
         self.stage_config = stage_config
         self.transformations = {}
+        self.custom_operators = custom_operators or {}
 
     @classmethod
     def from_dict(cls, d: dict):
