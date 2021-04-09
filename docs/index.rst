@@ -9,6 +9,7 @@ Welcome to Flycs SDK's documentation!
    installation
    usage
    triggers
+   custom_operators
    modules
    contributing
    authors
