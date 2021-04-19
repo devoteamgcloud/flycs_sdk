@@ -3,6 +3,8 @@
 from enum import Enum
 from typing import List
 
+from flycs_sdk.custom_code import Dependency
+
 
 class WriteDisposition(Enum):
     """Transformation write dispositions."""
@@ -42,7 +44,7 @@ class Transformation:
             SchemaUpdateOptions.ALLOW_FIELD_ADDITION
         ],
         destination_data_mart: str = None,
-        dependencies: List[dict] = None,
+        dependencies: List[Dependency] = None,
         parsing_dependencies: List[dict] = None,
         destroy_table: bool = False,
         tables: List[dict] = None,
@@ -82,7 +84,7 @@ class Transformation:
         :param destination_data_mart: Alias of the table to use for data mart
         :type destination_data_mart: str
         :param dependencies: This allows you to set hard dependencies on your queries, defaults to None
-        :type dependencies: List[dict], optional
+        :type dependencies: List[Dependency], optional
         :param parsing_dependencies:
         :type parsing_dependencies: List[dict], optional
         :param destroy_table: If True, the resulting table of this transformation will be destroy and recreated automatically. Only works in sandbox environment.
@@ -101,14 +103,14 @@ class Transformation:
         self.persist_backup = persist_backup
         self.write_disposition = write_disposition
         self.time_partitioning = time_partitioning
-        self.cluster_fields = cluster_fields
+        self.cluster_fields = cluster_fields or []
         self.table_expiration = table_expiration
         self.partition_expiration = partition_expiration
         self.required_partition_filter = required_partition_filter
         self.schema_update_options = schema_update_options
         self.destination_data_mart = destination_data_mart
-        self.dependencies = dependencies
-        self.parsing_dependencies = parsing_dependencies
+        self.dependencies = dependencies or []
+        self.parsing_dependencies = parsing_dependencies or []
         self.destroy_table = destroy_table
         self.tables = tables
 
@@ -142,7 +144,7 @@ class Transformation:
                 SchemaUpdateOptions(x) for x in d.get("SCHEMA_UPDATE_OPTIONS", [])
             ],
             destination_data_mart=d.get("DESTINATION_DATA_MART"),
-            dependencies=d.get("DEPENDS_ON", []),
+            dependencies=[Dependency.from_dict(x) for x in d.get("DEPENDS_ON") or []],
             parsing_dependencies=d.get("PARSING_DEPENDS_ON", []),
             destroy_table=d.get("DESTROY_TABLE", False),
             tables=d.get("TABLES"),
@@ -174,7 +176,7 @@ class Transformation:
                 o.value for o in self.schema_update_options or []
             ],
             "DESTINATION_DATA_MART": self.destination_data_mart,
-            "DEPENDS_ON": self.dependencies,
+            "DEPENDS_ON": [d.to_dict() for d in self.dependencies],
             "PARSING_DEPENDS_ON": self.parsing_dependencies,
             "DESTROY_TABLE": self.destroy_table,
             "TABLES": self.tables,

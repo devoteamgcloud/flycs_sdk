@@ -1,6 +1,6 @@
 import pytest
 
-from flycs_sdk.custom_code import CustomCode, WrongSignatureError
+from flycs_sdk.custom_code import CustomCode, Dependency, WrongSignatureError
 
 
 class TestCustomCode:
@@ -29,3 +29,20 @@ class TestCustomCode:
             return DummyOperator()
 
         cc = CustomCode("mycode", "1.0.0", build)
+
+
+class TestDependency:
+    @pytest.fixture
+    def dependency(self) -> Dependency:
+        return Dependency("entity", "stage", "name")
+
+    def test_to_dict(self, dependency):
+        assert dependency.to_dict() == {
+            "ENTITY": "entity",
+            "STAGE": "stage",
+            "NAME": "name",
+        }
+
+    def test_from_dict(self, dependency):
+        loaded = Dependency.from_dict(dependency.to_dict())
+        assert loaded == dependency

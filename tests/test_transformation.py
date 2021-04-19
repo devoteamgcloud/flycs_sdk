@@ -1,3 +1,4 @@
+from flycs_sdk.custom_code import Dependency
 from flycs_sdk.transformations import (
     Transformation,
     WriteDisposition,
@@ -17,7 +18,7 @@ transformation_write_disposition = WriteDisposition.APPEND
 transformation_time_partitioning = None
 transformation_cluster_fields = ["field1", "field2"]
 transformation_schema_update_options = [SchemaUpdateOptions.ALLOW_FIELD_ADDITION]
-transformation_dependencies = []
+transformation_dependencies = [Dependency("entity1", "staging", "deps")]
 transformation_parsing_dependencies = []
 transformation_destroy_table = False
 
@@ -79,7 +80,7 @@ class TestTranformations:
             "TABLE_EXPIRATION": None,
             "SCHEMA_UPDATE_OPTIONS": ["ALLOW_FIELD_ADDITION"],
             "DESTINATION_DATA_MART": None,
-            "DEPENDS_ON": [],
+            "DEPENDS_ON": [{"NAME": "deps", "ENTITY": "entity1", "STAGE": "staging"}],
             "PARSING_DEPENDS_ON": [],
             "DESTROY_TABLE": False,
             "TABLES": None,

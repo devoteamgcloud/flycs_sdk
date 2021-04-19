@@ -11,7 +11,7 @@ class WrongSignatureError(TypeError):
 
 
 class Dependency:
-    """Represent a pipeline operator dependencyself."""
+    """Represent a pipeline operator dependency."""
 
     def __init__(self, entity: str, stage: str, name: str):
         """Create a Dependency object.
@@ -26,6 +26,37 @@ class Dependency:
         self.entity = entity
         self.stage = stage
         self.name = name
+
+    @classmethod
+    def from_dict(cls, d):
+        """Create a Dependency object form a dictionnary created with the to_dict method.
+
+        :param d: source dictionary
+        :type d: dict
+        :return: Dependency
+        :rtype: Dependency
+        """
+        return cls(entity=d["ENTITY"], stage=d["STAGE"], name=d["NAME"])
+
+    def to_dict(self) -> dict:
+        """
+        Serialize the Dependency to a dictionary object.
+
+        :return: the Dependency as a dictionary object.
+        """
+        return {
+            "ENTITY": self.entity,
+            "STAGE": self.stage,
+            "NAME": self.name,
+        }
+
+    def __eq__(self, other):
+        """Implement the __eq__ method."""
+        return (
+            self.name == other.name
+            and self.entity == other.entity
+            and self.stage == other.stage
+        )
 
 
 class CustomCode:
