@@ -21,7 +21,7 @@ packages = [
   {include = "tests", format = "sdist"},
 ]
 readme = "README.rst"
-version = "0.6.3"
+version = "0.7.0"
 
 [tool.poetry.dependencies]
 python = ">=3.6"

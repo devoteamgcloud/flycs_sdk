@@ -2,4 +2,4 @@
 
 __author__ = """Tristan Van Thielen"""
 __email__ = "tristan.van.thielen@devoteam.com"
-__version__ = "0.6.3"
+__version__ = "0.7.0"
