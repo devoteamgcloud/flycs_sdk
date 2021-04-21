@@ -89,7 +89,9 @@ class CustomCode:
         self.version = version
         self.operator_builder = operator_builder
         self.dependencies = dependencies or []
-        self.requirements = requirements or []
+        self.requirements = (
+            requirements or []
+        )  # TODO christophe: we should try to validate these as early on as possible
 
         self._ensure_builder_signature(operator_builder)
 
