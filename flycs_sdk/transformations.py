@@ -45,7 +45,7 @@ class Transformation:
         ],
         destination_data_mart: str = None,
         dependencies: List[Dependency] = None,
-        parsing_dependencies: List[dict] = None,
+        parsing_dependencies: List[Dependency] = None,
         destroy_table: bool = False,
         tables: List[dict] = None,
     ):
@@ -86,7 +86,7 @@ class Transformation:
         :param dependencies: This allows you to set hard dependencies on your queries, defaults to None
         :type dependencies: List[Dependency], optional
         :param parsing_dependencies:
-        :type parsing_dependencies: List[dict], optional
+        :type parsing_dependencies: List[Dependency], optional
         :param destroy_table: If True, the resulting table of this transformation will be destroy and recreated automatically. Only works in sandbox environment.
         :type destroy_table: bool, default to False
         :param tables: If specified, this transformation will generate multiple BigQueryOperator during Airflow generation, one for each table name in this list.
@@ -145,7 +145,9 @@ class Transformation:
             ],
             destination_data_mart=d.get("DESTINATION_DATA_MART"),
             dependencies=[Dependency.from_dict(x) for x in d.get("DEPENDS_ON") or []],
-            parsing_dependencies=d.get("PARSING_DEPENDS_ON", []),
+            parsing_dependencies=[
+                Dependency.from_dict(x) for x in d.get("PARSING_DEPENDS_ON") or []
+            ],
             destroy_table=d.get("DESTROY_TABLE", False),
             tables=d.get("TABLES"),
         )
@@ -177,7 +179,7 @@ class Transformation:
             ],
             "DESTINATION_DATA_MART": self.destination_data_mart,
             "DEPENDS_ON": [d.to_dict() for d in self.dependencies],
-            "PARSING_DEPENDS_ON": self.parsing_dependencies,
+            "PARSING_DEPENDS_ON": [d.to_dict() for d in self.parsing_dependencies],
             "DESTROY_TABLE": self.destroy_table,
             "TABLES": self.tables,
         }
