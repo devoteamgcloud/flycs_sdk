@@ -14,6 +14,11 @@ class TestCustomCode:
         cc = CustomCode("mycode", "1.0.0", build, requirements=["airflow==1.10.0"])
         assert cc.requirements == ["airflow==1.10.0"]
 
+        with pytest.raises(ValueError):
+            CustomCode(
+                "mycode", "1.0.0", build, requirements=["not a valid requirements"]
+            )
+
     def test_validation_signature_builder(self):
         def build():
             from airflow.operators.dummy_operator import DummyOperator

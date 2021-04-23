@@ -3,6 +3,8 @@
 import inspect
 from typing import Callable, List
 
+from requirements.requirement import Requirement
+
 
 class WrongSignatureError(TypeError):
     """Raised when passing a wrong operator builder function to  the CustomCode class."""
@@ -89,11 +91,10 @@ class CustomCode:
         self.version = version
         self.operator_builder = operator_builder
         self.dependencies = dependencies or []
-        self.requirements = (
-            requirements or []
-        )  # TODO christophe: we should try to validate these as early on as possible
+        self.requirements = requirements or []
 
         self._ensure_builder_signature(operator_builder)
+        self._validate_requirements()
 
     def _ensure_builder_signature(self, f: Callable):
         signature = inspect.Signature.from_callable(f)
@@ -101,3 +102,12 @@ class CustomCode:
             raise WrongSignatureError(
                 f"the builder function of the custom code {self.name}_{self.version} does not accept the mandatory ('dag', 'env', 'user') arguments"
             )
+
+    def _validate_requirements(self):
+        """
+        Make sure the format used in the requirements list is valid.
+
+        :raises ValueError: if format is not valid
+        """
+        for line in self.requirements:
+            Requirement.parse(line)
