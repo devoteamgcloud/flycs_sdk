@@ -103,7 +103,7 @@ class Transformation:
         self.persist_backup = persist_backup
         self.write_disposition = write_disposition
         self.time_partitioning = time_partitioning
-        self.cluster_fields = cluster_fields or []
+        self.cluster_fields = cluster_fields
         self.table_expiration = table_expiration
         self.partition_expiration = partition_expiration
         self.required_partition_filter = required_partition_filter
