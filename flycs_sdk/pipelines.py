@@ -3,7 +3,7 @@
 import itertools
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Dict, List, Union, Tuple
+from typing import Dict, List, Union, Tuple, Optional
 
 from semver import VersionInfo
 
@@ -38,11 +38,11 @@ class Pipeline:
                 Entity, BaseLayerEntity, ParametrizedEntity, ParametrizedBaseLayerEntity
             ]
         ] = None,
-        schedule: str = None,
+        schedule: Optional[str] = None,
         kind: PipelineKind = PipelineKind.VANILLA,
-        start_time: datetime = None,
-        trigger: PipelineTrigger = None,
-        params: Dict[str, str] = None,
+        start_time: Optional[datetime] = None,
+        trigger: Optional[PipelineTrigger] = None,
+        params: Optional[Dict[str, str]] = None,
     ):
         """
         Create a Pipeline object.
@@ -86,7 +86,9 @@ class Pipeline:
             name=d["name"],
             version=d["version"],
             schedule=d.get("schedule"),
-            start_time=_parse_datetime(d["start_time"]),
+            start_time=_parse_datetime(d["start_time"])
+            if d.get("start_time")
+            else None,
             kind=PipelineKind(d["kind"]),
             params=d.get("params", {}),
             entities=[Entity.from_dict(e) for e in d["entities"]],
@@ -126,7 +128,9 @@ class Pipeline:
             "name": self.name,
             "version": self.version,
             "schedule": schedule,
-            "start_time": _format_datetime(self.start_time),
+            "start_time": _format_datetime(self.start_time)
+            if self.start_time
+            else None,
             "trigger": self.trigger.to_dict() if self.trigger else None,
             "kind": self.kind.value,
             "params": self.params,
@@ -154,10 +158,10 @@ class ParametrizedPipeline:
         name: str,
         version: str,
         entities: List[Union[ParametrizedEntity, ParametrizedBaseLayerEntity]] = None,
-        schedule: str = None,
+        schedule: Optional[str] = None,
         kind: PipelineKind = PipelineKind.VANILLA,
-        start_time: datetime = None,
-        trigger: PipelineTrigger = None,
+        start_time: Optional[datetime] = None,
+        trigger: Optional[PipelineTrigger] = None,
         parameters: Dict[str, List[str]] = None,
     ):
         """
@@ -183,7 +187,8 @@ class ParametrizedPipeline:
             self.version = version
         self._schedule = schedule  # TODO: validate format
         self.kind = kind
-        self._start_time = start_time or datetime.now()
+        if _is_valid_start_time(start_time):
+            self._start_time = start_time or datetime.now()
         self.trigger = trigger if _is_valid_trigger(trigger) else None
         self.entities = entities or []
         self.parameters = parameters
@@ -193,10 +198,21 @@ class ParametrizedPipeline:
         """Property used by sub-class to modify the schedule value based on the parameters of the pipeline."""
         return self._schedule
 
+    @schedule.setter
+    def schedule(self, value: str):
+        self._schedule = None
+
     @property
     def start_time(self):
         """Property used by sub-class to modify the start_time value based on the parameters of the pipeline."""
         return self._start_time
+
+    @start_time.setter
+    def start_time(self, value: datetime):
+        """Set start_time."""
+        if value is not None:
+            _is_valid_start_time(value)
+        self._start_time = value
 
     def add_entity(
         self, entity: Union[ParametrizedEntity, ParametrizedBaseLayerEntity],
@@ -269,7 +285,9 @@ class ParametrizedPipeline:
                 "name": _parametrized_name(self.name, p),
                 "version": self.version,
                 "schedule": schedule,
-                "start_time": _format_datetime(self.start_time),
+                "start_time": _format_datetime(self.start_time)
+                if self.start_time
+                else None,
                 "trigger": self.trigger.to_dict() if self.trigger else None,
                 "kind": self.kind.value,
                 "params": p,
@@ -292,7 +310,7 @@ def _is_valid_version(version: str) -> bool:
     return True
 
 
-def _is_valid_start_time(start_time: datetime) -> bool:
+def _is_valid_start_time(start_time: Optional[datetime]) -> bool:
     """Test if start_time is a valid timestamp value.
 
     :param start_time: timestamp to validate
@@ -301,6 +319,9 @@ def _is_valid_start_time(start_time: datetime) -> bool:
     :return: True is start_time is valid
     :rtype: bool
     """
+    if start_time is None:
+        return True
+
     if not isinstance(start_time, datetime):
         raise TypeError("start_time must be a valid datetime object")
 
