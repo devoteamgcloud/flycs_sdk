@@ -75,6 +75,16 @@ class TestPipeline:
             entities=[],
         )
 
+    def test_init_none_start_time(self, my_pipeline):
+        p = Pipeline(
+            name=pipeline_name,
+            version=pipeline_version,
+            schedule=pipeline_schedule,
+            kind=pipeline_kind,
+            start_time=None,
+            entities=[],
+        )
+
     def test_init_pubsub(self, my_pipeline_pubsub):
         assert my_pipeline_pubsub.name == pipeline_name
         assert my_pipeline_pubsub.version == pipeline_version
@@ -177,15 +187,22 @@ class TestPipeline:
 
     def test_serialize_deserialize(self, my_pipeline, my_entity):
         my_pipeline.add_entity(my_entity)
-        serialized = my_pipeline.to_dict()
-        if not isinstance(serialized, list):
-            serialized = [serialized]
-        for d in serialized:
-            loaded = Pipeline.from_dict(d)
-            if isinstance(my_pipeline, ParametrizedPipeline):
-                assert loaded.params  # ensure the params area loaded
+        p1 = my_pipeline
+        p2 = my_pipeline
+        p2.start_time = None
+        p3 = my_pipeline
+        p3.schedule = None
 
-    def test_serialize_deserialize(self, my_pipeline_pubsub, my_entity):
+        for p in [p1, p2, p3]:
+            serialized = p.to_dict()
+            if not isinstance(serialized, list):
+                serialized = [serialized]
+            for d in serialized:
+                loaded = Pipeline.from_dict(d)
+                if isinstance(my_pipeline, ParametrizedPipeline):
+                    assert loaded.params  # ensure the params area loaded
+
+    def test_serialize_deserialize_pubsub(self, my_pipeline_pubsub, my_entity):
         my_pipeline_pubsub.add_entity(my_entity)
         serialized = my_pipeline_pubsub.to_dict()
         if not isinstance(serialized, list):
