@@ -1,7 +1,16 @@
 """Module containing entity classes."""
 
-from typing import Dict, List
+from typing import Dict, List, Optional, Union
 from .custom_code import CustomCode
+from .transformations import Transformation
+from .views import View
+
+
+class ConflictingNameError(ValueError):
+    """Raised when trying to insert a Transformation or View into an entities \
+    that already contains a Transformation or View with the same name."""
+
+    pass
 
 
 class Entity:
@@ -11,8 +20,8 @@ class Entity:
         self,
         name: str,
         version: str,
-        stage_config: Dict[str, Dict[str, str]] = None,
-        custom_operators: Dict[str, List[CustomCode]] = None,
+        stage_config: Optional[Dict[str, Dict[str, str]]] = None,
+        custom_operators: Optional[Dict[str, List[CustomCode]]] = None,
     ):
         """
         Create an Entity object.
@@ -28,7 +37,7 @@ class Entity:
         """
         self.name = name
         self.version = version
-        self.stage_config = stage_config
+        self.stage_config = stage_config or {}
         self.transformations = {}
         self.custom_operators = custom_operators or {}
 
@@ -57,6 +66,43 @@ class Entity:
         :return: the versions of the queries in the given stage
         """
         return self.stage_config[stage]
+
+    def _insert_into_stage_config(self, stage: str, obj: Union[Transformation, View]):
+        if stage not in self.stage_config:
+            self.stage_config[stage] = {}
+        if obj.name in self.stage_config[stage]:
+            raise ConflictingNameError(
+                "an object with name {obj.name} already exists in stage {stage}"
+            )
+        self.stage_config[stage].update({obj.name: obj.version})
+
+        if stage not in self.transformations:
+            self.transformations[stage] = {}
+        if obj.name in self.transformations[stage]:
+            raise ConflictingNameError(
+                "an object with name {obj.name} already exists in stage {stage}"
+            )
+        self.transformations[stage].update({obj.name: obj})
+
+    def add_transformation(self, stage: str, transformation: Transformation):
+        """Insert a Transformation into the stage_config of the entity.
+
+        :param stage: the name of the stage where to insert the transformation
+        :type stage: str
+        :param transformation: the transformation object to insert
+        :type transformation: Transformation
+        """
+        self._insert_into_stage_config(stage, transformation)
+
+    def add_view(self, stage: str, view: View):
+        """Insert a View into the stage_config of the entity.
+
+        :param stage: the name of the stage where to insert the transformation
+        :type stage: str
+        :param view: the View object to insert
+        :type view: View
+        """
+        self._insert_into_stage_config(stage, view)
 
     def to_dict(self) -> Dict:
         """
@@ -240,8 +286,8 @@ class ParametrizedEntity:
         self,
         name: str,
         version: str,
-        stage_config: Dict[str, Dict[str, str]] = None,
-        custom_operators: Dict[str, List[CustomCode]] = None,
+        stage_config: Optional[Dict[str, Dict[str, str]]] = None,
+        custom_operators: Optional[Dict[str, List[CustomCode]]] = None,
     ):
         """
         Create a ParametrizedEntity object.

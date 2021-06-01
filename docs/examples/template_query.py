@@ -6,7 +6,10 @@ from flycs_sdk.transformations import Transformation
 
 # Define your transformation SQL query using jinja template for the table name and define the list of table on which this transformation should be applied
 query = Transformation(
-    query="SELECT * FROM {table_name}", version="1.0.0", tables=["tables1", "tables2"]
+    name="my_query",
+    query="SELECT * FROM {table_name}",
+    version="1.0.0",
+    tables=["tables1", "tables2"],
 )
 
 # Then define your entity and pipeline as usual

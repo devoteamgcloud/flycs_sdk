@@ -24,6 +24,8 @@ class SchemaUpdateOptions(Enum):
 class Transformation:
     """Transformations are the lowest unit inside of a data pipeline. It is a single task implemented as a SQL query."""
 
+    kind = "transformation"
+
     def __init__(
         self,
         name: str,
@@ -182,6 +184,7 @@ class Transformation:
             "PARSING_DEPENDS_ON": [d.to_dict() for d in self.parsing_dependencies],
             "DESTROY_TABLE": self.destroy_table,
             "TABLES": self.tables,
+            "KIND": self.kind,
         }
 
     def __eq__(self, other):
@@ -207,4 +210,5 @@ class Transformation:
             and self.parsing_dependencies == other.parsing_dependencies
             and self.destroy_table == other.destroy_table
             and self.tables == other.tables
+            and self.kind == other.kind
         )
