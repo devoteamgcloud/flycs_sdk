@@ -84,6 +84,7 @@ class TestTranformations:
             "PARSING_DEPENDS_ON": [],
             "DESTROY_TABLE": False,
             "TABLES": None,
+            "KIND": "transformation",
         }
 
     def test_from_dict(self, my_transformation):
