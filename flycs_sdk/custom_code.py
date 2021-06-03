@@ -60,6 +60,10 @@ class Dependency:
             and self.stage == other.stage
         )
 
+    def __hash__(self) -> int:
+        """Implement the __eq__ method."""
+        return hash(f"{self.name}{self.entity}{self.stage}")
+
 
 class CustomCode:
     """Class representing a custom airflow operator to inject into an Airflow DAG."""
