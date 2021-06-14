@@ -1,9 +1,10 @@
 """Module containing transformations classes."""
 
 from enum import Enum
-from typing import List
+from typing import List, Optional
 
 from flycs_sdk.custom_code import Dependency
+from flycs_sdk.query_base import QueryBase
 
 
 class WriteDisposition(Enum):
@@ -21,7 +22,7 @@ class SchemaUpdateOptions(Enum):
     ALLOW_FIELD_ADDITION = "ALLOW_FIELD_ADDITION"
 
 
-class Transformation:
+class Transformation(QueryBase):
     """Transformations are the lowest unit inside of a data pipeline. It is a single task implemented as a SQL query."""
 
     kind = "transformation"
@@ -31,25 +32,26 @@ class Transformation:
         name: str,
         query: str,
         version: str,
-        static: bool = True,
-        has_output: bool = False,
-        destination_table: str = None,
-        keep_old_columns: bool = True,
-        persist_backup: bool = True,
-        write_disposition: WriteDisposition = WriteDisposition.APPEND,
-        time_partitioning: dict = None,
-        cluster_fields: List[str] = None,
-        table_expiration: int = None,
-        partition_expiration: int = None,
-        required_partition_filter: bool = False,
-        schema_update_options: List[SchemaUpdateOptions] = [
+        encrypt: Optional[bool] = None,
+        static: Optional[bool] = True,
+        has_output: Optional[bool] = False,
+        destination_table: Optional[str] = None,
+        keep_old_columns: Optional[bool] = True,
+        persist_backup: Optional[bool] = True,
+        write_disposition: Optional[WriteDisposition] = WriteDisposition.APPEND,
+        time_partitioning: Optional[dict] = None,
+        cluster_fields: Optional[List[str]] = None,
+        table_expiration: Optional[int] = None,
+        partition_expiration: Optional[int] = None,
+        required_partition_filter: Optional[bool] = False,
+        schema_update_options: Optional[List[SchemaUpdateOptions]] = [
             SchemaUpdateOptions.ALLOW_FIELD_ADDITION
         ],
-        destination_data_mart: str = None,
-        dependencies: List[Dependency] = None,
-        parsing_dependencies: List[Dependency] = None,
-        destroy_table: bool = False,
-        tables: List[dict] = None,
+        destination_data_mart: Optional[str] = None,
+        dependencies: Optional[List[Dependency]] = None,
+        parsing_dependencies: Optional[List[Dependency]] = None,
+        destroy_table: Optional[bool] = False,
+        tables: Optional[List[dict]] = None,
     ):
         """Class representing a transformation.
 
@@ -59,6 +61,8 @@ class Transformation:
         :type query: str
         :param version: version of the tranformation
         :type version: str
+        :param encrypt: if set to False, disable automatic encryption of the result of the query
+        :type encrypt: Optional[bool]
         :param static: Whether or not the version should be appended to the table name, defaults to False
         :type static: bool, optional
         :param has_output: Whether or not this query has a result that should be written into a table (false can be used to run DML or stored procedures for example), defaults to False
@@ -95,9 +99,7 @@ class Transformation:
                        The name of the transformation then becomes `{transformation_name}_{table_name}`
         :type tables: List[str], optional
         """
-        self.name = name
-        self.query = query
-        self.version = version
+        super().__init__(name=name, query=query, version=version, encrypt=encrypt)
         self.static = static
         self.has_output = has_output
         self.destination_table = destination_table
@@ -129,6 +131,7 @@ class Transformation:
             name=d.get("NAME", ""),
             query=d["QUERY"],
             version=d["VERSION"],
+            encrypt=d.get("ENCRYPT", None),
             static=d.get("STATIC", True),
             has_output=d.get("HAS_OUTPUT", True),
             destination_table=d.get("DESTINATION_TABLE"),
@@ -165,6 +168,7 @@ class Transformation:
             "NAME": self.name,
             "QUERY": self.query,
             "VERSION": self.version,
+            "ENCRYPT": self.encrypt,
             "STATIC": self.static,
             "HAS_OUTPUT": self.has_output,
             "DESTINATION_TABLE": self.destination_table,
@@ -194,6 +198,7 @@ class Transformation:
             and self.query == other.query
             and self.version == other.version
             and self.static == other.static
+            and self.encrypt == other.encrypt
             and self.has_output == other.has_output
             and self.destination_table == other.destination_table
             and self.keep_old_columns == other.keep_old_columns

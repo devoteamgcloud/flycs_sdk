@@ -33,6 +33,7 @@ class TestView:
             "DESCRIPTION": view_description,
             "DESTINATION_TABLE": None,
             "KIND": "view",
+            "ENCRYPT": None,
         }
 
     def test_serialize_deserialize(self, my_view):
