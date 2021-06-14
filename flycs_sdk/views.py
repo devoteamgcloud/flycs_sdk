@@ -1,15 +1,21 @@
 """Module containing view classes."""
 
 from typing import Optional
+from flycs_sdk.query_base import QueryBase
 
 
-class View:
+class View(QueryBase):
     """Class representing a View configuration."""
 
     kind = "view"
 
     def __init__(
-        self, name: str, query: str, version: str, description: Optional[str] = None,
+        self,
+        name: str,
+        query: str,
+        version: str,
+        description: Optional[str] = None,
+        encrypt: Optional[bool] = None,
     ):
         """Create a View object.
 
@@ -21,10 +27,10 @@ class View:
         :type version: str
         :param description: description of the view, defaults to None
         :type description: Optional[str], optional
+        :param encrypt: if set to False, disable automatic encryption of the result of the query
+        :type encrypt: Optional[bool]
         """
-        self.name = name
-        self.query = query
-        self.version = version
+        super().__init__(name=name, query=query, version=version, encrypt=encrypt)
         self.description = description
         self.destination_table = None
         self.dependencies = []
@@ -44,6 +50,7 @@ class View:
             query=d["QUERY"],
             version=d["VERSION"],
             description=d.get("DESCRIPTION"),
+            encrypt=d.get("ENCRYPT", None),
         )
         view.destination_table = d.get("DESTINATION_TABLE")
         return view
@@ -62,6 +69,7 @@ class View:
             "DESCRIPTION": self.description,
             "DESTINATION_TABLE": self.destination_table,
             "KIND": self.kind,
+            "ENCRYPT": self.encrypt,
         }
 
     def __eq__(self, o) -> bool:
@@ -73,4 +81,5 @@ class View:
             and self.description == o.description
             and self.destination_table == o.destination_table
             and self.kind == o.kind
+            and self.encrypt == o.encrypt
         )
