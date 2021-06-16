@@ -1,6 +1,8 @@
 """Module containing view classes."""
 
 from typing import Optional
+
+from flycs_sdk.custom_code import Dependency
 from flycs_sdk.query_base import QueryBase
 
 
@@ -53,6 +55,10 @@ class View(QueryBase):
             encrypt=d.get("ENCRYPT", None),
         )
         view.destination_table = d.get("DESTINATION_TABLE")
+        view.dependencies = [Dependency.from_dict(x) for x in d.get("DEPENDS_ON") or []]
+        view.parsing_dependencies = [
+            Dependency.from_dict(x) for x in d.get("PARSING_DEPENDS_ON") or []
+        ]
         return view
 
     def to_dict(self) -> dict:
@@ -70,6 +76,8 @@ class View(QueryBase):
             "DESTINATION_TABLE": self.destination_table,
             "KIND": self.kind,
             "ENCRYPT": self.encrypt,
+            "DEPENDS_ON": [d.to_dict() for d in self.dependencies],
+            "PARSING_DEPENDS_ON": [d.to_dict() for d in self.parsing_dependencies],
         }
 
     def __eq__(self, o) -> bool:
@@ -82,4 +90,6 @@ class View(QueryBase):
             and self.destination_table == o.destination_table
             and self.kind == o.kind
             and self.encrypt == o.encrypt
+            and self.dependencies == o.dependencies
+            and self.parsing_dependencies == o.parsing_dependencies
         )
