@@ -34,6 +34,8 @@ class TestView:
             "DESTINATION_TABLE": None,
             "KIND": "view",
             "ENCRYPT": None,
+            "DEPENDS_ON": [],
+            "PARSING_DEPENDS_ON": [],
         }
 
     def test_serialize_deserialize(self, my_view):
