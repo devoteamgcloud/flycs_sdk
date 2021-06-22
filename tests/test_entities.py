@@ -4,13 +4,17 @@
 
 import pytest
 from deepdiff import DeepDiff
+
 from flycs_sdk.entities import (
-    Entity,
     BaseLayerEntity,
-    ParametrizedEntity,
+    Entity,
     ParametrizedBaseLayerEntity,
+    ParametrizedEntity,
     _parametrized_name,
+    ConflictingNameError,
 )
+from flycs_sdk.transformations import Transformation
+from flycs_sdk.views import View
 
 entity_name = "test"
 entity_version = "1.0.0"
@@ -42,6 +46,30 @@ class TestEntity:
     def test_init(self, my_entity):
         assert my_entity.name == entity_name
         assert my_entity.version == entity_version
+
+    def test_add_transformation(self):
+        entity = Entity(entity_name, entity_version)
+        transformation = Transformation("my_query", "SELECT * FROM TABLE", "1.0.0")
+        entity.add_transformation("staging", transformation)
+        assert entity.stage_config == {
+            "staging": {transformation.name: transformation.version}
+        }
+        assert entity.transformations == {
+            "staging": {transformation.name: transformation}
+        }
+
+        with pytest.raises(ConflictingNameError):
+            entity.add_transformation("staging", transformation)
+
+    def test_add_view(self):
+        entity = Entity(entity_name, entity_version)
+        view = View("my_query", "SELECT * FROM TABLE", "1.0.0")
+        entity.add_view("staging", view)
+        assert entity.stage_config == {"staging": {view.name: view.version}}
+        assert entity.transformations == {"staging": {view.name: view}}
+
+        with pytest.raises(ConflictingNameError):
+            entity.add_view("staging", view)
 
     def test_to_dict(self, my_entity):
         assert not DeepDiff(

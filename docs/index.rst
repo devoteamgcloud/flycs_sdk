@@ -8,6 +8,7 @@ Welcome to Flycs SDK's documentation!
    readme
    installation
    usage
+   views
    triggers
    custom_operators
    modules
