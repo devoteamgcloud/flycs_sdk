@@ -6,11 +6,10 @@ from datetime import datetime, timezone, timedelta
 
 import pytest
 from deepdiff import DeepDiff
-from flycs_sdk.entities import Entity, ParametrizedEntity
+from flycs_sdk.entities import Entity, ParametrizedEntity, Kind
 from flycs_sdk.pipelines import (
     Pipeline,
     ParametrizedPipeline,
-    PipelineKind,
     _parse_datetime,
     _format_datetime,
 )
@@ -20,7 +19,7 @@ from flycs_sdk.triggers import PubSubTrigger
 pipeline_name = "test"
 pipeline_version = "1.0.0"
 pipeline_schedule = "* 12 * * *"
-pipeline_kind = PipelineKind.VANILLA
+pipeline_kind = Kind.VANILLA
 pipeline_start_time = datetime.fromtimestamp(1606923514, tz=timezone.utc)
 pipeline_pubsub_topic = "my_topic"
 
