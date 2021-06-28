@@ -28,8 +28,8 @@ class Entity:
         name: str,
         version: str,
         kind : Kind = None,
-        stage_config: Dict[str, Dict[str, str]] = None,
-        custom_operators: Dict[str, List[CustomCode]] = None,
+        stage_config: Optional[Dict[str, Dict[str, str]]] = None,
+        custom_operators: Optional[Dict[str, List[CustomCode]]] = None,
     ):
         """
         Create an Entity object.
@@ -47,7 +47,7 @@ class Entity:
         self.name = name
         self.version = version
         self.kind = kind
-        self.stage_config = stage_config
+        self.stage_config = stage_config or {}
         self.transformations = {}
         self.custom_operators = custom_operators or {}
 
@@ -306,8 +306,8 @@ class ParametrizedEntity:
         name: str,
         version: str,
         kind: Kind = None,
-        stage_config: Dict[str, Dict[str, str]] = None,
-        custom_operators: Dict[str, List[CustomCode]] = None,
+        stage_config: Optional[Dict[str, Dict[str, str]]] = None,
+        custom_operators: Optional[Dict[str, List[CustomCode]]] = None,
     ):
         """
         Create a ParametrizedEntity object.
@@ -325,7 +325,7 @@ class ParametrizedEntity:
         self.name = name
         self.version = version
         self.kind = kind
-        self.stage_config = stage_config
+        self.stage_config = stage_config or {}
         self.transformations = {}
         self.custom_operators = custom_operators or {}
 
