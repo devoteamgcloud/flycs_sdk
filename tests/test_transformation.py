@@ -67,6 +67,7 @@ class TestTranformations:
             "NAME": "my_tranformation",
             "QUERY": "SELECT * FROM TABLE;",
             "VERSION": "1.0.0",
+            "ENCRYPT": None,
             "STATIC": False,
             "HAS_OUTPUT": False,
             "DESTINATION_TABLE": None,
@@ -84,6 +85,7 @@ class TestTranformations:
             "PARSING_DEPENDS_ON": [],
             "DESTROY_TABLE": False,
             "TABLES": None,
+            "KIND": "transformation",
         }
 
     def test_from_dict(self, my_transformation):
