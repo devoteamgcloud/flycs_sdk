@@ -18,7 +18,7 @@ class Entity:
         self,
         name: str,
         version: str,
-        kind : Kind,
+        kind : Kind = None,
         stage_config: Dict[str, Dict[str, str]] = None,
         custom_operators: Dict[str, List[CustomCode]] = None,
     ):
@@ -51,8 +51,9 @@ class Entity:
         :return: Entity
         :rtype: Entity
         """
+
         stage_config = {stage["name"]: stage["versions"] for stage in d["stage_config"]}
-        return cls(name=d["name"], version=d["version"], kind=d.get("kind"), stage_config=stage_config)
+        return cls(name=d["name"], version=d["version"], kind=Kind(d["kind"]) if d.get("kind") is not None else None, stage_config=stage_config)
 
     @property
     def stages(self):
@@ -85,6 +86,7 @@ class Entity:
             if self.stage_config is not None
             else [],
         }
+        print(self.kind)
         if self.kind is not None:
             temp_dict["kind"] = self.kind.value
         return temp_dict
@@ -108,7 +110,7 @@ class BaseLayerEntity(Entity):
         self,
         name: str,
         version: str,
-        kind : Kind,
+        kind : Kind = None,
         datalake_versions: Dict[str, str] = None,
         preamble_versions: Dict[str, str] = None,
         staging_versions: Dict[str, str] = None,
@@ -147,7 +149,7 @@ class BaseLayerEntity(Entity):
         :return: BaseLayerEntity
         :rtype: BaseLayerEntity
         """
-        entity = cls(name=d["name"], version=d["version"], kind=d.get("kind"))
+        entity = cls(name=d["name"], version=d["version"], kind=Kind(d["kind"]) if d.get("kind") is not None else None)
         for stage in d.get("stage_config", {}):
             if stage["name"] == "datalake":
                 entity.datalake_versions = stage["versions"]
@@ -256,7 +258,7 @@ class ParametrizedEntity:
         self,
         name: str,
         version: str,
-        kind: Kind,
+        kind: Kind = None,
         stage_config: Dict[str, Dict[str, str]] = None,
         custom_operators: Dict[str, List[CustomCode]] = None,
     ):
@@ -289,7 +291,7 @@ class ParametrizedEntity:
         :rtype: ParametrizedEntity
         """
         stage_config = {stage["name"]: stage["versions"] for stage in d["stage_config"]}
-        return cls(name=d["name"], version=d["version"], kind=d.get("kind"), stage_config=stage_config)
+        return cls(name=d["name"], version=d["version"], kind=Kind(d["kind"]) if d.get("kind") is not None else None, stage_config=stage_config)
 
     @property
     def stages(self):
@@ -347,7 +349,7 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
         self,
         name: str,
         version: str,
-        kind: Kind,
+        kind: Kind = None,
         datalake_versions: Dict[str, str] = None,
         preamble_versions: Dict[str, str] = None,
         staging_versions: Dict[str, str] = None,
@@ -389,7 +391,7 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
         entity = cls(
             name=d["name"],
             version=d["version"],
-            kind = d.get("kind"),
+            kind = Kind(d["kind"]) if d.get("kind") is not None else None,
             datalake_versions=d["stage_config"],
             preamble_versions=d["preamble_versions"],
             staging_versions=d["staging_versions"],

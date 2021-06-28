@@ -31,7 +31,7 @@ class TestPipeline:
             "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
             "staging": {"table_1": "1.0.0", "table_2": "1.0.0"},
         }
-        return Entity("entity1", "1.0.0", stage_config)
+        return Entity("entity1", "1.0.0", stage_config=stage_config)
 
     @pytest.fixture
     def my_pipeline(self, my_entity):
@@ -227,7 +227,7 @@ class TestParametrizedPipeline(TestPipeline):
             "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
             "staging": {"table_1": "1.0.0", "table_2": "1.0.0"},
         }
-        return ParametrizedEntity("entity1", "1.0.0", stage_config)
+        return ParametrizedEntity("entity1", "1.0.0", stage_config=stage_config)
 
     @pytest.fixture
     def my_non_parameterized_entity(self):
@@ -235,7 +235,7 @@ class TestParametrizedPipeline(TestPipeline):
             "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
             "staging": {"table_1": "1.0.0", "table_2": "1.0.0"},
         }
-        return Entity("entity1", "1.0.0", stage_config)
+        return Entity("entity1", "1.0.0", stage_config=stage_config)
 
     @pytest.fixture
     def my_pipeline(self, my_entity):
