@@ -86,7 +86,7 @@ class Entity:
             if self.stage_config is not None
             else [],
         }
-        print(self.kind)
+
         if self.kind is not None:
             temp_dict["kind"] = self.kind.value
         return temp_dict
@@ -126,6 +126,7 @@ class BaseLayerEntity(Entity):
         :param name: the name of the entity
         :param version: the version of the entity, this can be used for table naming
         this entity belongs to.
+        :param kind: the kind of the entity
         :param datalake_versions: the versions of the queries for the datalake stage
         :param preamble_versions: the versions of the queries for the preamble stage
         :param staging_versions: the versions of the queries for the staging stage
@@ -271,6 +272,7 @@ class ParametrizedEntity:
         :param name: the name of the entity
         :param version: the version of the entity, this can be used for table naming
         this entity belongs to.
+        :param kind: the kind of the entity
         :param stage_config: a dictionary with the name of the stage as key and a dictionary of query names
         and their versions as value.
         """
@@ -365,6 +367,7 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
         :param name: the name of the entity
         :param version: the version of the entity, this can be used for table naming
         this entity belongs to.
+        :param kind: the kind of the entity
         :param datalake_versions: the versions of the queries for the datalake stage
         :param preamble_versions: the versions of the queries for the preamble stage
         :param staging_versions: the versions of the queries for the staging stage
