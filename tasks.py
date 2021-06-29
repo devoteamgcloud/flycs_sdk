@@ -45,12 +45,12 @@ def _run(c, command):
 def format(c, check=False):
     """Format code."""
     python_dirs_string = " ".join(PYTHON_DIRS)
-    # Run yapf
-    yapf_options = "--recursive {}".format("--diff" if check else "--in-place")
-    _run(c, "yapf {} {}".format(yapf_options, python_dirs_string))
+    # Run black
+    black_options = "{}".format("--check" if check else "")
+    _run(c, "black {} {}".format(black_options, python_dirs_string))
     # Run isort
-    isort_options = "--recursive {}".format("--check-only --diff" if check else "")
-    _run(c, "isort {} {}".format(isort_options, python_dirs_string))
+    # isort_options = "--recursive {}".format("--check-only --diff" if check else "")
+    # _run(c, "isort {} {}".format(isort_options, python_dirs_string))
 
 
 @task
