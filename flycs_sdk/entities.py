@@ -13,12 +13,14 @@ class ConflictingNameError(ValueError):
 
     pass
 
+
 class Kind(Enum):
-    """This enumeration contains all the supported entity types. Can be used in an entity or a pipeline"""
+    """This enumeration contains all the supported entity types. Can be used in an entity or a pipeline."""
 
     VANILLA = "vanilla"
     DELTA_TRACKING = "delta_tracking"
     DATA_VAULT = "data_vault"
+
 
 class Entity:
     """Class that serves as a version configuration for a logical subset of a Pipeline."""
@@ -27,7 +29,7 @@ class Entity:
         self,
         name: str,
         version: str,
-        kind : Kind = None,
+        kind: Optional[Kind] = None,
         stage_config: Optional[Dict[str, Dict[str, str]]] = None,
         custom_operators: Optional[Dict[str, List[CustomCode]]] = None,
     ):
@@ -53,16 +55,21 @@ class Entity:
 
     @classmethod
     def from_dict(cls, d: dict):
-        """Create an Entity object form a dictionnary created with the to_dict method.
+        """
+        Create an Entity object form a dictionnary created with the to_dict method.
 
         :param d: source dictionary
         :type d: dict
         :return: Entity
         :rtype: Entity
         """
-
         stage_config = {stage["name"]: stage["versions"] for stage in d["stage_config"]}
-        return cls(name=d["name"], version=d["version"], kind=Kind(d["kind"]) if d.get("kind") is not None else None, stage_config=stage_config)
+        return cls(
+            name=d["name"],
+            version=d["version"],
+            kind=Kind(d["kind"]) if d.get("kind") is not None else None,
+            stage_config=stage_config,
+        )
 
     @property
     def stages(self):
@@ -121,7 +128,6 @@ class Entity:
 
         :return: the entity as a dictionary object.
         """
-
         temp_dict = {
             "name": self.name,
             "version": self.version,
@@ -142,7 +148,7 @@ class Entity:
         return (
             self.name == other.name
             and self.version == other.version
-            and self.stage_config == other.stage_config 
+            and self.stage_config == other.stage_config
             and self.kind == other.kind
         )
 
@@ -156,7 +162,7 @@ class BaseLayerEntity(Entity):
         self,
         name: str,
         version: str,
-        kind : Kind = None,
+        kind: Optional[Kind] = None,
         datalake_versions: Dict[str, str] = None,
         preamble_versions: Dict[str, str] = None,
         staging_versions: Dict[str, str] = None,
@@ -196,7 +202,11 @@ class BaseLayerEntity(Entity):
         :return: BaseLayerEntity
         :rtype: BaseLayerEntity
         """
-        entity = cls(name=d["name"], version=d["version"], kind=Kind(d["kind"]) if d.get("kind") is not None else None)
+        entity = cls(
+            name=d["name"],
+            version=d["version"],
+            kind=Kind(d["kind"]) if d.get("kind") is not None else None,
+        )
         for stage in d.get("stage_config", {}):
             if stage["name"] == "datalake":
                 entity.datalake_versions = stage["versions"]
@@ -305,7 +315,7 @@ class ParametrizedEntity:
         self,
         name: str,
         version: str,
-        kind: Kind = None,
+        kind: Optional[Kind] = None,
         stage_config: Optional[Dict[str, Dict[str, str]]] = None,
         custom_operators: Optional[Dict[str, List[CustomCode]]] = None,
     ):
@@ -339,7 +349,12 @@ class ParametrizedEntity:
         :rtype: ParametrizedEntity
         """
         stage_config = {stage["name"]: stage["versions"] for stage in d["stage_config"]}
-        return cls(name=d["name"], version=d["version"], kind=Kind(d["kind"]) if d.get("kind") is not None else None, stage_config=stage_config)
+        return cls(
+            name=d["name"],
+            version=d["version"],
+            kind=Kind(d["kind"]) if d.get("kind") is not None else None,
+            stage_config=stage_config,
+        )
 
     @property
     def stages(self):
@@ -397,7 +412,7 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
         self,
         name: str,
         version: str,
-        kind: Kind = None,
+        kind: Optional[Kind] = None,
         datalake_versions: Dict[str, str] = None,
         preamble_versions: Dict[str, str] = None,
         staging_versions: Dict[str, str] = None,
@@ -440,7 +455,7 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
         entity = cls(
             name=d["name"],
             version=d["version"],
-            kind = Kind(d["kind"]) if d.get("kind") is not None else None,
+            kind=Kind(d["kind"]) if d.get("kind") is not None else None,
             datalake_versions=d["stage_config"],
             preamble_versions=d["preamble_versions"],
             staging_versions=d["staging_versions"],
