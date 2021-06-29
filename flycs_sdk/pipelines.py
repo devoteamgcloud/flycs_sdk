@@ -13,10 +13,18 @@ from .entities import (
     ParametrizedBaseLayerEntity,
     ParametrizedEntity,
     _parametrized_name,
-    Kind
 )
 
 from .triggers import PipelineTrigger, trigger_factory
+
+
+class PipelineKind(Enum):
+    """This enumeration contains all the supported pipeline type."""
+
+    VANILLA = "vanilla"
+    DELTA_TRACKING = "delta_tracking"
+    DATA_VAULT = "data_vault"
+
 
 class Pipeline:
     """Class representing a pipeline configuration."""
@@ -31,7 +39,7 @@ class Pipeline:
             ]
         ] = None,
         schedule: Optional[str] = None,
-        kind: Kind = Kind.VANILLA,
+        kind: PipelineKind = PipelineKind.VANILLA,
         start_time: Optional[datetime] = None,
         trigger: Optional[PipelineTrigger] = None,
         params: Optional[Dict[str, str]] = None,
@@ -46,7 +54,7 @@ class Pipeline:
         :param schedule: the scheduler definition using cron format
         :kind schedule: str
         :param kind: the type of the pipeline. the type determines what actions will be taken aside from just running the queries
-        :type type: Kind, default to vanilla
+        :type type: PipelineKind, default to vanilla
         :param start_time: timestamp at which the pipeline should start to be processed. The time MUST always be expressed using UTC timezone, defaults to None
         :type start_time: datetime, optional
         :param trigger: special pipeline trigger. If specified, the pipeline can will be automatically triggered by different events like a PubSub message or a Google Storage event
@@ -81,7 +89,7 @@ class Pipeline:
             start_time=_parse_datetime(d["start_time"])
             if d.get("start_time")
             else None,
-            kind=Kind(d["kind"]),
+            kind=PipelineKind(d["kind"]),
             params=d.get("params", {}),
             entities=[Entity.from_dict(e) for e in d["entities"]],
         )
@@ -151,7 +159,7 @@ class ParametrizedPipeline:
         version: str,
         entities: List[Union[ParametrizedEntity, ParametrizedBaseLayerEntity]] = None,
         schedule: Optional[str] = None,
-        kind: Kind = Kind.VANILLA,
+        kind: PipelineKind = PipelineKind.VANILLA,
         start_time: Optional[datetime] = None,
         trigger: Optional[PipelineTrigger] = None,
         parameters: Dict[str, List[str]] = None,
@@ -166,7 +174,7 @@ class ParametrizedPipeline:
         :param schedule: the scheduler definition using cron format
         :kind schedule: str
         :param kind: the type of the pipeline. the type determines what actions will be taken aside from just running the queries
-        :type type: Kind, default to vanilla
+        :type type: PipelineKind, default to vanilla
         :param start_time: timestamp at which the pipeline should start to be processed. The time MUST always be expressed using UTC timezone, defaults to None
         :type start_time: datetime, optional
         :param trigger: special pipeline trigger. If specified, the pipeline can will be automatically triggered by different events like a PubSub message or a Google Storage event

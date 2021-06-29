@@ -6,12 +6,13 @@ from datetime import datetime, timezone, timedelta
 
 import pytest
 from deepdiff import DeepDiff
-from flycs_sdk.entities import Entity, ParametrizedEntity, Kind
+from flycs_sdk.entities import Entity, ParametrizedEntity
 from flycs_sdk.pipelines import (
     Pipeline,
     ParametrizedPipeline,
     _parse_datetime,
     _format_datetime,
+    PipelineKind,
 )
 
 from flycs_sdk.triggers import PubSubTrigger
@@ -19,7 +20,7 @@ from flycs_sdk.triggers import PubSubTrigger
 pipeline_name = "test"
 pipeline_version = "1.0.0"
 pipeline_schedule = "* 12 * * *"
-pipeline_kind = Kind.VANILLA
+pipeline_kind = PipelineKind.VANILLA
 pipeline_start_time = datetime.fromtimestamp(1606923514, tz=timezone.utc)
 pipeline_pubsub_topic = "my_topic"
 
@@ -135,6 +136,7 @@ class TestPipeline:
                 {
                     "name": "entity1",
                     "version": "1.0.0",
+                    "kind": None,
                     "stage_config": [
                         {
                             "name": "raw",
@@ -169,6 +171,7 @@ class TestPipeline:
                 {
                     "name": "entity1",
                     "version": "1.0.0",
+                    "kind": None,
                     "stage_config": [
                         {
                             "name": "raw",
@@ -274,6 +277,7 @@ class TestParametrizedPipeline(TestPipeline):
                     {
                         "name": "entity1_nl_be",
                         "version": "1.0.0",
+                        "kind": None,
                         "stage_config": [
                             {
                                 "name": "raw",
@@ -299,6 +303,7 @@ class TestParametrizedPipeline(TestPipeline):
                     {
                         "name": "entity1_nl_en",
                         "version": "1.0.0",
+                        "kind": None,
                         "stage_config": [
                             {
                                 "name": "raw",
@@ -324,6 +329,7 @@ class TestParametrizedPipeline(TestPipeline):
                     {
                         "name": "entity1_fr_be",
                         "version": "1.0.0",
+                        "kind": None,
                         "stage_config": [
                             {
                                 "name": "raw",
@@ -349,6 +355,7 @@ class TestParametrizedPipeline(TestPipeline):
                     {
                         "name": "entity1_fr_en",
                         "version": "1.0.0",
+                        "kind": None,
                         "stage_config": [
                             {
                                 "name": "raw",

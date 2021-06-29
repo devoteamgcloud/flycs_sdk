@@ -11,7 +11,7 @@ from flycs_sdk.entities import (
     ParametrizedBaseLayerEntity,
     ParametrizedEntity,
     _parametrized_name,
-    Kind,
+    EntityKind,
     ConflictingNameError,
 )
 from flycs_sdk.transformations import Transformation
@@ -19,7 +19,7 @@ from flycs_sdk.views import View
 
 entity_name = "test"
 entity_version = "1.0.0"
-entity_kind = Kind.VANILLA
+entity_kind = EntityKind.VANILLA
 
 
 class TestEntity:
@@ -36,7 +36,7 @@ class TestEntity:
         return {
             "name": entity_name,
             "version": entity_version,
-            "kind" : entity_kind,
+            "kind": entity_kind,
             "stage_config": [
                 {"name": "raw", "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},},
                 {
@@ -111,55 +111,6 @@ class TestEntity:
         loaded = Entity.from_dict(d)
         assert loaded == my_entity
 
-class NoKindTestEntity:
-
-    @pytest.fixture
-    def no_kind_entity(self):
-        stage_config = {
-            "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
-            "staging": {"table_3": "1.0.0", "table_4": "1.0.0"},
-        }
-        return Entity(entity_name, entity_version, stage_config)
-
-    def test_init(self, my_entity):
-        assert my_entity.name == entity_name
-        assert my_entity.version == entity_version
-        assert my_entity.kind is None
-
-    def test_to_dict(self, my_entity):
-        assert not DeepDiff(
-            my_entity.to_dict(),
-            {
-                "name": entity_name,
-                "version": entity_version,
-                "stage_config": [
-                    {
-                        "name": "raw",
-                        "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
-                    },
-                    {
-                        "name": "staging",
-                        "versions": {"table_3": "1.0.0", "table_4": "1.0.0"},
-                    },
-                ],
-            },
-            ignore_order=True,
-        )
-
-    def test_from_dict(self, my_dict):
-        e = Entity.from_dict(my_dict)
-        assert e.name == entity_name
-        assert e.version == entity_version
-        assert e.kind is None 
-        assert e.stage_config == {
-            "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
-            "staging": {"table_3": "1.0.0", "table_4": "1.0.0"},
-        }
-
-    def test_serialize_deserialize(self, my_entity):
-        d = my_entity.to_dict()
-        loaded = Entity.from_dict(d)
-        assert loaded == my_entity
 
 class TestBaseLayerEntity(TestEntity):
     @pytest.fixture
@@ -184,7 +135,7 @@ class TestBaseLayerEntity(TestEntity):
         return {
             "name": entity_name,
             "version": entity_version,
-            "kind" : entity_kind.value,
+            "kind": entity_kind.value,
             "stage_config": [
                 {
                     "name": "datalake",
@@ -215,7 +166,7 @@ class TestBaseLayerEntity(TestEntity):
             {
                 "name": entity_name,
                 "version": entity_version,
-                "kind" : entity_kind.value,
+                "kind": entity_kind.value,
                 "stage_config": [
                     {
                         "name": "datalake",
@@ -248,7 +199,7 @@ class TestBaseLayerEntity(TestEntity):
             {
                 "name": entity_name,
                 "version": entity_version,
-                "kind" : entity_kind.value,
+                "kind": entity_kind.value,
                 "stage_config": [
                     {"name": "datalake", "versions": {}},
                     {"name": "preamble", "versions": {}},
@@ -291,7 +242,9 @@ class TestParametrizedEntity(TestEntity):
             "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
             "staging": {"table_3": "1.0.0", "table_4": "1.0.0"},
         }
-        return ParametrizedEntity(entity_name, entity_version, entity_kind, stage_config)
+        return ParametrizedEntity(
+            entity_name, entity_version, entity_kind, stage_config
+        )
 
 
 class TestParametrizedBaseLayerEntity(TestParametrizedEntity, TestBaseLayerEntity):
@@ -319,3 +272,69 @@ class TestParametrizedEntityName:
             _parametrized_name("name", {"language": "fr", "country": "be"})
             == "name_fr_be"
         )
+
+
+class TestNoKindEntity:
+    @pytest.fixture
+    def no_kind_entity(self):
+        stage_config = {
+            "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
+            "staging": {"table_3": "1.0.0", "table_4": "1.0.0"},
+        }
+        return Entity(entity_name, entity_version, stage_config=stage_config)
+
+    @pytest.fixture
+    def no_kind_dict(self):
+        return {
+            "name": entity_name,
+            "version": entity_version,
+            "kind": None,
+            "stage_config": [
+                {"name": "raw", "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},},
+                {
+                    "name": "staging",
+                    "versions": {"table_3": "1.0.0", "table_4": "1.0.0"},
+                },
+            ],
+        }
+
+    def test_init(self, no_kind_entity):
+        assert no_kind_entity.name == entity_name
+        assert no_kind_entity.version == entity_version
+        assert no_kind_entity.kind is None
+
+    def test_to_dict(self, no_kind_entity):
+        assert not DeepDiff(
+            no_kind_entity.to_dict(),
+            {
+                "name": entity_name,
+                "version": entity_version,
+                "kind": None,
+                "stage_config": [
+                    {
+                        "name": "raw",
+                        "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                    },
+                    {
+                        "name": "staging",
+                        "versions": {"table_3": "1.0.0", "table_4": "1.0.0"},
+                    },
+                ],
+            },
+            ignore_order=True,
+        )
+
+    def test_from_dict(self, no_kind_dict):
+        e = Entity.from_dict(no_kind_dict)
+        assert e.name == entity_name
+        assert e.version == entity_version
+        assert e.kind is None
+        assert e.stage_config == {
+            "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
+            "staging": {"table_3": "1.0.0", "table_4": "1.0.0"},
+        }
+
+    def test_serialize_deserialize(self, no_kind_entity):
+        d = no_kind_entity.to_dict()
+        loaded = Entity.from_dict(d)
+        assert loaded == no_kind_entity
