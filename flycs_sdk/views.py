@@ -19,6 +19,7 @@ class View(QueryBase):
         description: Optional[str] = None,
         encrypt: Optional[bool] = None,
         static: Optional[bool] = True,
+        destination_data_mart: Optional[str] = None,
     ):
         """Create a View object.
 
@@ -34,7 +35,12 @@ class View(QueryBase):
         :type encrypt: Optional[bool]
         """
         super().__init__(
-            name=name, query=query, version=version, encrypt=encrypt, static=static
+            name=name,
+            query=query,
+            version=version,
+            encrypt=encrypt,
+            static=static,
+            destination_data_mart=destination_data_mart,
         )
         self.description = description
         self.destination_table = None
@@ -57,6 +63,7 @@ class View(QueryBase):
             description=d.get("DESCRIPTION"),
             encrypt=d.get("ENCRYPT", None),
             static=d.get("STATIC", True),
+            destination_data_mart=d.get("DESTINATION_DATA_MART"),
         )
         view.destination_table = d.get("DESTINATION_TABLE")
         view.dependencies = [Dependency.from_dict(x) for x in d.get("DEPENDS_ON") or []]
@@ -81,6 +88,7 @@ class View(QueryBase):
             "KIND": self.kind,
             "ENCRYPT": self.encrypt,
             "STATIC": self.static,
+            "DESTINATION_DATA_MART": self.destination_data_mart,
             "DEPENDS_ON": [d.to_dict() for d in self.dependencies],
             "PARSING_DEPENDS_ON": [d.to_dict() for d in self.parsing_dependencies],
         }
@@ -96,6 +104,7 @@ class View(QueryBase):
             and self.kind == o.kind
             and self.encrypt == o.encrypt
             and self.static == o.static
+            and self.destination_data_mart == o.destination_data_mart
             and self.dependencies == o.dependencies
             and self.parsing_dependencies == o.parsing_dependencies
         )
