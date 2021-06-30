@@ -100,7 +100,12 @@ class Transformation(QueryBase):
         :type tables: List[str], optional
         """
         super().__init__(
-            name=name, query=query, version=version, encrypt=encrypt, static=static
+            name=name,
+            query=query,
+            version=version,
+            encrypt=encrypt,
+            static=static,
+            destination_data_mart=destination_data_mart,
         )
         self.has_output = has_output
         self.destination_table = destination_table
@@ -113,7 +118,6 @@ class Transformation(QueryBase):
         self.partition_expiration = partition_expiration
         self.required_partition_filter = required_partition_filter
         self.schema_update_options = schema_update_options
-        self.destination_data_mart = destination_data_mart
         self.dependencies = dependencies or []
         self.parsing_dependencies = parsing_dependencies or []
         self.destroy_table = destroy_table
