@@ -34,6 +34,7 @@ class TestView:
             "DESTINATION_TABLE": None,
             "KIND": "view",
             "ENCRYPT": None,
+            "STATIC": True,
             "DEPENDS_ON": [],
             "PARSING_DEPENDS_ON": [],
         }

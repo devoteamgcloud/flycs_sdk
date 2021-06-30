@@ -99,8 +99,9 @@ class Transformation(QueryBase):
                        The name of the transformation then becomes `{transformation_name}_{table_name}`
         :type tables: List[str], optional
         """
-        super().__init__(name=name, query=query, version=version, encrypt=encrypt)
-        self.static = static
+        super().__init__(
+            name=name, query=query, version=version, encrypt=encrypt, static=static
+        )
         self.has_output = has_output
         self.destination_table = destination_table
         self.keep_old_columns = keep_old_columns
