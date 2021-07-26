@@ -18,6 +18,8 @@ class View(QueryBase):
         version: str,
         description: Optional[str] = None,
         encrypt: Optional[bool] = None,
+        static: Optional[bool] = True,
+        destination_data_mart: Optional[str] = None,
     ):
         """Create a View object.
 
@@ -32,7 +34,14 @@ class View(QueryBase):
         :param encrypt: if set to False, disable automatic encryption of the result of the query
         :type encrypt: Optional[bool]
         """
-        super().__init__(name=name, query=query, version=version, encrypt=encrypt)
+        super().__init__(
+            name=name,
+            query=query,
+            version=version,
+            encrypt=encrypt,
+            static=static,
+            destination_data_mart=destination_data_mart,
+        )
         self.description = description
         self.destination_table = None
         self.dependencies = []
@@ -53,6 +62,8 @@ class View(QueryBase):
             version=d["VERSION"],
             description=d.get("DESCRIPTION"),
             encrypt=d.get("ENCRYPT", None),
+            static=d.get("STATIC", True),
+            destination_data_mart=d.get("DESTINATION_DATA_MART"),
         )
         view.destination_table = d.get("DESTINATION_TABLE")
         view.dependencies = [Dependency.from_dict(x) for x in d.get("DEPENDS_ON") or []]
@@ -76,6 +87,8 @@ class View(QueryBase):
             "DESTINATION_TABLE": self.destination_table,
             "KIND": self.kind,
             "ENCRYPT": self.encrypt,
+            "STATIC": self.static,
+            "DESTINATION_DATA_MART": self.destination_data_mart,
             "DEPENDS_ON": [d.to_dict() for d in self.dependencies],
             "PARSING_DEPENDS_ON": [d.to_dict() for d in self.parsing_dependencies],
         }
@@ -90,6 +103,8 @@ class View(QueryBase):
             and self.destination_table == o.destination_table
             and self.kind == o.kind
             and self.encrypt == o.encrypt
+            and self.static == o.static
+            and self.destination_data_mart == o.destination_data_mart
             and self.dependencies == o.dependencies
             and self.parsing_dependencies == o.parsing_dependencies
         )

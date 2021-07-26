@@ -10,9 +10,9 @@ from flycs_sdk.entities import Entity, ParametrizedEntity
 from flycs_sdk.pipelines import (
     Pipeline,
     ParametrizedPipeline,
-    PipelineKind,
     _parse_datetime,
     _format_datetime,
+    PipelineKind,
 )
 
 from flycs_sdk.triggers import PubSubTrigger
@@ -32,7 +32,7 @@ class TestPipeline:
             "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
             "staging": {"table_1": "1.0.0", "table_2": "1.0.0"},
         }
-        return Entity("entity1", "1.0.0", stage_config)
+        return Entity("entity1", "1.0.0", stage_config=stage_config)
 
     @pytest.fixture
     def my_pipeline(self, my_entity):
@@ -136,6 +136,7 @@ class TestPipeline:
                 {
                     "name": "entity1",
                     "version": "1.0.0",
+                    "kind": None,
                     "stage_config": [
                         {
                             "name": "raw",
@@ -170,6 +171,7 @@ class TestPipeline:
                 {
                     "name": "entity1",
                     "version": "1.0.0",
+                    "kind": None,
                     "stage_config": [
                         {
                             "name": "raw",
@@ -228,7 +230,7 @@ class TestParametrizedPipeline(TestPipeline):
             "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
             "staging": {"table_1": "1.0.0", "table_2": "1.0.0"},
         }
-        return ParametrizedEntity("entity1", "1.0.0", stage_config)
+        return ParametrizedEntity("entity1", "1.0.0", stage_config=stage_config)
 
     @pytest.fixture
     def my_non_parameterized_entity(self):
@@ -236,7 +238,7 @@ class TestParametrizedPipeline(TestPipeline):
             "raw": {"table_1": "1.0.0", "table_2": "1.0.0"},
             "staging": {"table_1": "1.0.0", "table_2": "1.0.0"},
         }
-        return Entity("entity1", "1.0.0", stage_config)
+        return Entity("entity1", "1.0.0", stage_config=stage_config)
 
     @pytest.fixture
     def my_pipeline(self, my_entity):
@@ -275,6 +277,7 @@ class TestParametrizedPipeline(TestPipeline):
                     {
                         "name": "entity1_nl_be",
                         "version": "1.0.0",
+                        "kind": None,
                         "stage_config": [
                             {
                                 "name": "raw",
@@ -300,6 +303,7 @@ class TestParametrizedPipeline(TestPipeline):
                     {
                         "name": "entity1_nl_en",
                         "version": "1.0.0",
+                        "kind": None,
                         "stage_config": [
                             {
                                 "name": "raw",
@@ -325,6 +329,7 @@ class TestParametrizedPipeline(TestPipeline):
                     {
                         "name": "entity1_fr_be",
                         "version": "1.0.0",
+                        "kind": None,
                         "stage_config": [
                             {
                                 "name": "raw",
@@ -350,6 +355,7 @@ class TestParametrizedPipeline(TestPipeline):
                     {
                         "name": "entity1_fr_en",
                         "version": "1.0.0",
+                        "kind": None,
                         "stage_config": [
                             {
                                 "name": "raw",

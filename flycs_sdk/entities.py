@@ -2,6 +2,7 @@
 
 from typing import Dict, List, Optional, Union
 from .custom_code import CustomCode
+from enum import Enum
 from .transformations import Transformation
 from .views import View
 
@@ -13,6 +14,14 @@ class ConflictingNameError(ValueError):
     pass
 
 
+class EntityKind(Enum):
+    """This enumeration contains all the supported entity types."""
+
+    VANILLA = "vanilla"
+    DELTA_TRACKING = "delta_tracking"
+    DATA_VAULT = "data_vault"
+
+
 class Entity:
     """Class that serves as a version configuration for a logical subset of a Pipeline."""
 
@@ -20,6 +29,7 @@ class Entity:
         self,
         name: str,
         version: str,
+        kind: Optional[EntityKind] = None,
         stage_config: Optional[Dict[str, Dict[str, str]]] = None,
         custom_operators: Optional[Dict[str, List[CustomCode]]] = None,
     ):
@@ -28,6 +38,7 @@ class Entity:
 
         :param name: the name of the entity
         :param version: the version of the entity, this can be used for table naming this entity belongs to.
+        :param kind: the kind of the entity
         :param stage_config: a dictionary with the name of the stage as key and a dictionary of query names
         and their versions as value.
         :param custom_operators: a dictionary with the name of the stage as key and a list
@@ -37,13 +48,15 @@ class Entity:
         """
         self.name = name
         self.version = version
+        self.kind = kind
         self.stage_config = stage_config or {}
         self.transformations = {}
         self.custom_operators = custom_operators or {}
 
     @classmethod
     def from_dict(cls, d: dict):
-        """Create an Entity object form a dictionnary created with the to_dict method.
+        """
+        Create an Entity object form a dictionnary created with the to_dict method.
 
         :param d: source dictionary
         :type d: dict
@@ -51,7 +64,12 @@ class Entity:
         :rtype: Entity
         """
         stage_config = {stage["name"]: stage["versions"] for stage in d["stage_config"]}
-        return cls(name=d["name"], version=d["version"], stage_config=stage_config)
+        return cls(
+            name=d["name"],
+            version=d["version"],
+            kind=EntityKind(d["kind"]) if d.get("kind") is not None else None,
+            stage_config=stage_config,
+        )
 
     @property
     def stages(self):
@@ -113,6 +131,7 @@ class Entity:
         return {
             "name": self.name,
             "version": self.version,
+            "kind": self.kind.value if self.kind is not None else None,
             "stage_config": [
                 {"name": stage, "versions": self.get_stage_versions(stage)}
                 for stage in self.stage_config.keys()
@@ -127,6 +146,7 @@ class Entity:
             self.name == other.name
             and self.version == other.version
             and self.stage_config == other.stage_config
+            and self.kind == other.kind
         )
 
 
@@ -139,6 +159,7 @@ class BaseLayerEntity(Entity):
         self,
         name: str,
         version: str,
+        kind: Optional[EntityKind] = None,
         datalake_versions: Dict[str, str] = None,
         preamble_versions: Dict[str, str] = None,
         staging_versions: Dict[str, str] = None,
@@ -154,13 +175,14 @@ class BaseLayerEntity(Entity):
         :param name: the name of the entity
         :param version: the version of the entity, this can be used for table naming
         this entity belongs to.
+        :param kind: the kind of the entity
         :param datalake_versions: the versions of the queries for the datalake stage
         :param preamble_versions: the versions of the queries for the preamble stage
         :param staging_versions: the versions of the queries for the staging stage
         :param data_warehouse_versions: the versions of the queries for the data warehouse stage
         :param data_mart_versions: the versions of the queries for the data mart stage
         """
-        super().__init__(name, version)
+        super().__init__(name, version, kind)
         self.datalake_versions = datalake_versions
         self.preamble_versions = preamble_versions
         self.staging_versions = staging_versions
@@ -177,7 +199,11 @@ class BaseLayerEntity(Entity):
         :return: BaseLayerEntity
         :rtype: BaseLayerEntity
         """
-        entity = cls(name=d["name"], version=d["version"])
+        entity = cls(
+            name=d["name"],
+            version=d["version"],
+            kind=EntityKind(d["kind"]) if d.get("kind") is not None else None,
+        )
         for stage in d.get("stage_config", {}):
             if stage["name"] == "datalake":
                 entity.datalake_versions = stage["versions"]
@@ -286,6 +312,7 @@ class ParametrizedEntity:
         self,
         name: str,
         version: str,
+        kind: Optional[EntityKind] = None,
         stage_config: Optional[Dict[str, Dict[str, str]]] = None,
         custom_operators: Optional[Dict[str, List[CustomCode]]] = None,
     ):
@@ -298,12 +325,14 @@ class ParametrizedEntity:
         :param name: the name of the entity
         :param version: the version of the entity, this can be used for table naming
         this entity belongs to.
+        :param kind: the kind of the entity
         :param stage_config: a dictionary with the name of the stage as key and a dictionary of query names
         and their versions as value.
         """
         self.name = name
         self.version = version
-        self.stage_config = stage_config
+        self.kind = kind
+        self.stage_config = stage_config or {}
         self.transformations = {}
         self.custom_operators = custom_operators or {}
 
@@ -317,7 +346,12 @@ class ParametrizedEntity:
         :rtype: ParametrizedEntity
         """
         stage_config = {stage["name"]: stage["versions"] for stage in d["stage_config"]}
-        return cls(name=d["name"], version=d["version"], stage_config=stage_config)
+        return cls(
+            name=d["name"],
+            version=d["version"],
+            kind=EntityKind(d["kind"]) if d.get("kind") is not None else None,
+            stage_config=stage_config,
+        )
 
     @property
     def stages(self):
@@ -346,6 +380,7 @@ class ParametrizedEntity:
         return {
             "name": _parametrized_name(self.name, parameters),
             "version": self.version,
+            "kind": self.kind.value if self.kind is not None else None,
             "stage_config": [
                 {"name": stage, "versions": self.get_stage_versions(stage, parameters)}
                 for stage in self.stage_config.keys()
@@ -358,6 +393,7 @@ class ParametrizedEntity:
             self.name == other.name
             and self.version == other.version
             and self.stage_config == other.stage_config
+            and self.kind == other.kind
         )
 
 
@@ -370,6 +406,7 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
         self,
         name: str,
         version: str,
+        kind: Optional[EntityKind] = None,
         datalake_versions: Dict[str, str] = None,
         preamble_versions: Dict[str, str] = None,
         staging_versions: Dict[str, str] = None,
@@ -385,13 +422,14 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
         :param name: the name of the entity
         :param version: the version of the entity, this can be used for table naming
         this entity belongs to.
+        :param kind: the kind of the entity
         :param datalake_versions: the versions of the queries for the datalake stage
         :param preamble_versions: the versions of the queries for the preamble stage
         :param staging_versions: the versions of the queries for the staging stage
         :param data_warehouse_versions: the versions of the queries for the data warehouse stage
         :param data_mart_versions: the versions of the queries for the data mart stage
         """
-        super().__init__(name, version)
+        super().__init__(name, version, kind)
         self.datalake_versions = datalake_versions
         self.preamble_versions = preamble_versions
         self.staging_versions = staging_versions
@@ -411,6 +449,7 @@ class ParametrizedBaseLayerEntity(ParametrizedEntity):
         entity = cls(
             name=d["name"],
             version=d["version"],
+            kind=EntityKind(d["kind"]) if d.get("kind") is not None else None,
             datalake_versions=d["stage_config"],
             preamble_versions=d["preamble_versions"],
             staging_versions=d["staging_versions"],
