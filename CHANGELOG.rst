@@ -1,6 +1,22 @@
 Changelog
 =========
 
+v0.8.0 (2021-07-26)
+-------------------
+
+New - Dev|pkg|test|doc
+~~~~~~~~~~~~~~~~~~~~~~
+- Introduce QueryBase class. [Christophe de Carvalho]
+
+  This class is the base for any other class that uses SQL query.
+  It has 2 child classes, Transformation and View.
+- Add concept of View object. [Christophe de Carvalho]
+
+  You can now define views.
+  The work mostly the same way Transformation do, but without all the
+  tables related configurations.
+
+
 v0.7.2 (2021-05-18)
 -------------------
 
