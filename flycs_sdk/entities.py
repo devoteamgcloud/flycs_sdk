@@ -32,6 +32,7 @@ class Entity:
         kind: Optional[EntityKind] = None,
         stage_config: Optional[Dict[str, Dict[str, str]]] = None,
         custom_operators: Optional[Dict[str, List[CustomCode]]] = None,
+        location: Optional[str] = None,
     ):
         """
         Create an Entity object.
@@ -45,6 +46,8 @@ class Entity:
                                  of CustomCode objects allowing to inject custom Airflow operator
                                  into the pipeline as value
         :type custom_operators: list
+        :param location: The location where to create the associated dataset. This field is optional and only required when you want to
+                  manually overwrite the default dataset location configure in the environmen
         """
         self.name = name
         self.version = version
@@ -52,6 +55,7 @@ class Entity:
         self.stage_config = stage_config or {}
         self.transformations = {}
         self.custom_operators = custom_operators or {}
+        self.location = location
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -69,6 +73,7 @@ class Entity:
             version=d["version"],
             kind=EntityKind(d["kind"]) if d.get("kind") is not None else None,
             stage_config=stage_config,
+            location=d.get("location"),
         )
 
     @property
@@ -138,6 +143,7 @@ class Entity:
             ]
             if self.stage_config is not None
             else [],
+            "location": self.location,
         }
 
     def __eq__(self, other):
@@ -147,6 +153,7 @@ class Entity:
             and self.version == other.version
             and self.stage_config == other.stage_config
             and self.kind == other.kind
+            and self.location == other.location
         )
 
 
@@ -315,6 +322,7 @@ class ParametrizedEntity:
         kind: Optional[EntityKind] = None,
         stage_config: Optional[Dict[str, Dict[str, str]]] = None,
         custom_operators: Optional[Dict[str, List[CustomCode]]] = None,
+        location: Optional[str] = None,
     ):
         """
         Create a ParametrizedEntity object.
@@ -328,6 +336,11 @@ class ParametrizedEntity:
         :param kind: the kind of the entity
         :param stage_config: a dictionary with the name of the stage as key and a dictionary of query names
         and their versions as value.
+        :param custom_operators: a dictionary with the name of the stage as key and a list
+                                 of CustomCode objects allowing to inject custom Airflow operator
+                                 into the pipeline as value
+        :param location: The location where to create the associated dataset. This field is optional and only required when you want to
+                  manually overwrite the default dataset location configure in the environmen
         """
         self.name = name
         self.version = version
@@ -335,6 +348,7 @@ class ParametrizedEntity:
         self.stage_config = stage_config or {}
         self.transformations = {}
         self.custom_operators = custom_operators or {}
+        self.location = location
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -351,6 +365,7 @@ class ParametrizedEntity:
             version=d["version"],
             kind=EntityKind(d["kind"]) if d.get("kind") is not None else None,
             stage_config=stage_config,
+            location=d.get("location"),
         )
 
     @property
@@ -385,6 +400,7 @@ class ParametrizedEntity:
                 {"name": stage, "versions": self.get_stage_versions(stage, parameters)}
                 for stage in self.stage_config.keys()
             ],
+            "location": self.location,
         }
 
     def __eq__(self, other):
@@ -394,6 +410,7 @@ class ParametrizedEntity:
             and self.version == other.version
             and self.stage_config == other.stage_config
             and self.kind == other.kind
+            and self.location == other.location
         )
 
 

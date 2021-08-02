@@ -147,6 +147,7 @@ class TestPipeline:
                             "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
                         },
                     ],
+                    "location": None,
                 }
             ],
         }
@@ -182,6 +183,7 @@ class TestPipeline:
                             "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
                         },
                     ],
+                    "location": None,
                 }
             ],
         }
@@ -288,6 +290,7 @@ class TestParametrizedPipeline(TestPipeline):
                                 "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
                             },
                         ],
+                        "location": None,
                     },
                 ],
             },
@@ -314,6 +317,7 @@ class TestParametrizedPipeline(TestPipeline):
                                 "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
                             },
                         ],
+                        "location": None,
                     },
                 ],
             },
@@ -340,6 +344,7 @@ class TestParametrizedPipeline(TestPipeline):
                                 "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
                             },
                         ],
+                        "location": None,
                     },
                 ],
             },
@@ -366,6 +371,7 @@ class TestParametrizedPipeline(TestPipeline):
                                 "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
                             },
                         ],
+                        "location": None,
                     },
                 ],
             },
