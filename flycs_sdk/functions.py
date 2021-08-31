@@ -1,4 +1,4 @@
-"""Module containing view classes."""
+"""Module containing Function classes."""
 
 from typing import Optional, List
 
@@ -89,12 +89,12 @@ class Function(QueryBase):
 
     @classmethod
     def from_dict(cls, d: dict):
-        """Create a View object form a dictionary created with the to_dict method.
+        """Create a Function object from a dictionary created with the to_dict method.
 
         :param d: source dictionary
         :type d: dict
-        :return: View
-        :rtype: View
+        :return: Function
+        :rtype: Function
         """
         function = cls(
             name=d.get("NAME", ""),
@@ -118,9 +118,9 @@ class Function(QueryBase):
 
     def to_dict(self) -> dict:
         """
-        Serialize the View to a dictionary object.
+        Serialize the Function to a dictionary object.
 
-        :return: the View as a dictionary object.
+        :return: the Function as a dictionary object.
         :rtype: Dict
         """
         return {
