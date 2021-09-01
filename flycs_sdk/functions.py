@@ -39,6 +39,10 @@ class Argument:
         """
         return cls(name=a["NAME"], type=a["TYPE"])
 
+    def __eq__(self, o) -> bool:
+        """Implement __eq__ method."""
+        return self.name == o.name and self.type == o.type
+
 
 class Function(QueryBase):
     """Class representing a Function configuration."""
@@ -78,10 +82,12 @@ class Function(QueryBase):
             name=name,
             query=query,
             version=version,
-            encrypt=False,
             static=static,
             destination_data_mart=destination_data_mart,
         )
+        self.destination_table = None
+        self.dependencies = []
+        self.parsing_dependencies = []
         self.argument_list = argument_list
         self.description = description
         self.return_type = return_type
@@ -102,14 +108,15 @@ class Function(QueryBase):
             version=d["VERSION"],
             description=d.get("DESCRIPTION"),
             static=d.get("STATIC", True),
+            # encrypt=d.get("ENCRYPT", False),
             destination_data_mart=d.get("DESTINATION_DATA_MART"),
+            argument_list=[Argument.from_dict(a) for a in d.get("ARGUMENT_LIST") or []],
+            return_type=d.get("RETURN_TYPE"),
+            language=d.get("LANGUAGE", "sql"),
         )
         function.destination_table = d.get("DESTINATION_TABLE")
         function.dependencies = [
             Dependency.from_dict(x) for x in d.get("DEPENDS_ON") or []
-        ]
-        function.argument_list = [
-            Argument.from_dict(a) for a in d.get("ARGUMENT_LIST") or []
         ]
         function.parsing_dependencies = [
             Dependency.from_dict(x) for x in d.get("PARSING_DEPENDS_ON") or []
@@ -130,6 +137,7 @@ class Function(QueryBase):
             "DESCRIPTION": self.description,
             "DESTINATION_TABLE": self.destination_table,
             "KIND": self.kind,
+            "ENCRYPT": self.encrypt,
             "STATIC": self.static,
             "DESTINATION_DATA_MART": self.destination_data_mart,
             "DEPENDS_ON": [d.to_dict() for d in self.dependencies],
