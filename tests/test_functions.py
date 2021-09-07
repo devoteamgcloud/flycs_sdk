@@ -72,7 +72,6 @@ class TestFunction:
             "DESCRIPTION": function_description,
             "DESTINATION_TABLE": None,
             "KIND": "function",
-            "ENCRYPT": None,
             "STATIC": True,
             "DESTINATION_DATA_MART": None,
             "DEPENDS_ON": [],
