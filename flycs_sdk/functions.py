@@ -20,7 +20,7 @@ class Argument:
         self.name = name
         self.type = type
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Serialize the Argument to a dictionary object.
 
@@ -55,7 +55,7 @@ class Function(QueryBase):
         query: str,
         version: str,
         argument_list: List[Argument],
-        return_type: str,
+        return_type: Optional[str],
         language: Optional[str] = "sql",
         description: Optional[str] = None,
         static: Optional[bool] = True,
@@ -72,7 +72,7 @@ class Function(QueryBase):
         :param argument_list: the list of arguments of the function
         :type argument_list: List[Argument]
         :param return_type: the SQL return type of the function
-        :type return_type: str
+        :type return_type: Optional[str]
         :param language: the language of the function, defaults to sql
         :type language: Optional[str]
         :param description: description of the function, defaults to None
