@@ -22,6 +22,44 @@ class SchemaUpdateOptions(Enum):
     ALLOW_FIELD_ADDITION = "ALLOW_FIELD_ADDITION"
 
 
+class FieldConfig:
+    """FieldConfig allows to configure special options on a single field of a table."""
+
+    def __init__(self, field_name: str, decrypt: bool):
+        """Create FieldConfig object.
+
+        :param field_name: name of the field to configure
+        :type field_name: str
+        :param decrypt: whether this field should be decrypted automatically or not
+        :type decrypt: bool
+        """
+        self.field_name = field_name
+        self.decrypt = decrypt
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create a FieldConfig object form a dictionnary created with the to_dict method.
+
+        :param d: source dictionary
+        :type d: dict
+        :return: FieldConfig object
+        :rtype: FieldConfig
+        """
+        return FieldConfig(field_name=d["FIELD_NAME"], decrypt=d["DECRYPT"])
+
+    def to_dict(self) -> dict:
+        """Serialize the Transformation to a dictionary object.
+
+        :return: the FieldConfig as a dictionary object.
+        :rtype: Dict
+        """
+        return {"FIELD_NAME": self.field_name, "DECRYPT": self.decrypt}
+
+    def __eq__(self, other):
+        """Implement __eq__ method."""
+        return self.field_name == other.field_name and self.decrypt == other.decrypt
+
+
 class Transformation(QueryBase):
     """Transformations are the lowest unit inside of a data pipeline. It is a single task implemented as a SQL query."""
 
@@ -52,6 +90,7 @@ class Transformation(QueryBase):
         parsing_dependencies: Optional[List[Dependency]] = None,
         destroy_table: Optional[bool] = False,
         tables: Optional[List[dict]] = None,
+        fields_config: Optional[List[FieldConfig]] = None,
     ):
         """Class representing a transformation.
 
@@ -98,6 +137,8 @@ class Transformation(QueryBase):
         :param tables: If specified, this transformation will generate multiple BigQueryOperator during Airflow generation, one for each table name in this list.
                        The name of the transformation then becomes `{transformation_name}_{table_name}`
         :type tables: List[str], optional
+        :param field_config: List of extra configuration per field of the transformation
+        :type field_config: List[FieldConfig], optional
         """
         super().__init__(
             name=name,
@@ -122,6 +163,7 @@ class Transformation(QueryBase):
         self.parsing_dependencies = parsing_dependencies or []
         self.destroy_table = destroy_table
         self.tables = tables
+        self.fields_config = fields_config or []
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -160,6 +202,9 @@ class Transformation(QueryBase):
             ],
             destroy_table=d.get("DESTROY_TABLE", False),
             tables=d.get("TABLES"),
+            fields_config=[
+                FieldConfig.from_dict(x) for x in d.get("FIELDS_CONFIG") or []
+            ],
         )
 
     def to_dict(self) -> dict:
@@ -194,6 +239,7 @@ class Transformation(QueryBase):
             "DESTROY_TABLE": self.destroy_table,
             "TABLES": self.tables,
             "KIND": self.kind,
+            "FIELDS_CONFIG": [config.to_dict() for config in self.fields_config],
         }
 
     def __eq__(self, other):
@@ -221,4 +267,5 @@ class Transformation(QueryBase):
             and self.destroy_table == other.destroy_table
             and self.tables == other.tables
             and self.kind == other.kind
+            and self.fields_config == other.fields_config
         )
