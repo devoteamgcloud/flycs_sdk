@@ -205,9 +205,9 @@ unreleased_version_label = "(unreleased)"
 ##        Examples:
 ##           - makotemplate("restructuredtext")
 ##
-output_engine = rest_py
+#output_engine = rest_py
 #output_engine = mustache("restructuredtext")
-#output_engine = mustache("markdown")
+output_engine = mustache("markdown")
 #output_engine = makotemplate("restructuredtext")
 
 
@@ -297,7 +297,7 @@ include_merge = True
 ##        take care of everything and might be more complex. Check the README
 ##        for a complete copy-pastable example.
 ##
-OUTPUT_FILE = "CHANGELOG.rst"
+OUTPUT_FILE = "CHANGELOG.md"
 INSERT_POINT_REGEX = r'''(?isxu)
 ^
 (

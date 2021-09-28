@@ -1,8 +1,10 @@
 from flycs_sdk.custom_code import Dependency
 from flycs_sdk.transformations import (
+    FieldConfig,
     Transformation,
     WriteDisposition,
     SchemaUpdateOptions,
+    FieldConfig,
 )
 import pytest
 
@@ -21,6 +23,10 @@ transformation_schema_update_options = [SchemaUpdateOptions.ALLOW_FIELD_ADDITION
 transformation_dependencies = [Dependency("entity1", "staging", "deps")]
 transformation_parsing_dependencies = []
 transformation_destroy_table = False
+transformation_fields_config = [
+    FieldConfig(field_name="field1", decrypt=False),
+    FieldConfig(field_name="field2", decrypt=True),
+]
 
 
 class TestTranformations:
@@ -42,6 +48,7 @@ class TestTranformations:
             dependencies=transformation_dependencies,
             parsing_dependencies=transformation_parsing_dependencies,
             destroy_table=transformation_destroy_table,
+            fields_config=transformation_fields_config,
         )
 
     def test_init(self, my_transformation):
@@ -61,6 +68,7 @@ class TestTranformations:
         )
         assert my_transformation.dependencies == transformation_dependencies
         assert my_transformation.destroy_table == transformation_destroy_table
+        assert my_transformation.fields_config == transformation_fields_config
 
     def test_to_dict(self, my_transformation):
         assert my_transformation.to_dict() == {
@@ -86,6 +94,10 @@ class TestTranformations:
             "DESTROY_TABLE": False,
             "TABLES": None,
             "KIND": "transformation",
+            "FIELDS_CONFIG": [
+                {"FIELD_NAME": "field1", "DECRYPT": False,},
+                {"FIELD_NAME": "field2", "DECRYPT": True,},
+            ],
         }
 
     def test_from_dict(self, my_transformation):
