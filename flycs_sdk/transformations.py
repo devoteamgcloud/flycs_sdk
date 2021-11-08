@@ -75,7 +75,7 @@ class Transformation(QueryBase):
         has_output: Optional[bool] = False,
         destination_table: Optional[str] = None,
         keep_old_columns: Optional[bool] = True,
-        persist_backup: Optional[bool] = True,
+        persist_backup: Optional[bool] = None,
         write_disposition: Optional[WriteDisposition] = WriteDisposition.APPEND,
         time_partitioning: Optional[dict] = None,
         cluster_fields: Optional[List[str]] = None,
@@ -183,7 +183,7 @@ class Transformation(QueryBase):
             has_output=d.get("HAS_OUTPUT", True),
             destination_table=d.get("DESTINATION_TABLE"),
             keep_old_columns=d.get("KEEP_OLD_COLUMNS", True),
-            persist_backup=d.get("PERSIST_BACKUP", True),
+            persist_backup=d.get("PERSIST_BACKUP"),
             write_disposition=WriteDisposition(
                 d.get("WRITE_DISPOSITION", "WRITE_APPEND")
             ),
