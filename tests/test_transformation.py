@@ -95,8 +95,14 @@ class TestTranformations:
             "TABLES": None,
             "KIND": "transformation",
             "FIELDS_CONFIG": [
-                {"FIELD_NAME": "field1", "DECRYPT": False,},
-                {"FIELD_NAME": "field2", "DECRYPT": True,},
+                {
+                    "FIELD_NAME": "field1",
+                    "DECRYPT": False,
+                },
+                {
+                    "FIELD_NAME": "field2",
+                    "DECRYPT": True,
+                },
             ],
         }
 

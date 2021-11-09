@@ -215,7 +215,8 @@ class ParametrizedPipeline:
         self._start_time = value
 
     def add_entity(
-        self, entity: Union[ParametrizedEntity, ParametrizedBaseLayerEntity],
+        self,
+        entity: Union[ParametrizedEntity, ParametrizedBaseLayerEntity],
     ):
         """
         Add entity to the list of entities contained in this pipeline.
