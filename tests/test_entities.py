@@ -38,7 +38,10 @@ class TestEntity:
             "version": entity_version,
             "kind": entity_kind,
             "stage_config": [
-                {"name": "raw", "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},},
+                {
+                    "name": "raw",
+                    "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                },
                 {
                     "name": "staging",
                     "versions": {"table_3": "1.0.0", "table_4": "1.0.0"},
@@ -294,7 +297,10 @@ class TestNoKindEntity:
             "version": entity_version,
             "kind": None,
             "stage_config": [
-                {"name": "raw", "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},},
+                {
+                    "name": "raw",
+                    "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                },
                 {
                     "name": "staging",
                     "versions": {"table_3": "1.0.0", "table_4": "1.0.0"},
