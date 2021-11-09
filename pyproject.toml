@@ -21,16 +21,17 @@ packages = [
   {include = "tests", format = "sdist"},
 ]
 readme = "README.rst"
-version = "0.8.2"
+version = "0.10.0"
 
 [tool.poetry.dependencies]
-python = ">=3.6"
+python = ">=3.6.2"
+requirements-parser = "^0.2.0"
 "ruamel.yaml" = "^0.16.12"
 semver = "^2.13.0"
-requirements-parser = "^0.2.0"
+chardet = "^4.0.0"
 
 [tool.poetry.dev-dependencies]
-black = "19.10b0"
+black = "^21.10b0"
 bump2version = "*"
 coverage = "*"
 deepdiff = "^5.0.2"

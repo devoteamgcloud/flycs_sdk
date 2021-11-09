@@ -1,6 +1,26 @@
 Changelog
 =========
 
+## v0.10.0 (2021-11-09)
+
+### New - Dev|pkg|test|doc
+
+* Add location field on Entity class. [Christophe de Carvalho]
+
+  This fiels allow user to manually overwrite the default location of the
+  associated dataset.
+
+### Changes - Dev|pkg|test|doc
+
+* Upgrade black formatter version. [Christophe de Carvalho]
+
+* Do not give default value for PERSIST_BACKUP field. [Christophe de Carvalho]
+
+  If the user does not specify a value, then the airflow-deployment code
+  default behavior is used. So we should not enforce a default value here
+  in the SDK cause it overwrite the default behavior in airflow-deployment
+
+
 ## v0.8.1 (2021-07-26)
 
 ### New - Dev|pkg|test|doc

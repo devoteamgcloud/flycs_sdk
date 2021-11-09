@@ -38,7 +38,10 @@ class TestEntity:
             "version": entity_version,
             "kind": entity_kind,
             "stage_config": [
-                {"name": "raw", "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},},
+                {
+                    "name": "raw",
+                    "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                },
                 {
                     "name": "staging",
                     "versions": {"table_3": "1.0.0", "table_4": "1.0.0"},
@@ -92,6 +95,7 @@ class TestEntity:
                         "versions": {"table_3": "1.0.0", "table_4": "1.0.0"},
                     },
                 ],
+                "location": None,
             },
             ignore_order=True,
         )
@@ -158,6 +162,7 @@ class TestBaseLayerEntity(TestEntity):
                     "versions": {"table_9": "1.0.0", "table_10": "1.0.0"},
                 },
             ],
+            "location": None,
         }
 
     def test_to_dict(self, my_entity):
@@ -189,6 +194,7 @@ class TestBaseLayerEntity(TestEntity):
                         "versions": {"table_9": "1.0.0", "table_10": "1.0.0"},
                     },
                 ],
+                "location": None,
             },
             ignore_order=True,
         )
@@ -207,6 +213,7 @@ class TestBaseLayerEntity(TestEntity):
                     {"name": "data_warehouse", "versions": {}},
                     {"name": "data_mart", "versions": {}},
                 ],
+                "location": None,
             },
             ignore_order=True,
         )
@@ -290,7 +297,10 @@ class TestNoKindEntity:
             "version": entity_version,
             "kind": None,
             "stage_config": [
-                {"name": "raw", "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},},
+                {
+                    "name": "raw",
+                    "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                },
                 {
                     "name": "staging",
                     "versions": {"table_3": "1.0.0", "table_4": "1.0.0"},
@@ -320,6 +330,7 @@ class TestNoKindEntity:
                         "versions": {"table_3": "1.0.0", "table_4": "1.0.0"},
                     },
                 ],
+                "location": None,
             },
             ignore_order=True,
         )
