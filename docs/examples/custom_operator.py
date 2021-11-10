@@ -7,14 +7,13 @@ from flycs_sdk.transformations import Transformation
 
 ENTITY_NAME = "my_dataset"
 
-transformations = []
+
 query = Transformation(
     name="simple_copy",
     query="SELECT * FROM raw.alpha.employees.employees AS raw",
     version="1.0.0",
     static=True,
 )
-transformations.append(query)
 
 
 def build(dag, env=None):
@@ -40,12 +39,10 @@ mycode = CustomCode(
 entity = Entity(
     name=ENTITY_NAME,
     version="1.0.0",
-    stage_config={"staging": {t.name: t.version for t in transformations}},
     custom_operators={"staging": [mycode]},
 )
 # insert the transformations into the entity
-for t in transformations:
-    entity.transformations["staging"] = {t.name: t for t in transformations}
+entity.add_transformation("staging", query)
 
 
 python_pipeline = Pipeline(

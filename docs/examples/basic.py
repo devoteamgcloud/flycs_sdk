@@ -9,7 +9,7 @@ stage_config = {
     "staging": {"table_3": "1.0.0", "table_4": "1.0.0"},
     "data_warehouse": {"table_5": "1.1.0"},
 }
-entity1 = Entity("entity1", "1.0.0", stage_config)
+entity1 = Entity(name="entity1", version="1.0.0", stage_config=stage_config)
 
 # Once the entities are defined, we can create pipelines.
 p1 = Pipeline(
