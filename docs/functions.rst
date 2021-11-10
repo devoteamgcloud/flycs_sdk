@@ -7,6 +7,7 @@ Flycs lets you define BigQuery functions. These functions will be created in Big
 Example definition of a function in YAML:
 
 .. code-block:: yaml
+
     QUERY: |
     LANGUAGE js AS '''
         if (name === null) {
