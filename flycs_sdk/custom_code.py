@@ -1,7 +1,7 @@
 """Module containing class used to inject custom Airflow operator into pipelines definitions."""
 
 import inspect
-from typing import Callable, List
+from typing import Callable, Dict, List
 
 from requirements.requirement import Requirement
 
@@ -75,6 +75,7 @@ class CustomCode:
         operator_builder: Callable,
         dependencies: List[Dependency] = None,
         requirements: List[str] = None,
+        func_kwargs: Dict[str, object] = None,
     ):
         """Represent a custom Airflow code that needs to be injected into a DAG.
 
@@ -90,12 +91,15 @@ class CustomCode:
         :param requirements: list of python package required by this code, use the same format as normal python requirements.txt files.
                              These package will be installed on the composer instance.
         :type requirements: List[str]
+        :param func_kwargs: List of kwargs areguments for a customer operator
+        :type func_kwargs: Dict[str:object]
         """
         self.name = name
         self.version = version
         self.operator_builder = operator_builder
         self.dependencies = dependencies or []
         self.requirements = requirements or []
+        self.func_kwargs = func_kwargs or {}
 
         self._ensure_builder_signature(operator_builder)
         self._validate_requirements()
