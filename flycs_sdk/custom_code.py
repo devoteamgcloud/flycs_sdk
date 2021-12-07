@@ -106,7 +106,8 @@ class CustomCode:
 
     def _ensure_builder_signature(self, f: Callable):
         signature = inspect.Signature.from_callable(f)
-        if ["dag", "env"] != list(signature.parameters.keys()):
+        signature_parameters = list(signature.parameters.keys())
+        if "dag" in signature_parameters and "env" in signature_parameters:
             raise WrongSignatureError(
                 f"the builder function of the custom code {self.name}_{self.version} does not accept the mandatory ('dag', 'env', 'user') arguments"
             )
