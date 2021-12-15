@@ -9,16 +9,19 @@ from flycs_sdk.query_base import QueryBase
 class Argument:
     """Class representing a Stored Procedure Argument."""
 
-    def __init__(self, name: str, type: str):
+    def __init__(self, name: str, type: str, mode: Optional[str]):
         """Create an Argument object.
 
         :param name: name of the argument
         :type name: str
         :param type: the SQL type of the argument
         :type type: str
+        :param type: the SQL mode of the argumment (IN , OUT or INOUT)
+        :type mode: str
         """
         self.name = name
         self.type = type
+        self.mode = mode
 
     def to_dict(self) -> dict:
         """
@@ -26,7 +29,7 @@ class Argument:
 
         :return: the Argument as a dictionary object.
         """
-        return {"NAME": self.name, "TYPE": self.type}
+        return {"NAME": self.name, "TYPE": self.type, "MODE": self.mode}
 
     @classmethod
     def from_dict(cls, a):
@@ -37,11 +40,11 @@ class Argument:
         :return: Argument
         :rtype: Argument
         """
-        return cls(name=a["NAME"], type=a["TYPE"])
+        return cls(name=a["NAME"], type=a["TYPE"], mode=a["MODE"])
 
     def __eq__(self, o) -> bool:
         """Implement __eq__ method."""
-        return self.name == o.name and self.type == o.type
+        return self.name == o.name and self.type == o.type and self.mode == o.type
 
 
 class StoredProcedure(QueryBase):
