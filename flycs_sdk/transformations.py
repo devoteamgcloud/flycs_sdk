@@ -91,6 +91,7 @@ class Transformation(QueryBase):
         destroy_table: Optional[bool] = False,
         tables: Optional[List[dict]] = None,
         fields_config: Optional[List[FieldConfig]] = None,
+        force_cache_refresh: Optional[bool] = False,
     ):
         """Class representing a transformation.
 
@@ -139,6 +140,8 @@ class Transformation(QueryBase):
         :type tables: List[str], optional
         :param field_config: List of extra configuration per field of the transformation
         :type field_config: List[FieldConfig], optional
+        :param force_cache_refresh: whether or not we need to use the cache in the pii service
+        :type force_cache_refresh: bool, optional
         """
         super().__init__(
             name=name,
@@ -164,6 +167,7 @@ class Transformation(QueryBase):
         self.destroy_table = destroy_table
         self.tables = tables
         self.fields_config = fields_config or []
+        self.force_cache_refresh = force_cache_refresh
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -205,6 +209,7 @@ class Transformation(QueryBase):
             fields_config=[
                 FieldConfig.from_dict(x) for x in d.get("FIELDS_CONFIG") or []
             ],
+            force_cache_refresh=d.get("FORCE_CACHE_REFRESH", False),
         )
 
     def to_dict(self) -> dict:
@@ -240,6 +245,7 @@ class Transformation(QueryBase):
             "TABLES": self.tables,
             "KIND": self.kind,
             "FIELDS_CONFIG": [config.to_dict() for config in self.fields_config],
+            "FORCE_CACHE_REFRESH": self.force_cache_refresh,
         }
 
     def __eq__(self, other):
@@ -268,4 +274,5 @@ class Transformation(QueryBase):
             and self.tables == other.tables
             and self.kind == other.kind
             and self.fields_config == other.fields_config
+            and self.force_cache_refresh == other.force_cache_refresh
         )

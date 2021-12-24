@@ -20,6 +20,7 @@ class View(QueryBase):
         encrypt: Optional[bool] = None,
         static: Optional[bool] = True,
         destination_data_mart: Optional[str] = None,
+        force_cache_refresh: Optional[bool] = False,
     ):
         """Create a View object.
 
@@ -33,6 +34,8 @@ class View(QueryBase):
         :type description: Optional[str], optional
         :param encrypt: if set to False, disable automatic encryption of the result of the query
         :type encrypt: Optional[bool]
+        :param force_cache_refresh: whether or not we need to use the cache in the pii service
+        :type force_cache_refresh: bool, optional
         """
         super().__init__(
             name=name,
@@ -46,6 +49,7 @@ class View(QueryBase):
         self.destination_table = None
         self.dependencies = []
         self.parsing_dependencies = []
+        self.force_cache_refresh = force_cache_refresh
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -70,6 +74,7 @@ class View(QueryBase):
         view.parsing_dependencies = [
             Dependency.from_dict(x) for x in d.get("PARSING_DEPENDS_ON") or []
         ]
+        view.force_cache_refresh = d.get("FORCE_CACHE_REFRESH", False)
         return view
 
     def to_dict(self) -> dict:
@@ -91,6 +96,7 @@ class View(QueryBase):
             "DESTINATION_DATA_MART": self.destination_data_mart,
             "DEPENDS_ON": [d.to_dict() for d in self.dependencies],
             "PARSING_DEPENDS_ON": [d.to_dict() for d in self.parsing_dependencies],
+            "FORCE_CACHE_REFRESH": self.force_cache_refresh,
         }
 
     def __eq__(self, o) -> bool:
@@ -107,4 +113,5 @@ class View(QueryBase):
             and self.destination_data_mart == o.destination_data_mart
             and self.dependencies == o.dependencies
             and self.parsing_dependencies == o.parsing_dependencies
+            and self.force_cache_refresh == o.force_cache_refresh
         )

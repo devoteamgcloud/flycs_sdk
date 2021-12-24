@@ -27,6 +27,7 @@ transformation_fields_config = [
     FieldConfig(field_name="field1", decrypt=False),
     FieldConfig(field_name="field2", decrypt=True),
 ]
+transformation_force_cache_refresh = True
 
 
 class TestTranformations:
@@ -49,6 +50,7 @@ class TestTranformations:
             parsing_dependencies=transformation_parsing_dependencies,
             destroy_table=transformation_destroy_table,
             fields_config=transformation_fields_config,
+            force_cache_refresh=transformation_force_cache_refresh,
         )
 
     def test_init(self, my_transformation):
@@ -69,6 +71,9 @@ class TestTranformations:
         assert my_transformation.dependencies == transformation_dependencies
         assert my_transformation.destroy_table == transformation_destroy_table
         assert my_transformation.fields_config == transformation_fields_config
+        assert (
+            my_transformation.force_cache_refresh == transformation_force_cache_refresh
+        )
 
     def test_to_dict(self, my_transformation):
         assert my_transformation.to_dict() == {
@@ -104,6 +109,7 @@ class TestTranformations:
                     "DECRYPT": True,
                 },
             ],
+            "FORCE_CACHE_REFRESH": transformation_force_cache_refresh,
         }
 
     def test_from_dict(self, my_transformation):
