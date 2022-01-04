@@ -1,10 +1,11 @@
 =====
-Functions
+Stored Procedures
 =====
 
 Flycs lets you define BigQuery stored procedures. These functions will be created in BigQuery during the CI/CD pipeline and usable in your transformations.
 
-Example definition of a stored procedure in YAML: (Note that the argument mode must be specified IN,OUT or INOUT)
+Example definition of a stored procedure in YAML:
+(Note that the argument mode must be specified IN, OUT or INOUT)
 
 .. code-block:: yaml
 
