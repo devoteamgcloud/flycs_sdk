@@ -10,6 +10,7 @@ Welcome to Flycs SDK's documentation!
    usage
    views
    functions
+   stored_procedures
    triggers
    custom_operators
    modules

@@ -79,13 +79,13 @@ Here is an example tree from a flycs repository:
                 └── view_simple_copy.yaml
 
 
-Example definition of a view using python SDK:
+Example definition of a function using python SDK:
 
 .. code-block:: python
 
     from flycs_sdk.functions import Function, Argument
 
-    my_view = Function(
+    my_function = Function(
         name="func_decode_html",
         query="""
         LANGUAGE js AS '''
