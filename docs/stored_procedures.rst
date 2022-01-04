@@ -61,7 +61,7 @@ Example definition of a view using python SDK:
 
 .. code-block:: python
 
-    from flycs_sdk.procedures import Stored, Argument
+    from flycs_sdk.procedures import StoredProcedure, Argument
 
     my_procedure = StoredProcedure(
         name="simple_sum",
