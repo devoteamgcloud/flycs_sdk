@@ -1,6 +1,28 @@
 Changelog
 =========
 
+## (unreleased)
+
+### Changes - Dev|pkg|test|doc
+
+* Upgrade black version to 22.3.0. [Christophe de Carvalho]
+
+### Fix - Dev|pkg|test|doc
+
+* Add missing mode REQUIRED for field schema. [Christophe de Carvalho]
+
+
+## v0.10.3 (2022-05-11)
+
+### Changes - Dev|pkg|test|doc
+
+* Upgrade black version to 22.3.0. [Christophe de Carvalho]
+
+### Fix - Dev|pkg|test|doc
+
+* Add missing mode REQUIRED for field schema. [Christophe de Carvalho]
+
+
 ## v0.10.2 (2022-03-22)
 
 ### New - Dev|pkg|test|doc
