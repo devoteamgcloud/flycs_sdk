@@ -24,11 +24,12 @@ readme = "README.rst"
 version = "0.10.0"
 
 [tool.poetry.dependencies]
-python = ">=3.6.2"
+chardet = "^4.0.0"
+python = ">=3.6.2,<3.11"
 requirements-parser = "^0.2.0"
 "ruamel.yaml" = "^0.16.12"
 semver = "^2.13.0"
-chardet = "^4.0.0"
+urllib3 = "^1.26.5"
 
 [tool.poetry.dev-dependencies]
 black = "^21.10b0"
