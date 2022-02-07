@@ -1,6 +1,40 @@
 Changelog
 =========
 
+## v0.11.0 (2022-02-07)
+
+### New - Dev|pkg|test|doc
+
+* Documentation added for stored procedures in Flycs SDK & typo correction of functions doc. [Yannis Argyrakis]
+
+* Add procedure query type. [Yannis Argyrakis]
+
+* Add FORCE_CACHE_REFRESH attribute to views and transformations. [JordyHeusdensDT]
+
+* Document how to create BigQuery functions. [Christophe de Carvalho]
+
+* Add location field on Entity class. [Christophe de Carvalho]
+
+  This fiels allow user to manually overwrite the default location of the
+  associated dataset.
+
+* Document how to create BigQuery functions. [Christophe de Carvalho]
+
+### Changes - Dev|pkg|test|doc
+
+* Upgrade black formatter version. [Christophe de Carvalho]
+
+* Do not give default value for PERSIST_BACKUP field. [Christophe de Carvalho]
+
+  If the user does not specify a value, then the airflow-deployment code
+  default behavior is used. So we should not enforce a default value here
+  in the SDK cause it overwrite the default behavior in airflow-deployment
+
+### Fix - Dev|pkg|test|doc
+
+* Upgrade documentation with latest methods available in SDK. [Christophe de Carvalho]
+
+
 ## v0.10.0 (2021-11-09)
 
 ### New - Dev|pkg|test|doc
