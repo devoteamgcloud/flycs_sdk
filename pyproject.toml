@@ -24,7 +24,7 @@ readme = "README.rst"
 version = "0.10.0"
 
 [tool.poetry.dependencies]
-python = ">=3.6.2"
+python = ">=3.6.2,<4"
 requirements-parser = "^0.2.0"
 "ruamel.yaml" = "^0.16.12"
 semver = "^2.13.0"
