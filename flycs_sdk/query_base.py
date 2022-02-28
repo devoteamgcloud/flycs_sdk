@@ -1,4 +1,4 @@
-"""This module contains base class for any "query" object (Transformation, views,...)."""
+"""This module contains base class for any "query" object (Transformation, views, procedures, functions, ...)."""
 
 from abc import ABC, abstractmethod
 from typing import Optional

@@ -1,12 +1,13 @@
+import pytest
+
 from flycs_sdk.custom_code import Dependency
+from flycs_sdk.query_base_schema import UnsupportedMode, UnsupportedType
 from flycs_sdk.transformations import (
     FieldConfig,
+    SchemaUpdateOptions,
     Transformation,
     WriteDisposition,
-    SchemaUpdateOptions,
-    FieldConfig,
 )
-import pytest
 
 transformation_name = "my_tranformation"
 transformation_query = "SELECT * FROM TABLE;"
@@ -24,8 +25,8 @@ transformation_dependencies = [Dependency("entity1", "staging", "deps")]
 transformation_parsing_dependencies = []
 transformation_destroy_table = False
 transformation_fields_config = [
-    FieldConfig(field_name="field1", decrypt=False),
-    FieldConfig(field_name="field2", decrypt=True),
+    FieldConfig(name="field1", decrypt=False, type="STRING", mode="NULLABLE"),
+    FieldConfig(name="field2", decrypt=True, type="DATE", mode="NULLABLE"),
 ]
 transformation_force_cache_refresh = True
 
@@ -49,7 +50,7 @@ class TestTranformations:
             dependencies=transformation_dependencies,
             parsing_dependencies=transformation_parsing_dependencies,
             destroy_table=transformation_destroy_table,
-            fields_config=transformation_fields_config,
+            schema=transformation_fields_config,
             force_cache_refresh=transformation_force_cache_refresh,
         )
 
@@ -70,7 +71,7 @@ class TestTranformations:
         )
         assert my_transformation.dependencies == transformation_dependencies
         assert my_transformation.destroy_table == transformation_destroy_table
-        assert my_transformation.fields_config == transformation_fields_config
+        assert my_transformation.schema == transformation_fields_config
         assert (
             my_transformation.force_cache_refresh == transformation_force_cache_refresh
         )
@@ -99,14 +100,20 @@ class TestTranformations:
             "DESTROY_TABLE": False,
             "TABLES": None,
             "KIND": "transformation",
-            "FIELDS_CONFIG": [
+            "SCHEMA": [
                 {
-                    "FIELD_NAME": "field1",
+                    "NAME": "field1",
                     "DECRYPT": False,
+                    "TYPE": "STRING",
+                    "MODE": "NULLABLE",
+                    "FIELDS": [],
                 },
                 {
-                    "FIELD_NAME": "field2",
+                    "NAME": "field2",
                     "DECRYPT": True,
+                    "TYPE": "DATE",
+                    "MODE": "NULLABLE",
+                    "FIELDS": [],
                 },
             ],
             "FORCE_CACHE_REFRESH": transformation_force_cache_refresh,

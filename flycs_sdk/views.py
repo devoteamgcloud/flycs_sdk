@@ -1,12 +1,12 @@
 """Module containing view classes."""
 
-from typing import Optional
+from typing import List, Optional
 
 from flycs_sdk.custom_code import Dependency
-from flycs_sdk.query_base import QueryBase
+from flycs_sdk.query_base_schema import QueryBaseWithSchema, FieldConfig
 
 
-class View(QueryBase):
+class View(QueryBaseWithSchema):
     """Class representing a View configuration."""
 
     kind = "view"
@@ -21,6 +21,7 @@ class View(QueryBase):
         static: Optional[bool] = True,
         destination_data_mart: Optional[str] = None,
         force_cache_refresh: Optional[bool] = False,
+        schema: Optional[List[FieldConfig]] = None,
     ):
         """Create a View object.
 
@@ -44,6 +45,7 @@ class View(QueryBase):
             encrypt=encrypt,
             static=static,
             destination_data_mart=destination_data_mart,
+            schema=schema,
         )
         self.description = description
         self.destination_table = None
@@ -68,6 +70,7 @@ class View(QueryBase):
             encrypt=d.get("ENCRYPT", None),
             static=d.get("STATIC", True),
             destination_data_mart=d.get("DESTINATION_DATA_MART"),
+            schema=[FieldConfig.from_dict(x) for x in d.get("SCHEMA") or []],
         )
         view.destination_table = d.get("DESTINATION_TABLE")
         view.dependencies = [Dependency.from_dict(x) for x in d.get("DEPENDS_ON") or []]
@@ -97,6 +100,7 @@ class View(QueryBase):
             "DEPENDS_ON": [d.to_dict() for d in self.dependencies],
             "PARSING_DEPENDS_ON": [d.to_dict() for d in self.parsing_dependencies],
             "FORCE_CACHE_REFRESH": self.force_cache_refresh,
+            "SCHEMA": [config.to_dict() for config in self.schema],
         }
 
     def __eq__(self, o) -> bool:
@@ -114,4 +118,5 @@ class View(QueryBase):
             and self.dependencies == o.dependencies
             and self.parsing_dependencies == o.parsing_dependencies
             and self.force_cache_refresh == o.force_cache_refresh
+            and self.schema == o.schema
         )
