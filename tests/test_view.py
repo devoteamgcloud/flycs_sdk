@@ -42,6 +42,7 @@ class TestView:
             "DEPENDS_ON": [],
             "PARSING_DEPENDS_ON": [],
             "FORCE_CACHE_REFRESH": view_force_cache_refresh,
+            "SCHEMA": [],
         }
 
     def test_serialize_deserialize(self, my_view):

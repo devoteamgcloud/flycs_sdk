@@ -1,10 +1,11 @@
 """Module containing transformations classes."""
 
+
 from enum import Enum
 from typing import List, Optional
 
 from flycs_sdk.custom_code import Dependency
-from flycs_sdk.query_base import QueryBase
+from flycs_sdk.query_base_schema import QueryBaseWithSchema, FieldConfig
 
 
 class WriteDisposition(Enum):
@@ -22,45 +23,7 @@ class SchemaUpdateOptions(Enum):
     ALLOW_FIELD_ADDITION = "ALLOW_FIELD_ADDITION"
 
 
-class FieldConfig:
-    """FieldConfig allows to configure special options on a single field of a table."""
-
-    def __init__(self, field_name: str, decrypt: bool):
-        """Create FieldConfig object.
-
-        :param field_name: name of the field to configure
-        :type field_name: str
-        :param decrypt: whether this field should be decrypted automatically or not
-        :type decrypt: bool
-        """
-        self.field_name = field_name
-        self.decrypt = decrypt
-
-    @classmethod
-    def from_dict(cls, d: dict):
-        """Create a FieldConfig object form a dictionnary created with the to_dict method.
-
-        :param d: source dictionary
-        :type d: dict
-        :return: FieldConfig object
-        :rtype: FieldConfig
-        """
-        return FieldConfig(field_name=d["FIELD_NAME"], decrypt=d["DECRYPT"])
-
-    def to_dict(self) -> dict:
-        """Serialize the Transformation to a dictionary object.
-
-        :return: the FieldConfig as a dictionary object.
-        :rtype: Dict
-        """
-        return {"FIELD_NAME": self.field_name, "DECRYPT": self.decrypt}
-
-    def __eq__(self, other):
-        """Implement __eq__ method."""
-        return self.field_name == other.field_name and self.decrypt == other.decrypt
-
-
-class Transformation(QueryBase):
+class Transformation(QueryBaseWithSchema):
     """Transformations are the lowest unit inside of a data pipeline. It is a single task implemented as a SQL query."""
 
     kind = "transformation"
@@ -90,7 +53,7 @@ class Transformation(QueryBase):
         parsing_dependencies: Optional[List[Dependency]] = None,
         destroy_table: Optional[bool] = False,
         tables: Optional[List[dict]] = None,
-        fields_config: Optional[List[FieldConfig]] = None,
+        schema: Optional[List[FieldConfig]] = None,
         force_cache_refresh: Optional[bool] = False,
     ):
         """Class representing a transformation.
@@ -138,8 +101,8 @@ class Transformation(QueryBase):
         :param tables: If specified, this transformation will generate multiple BigQueryOperator during Airflow generation, one for each table name in this list.
                        The name of the transformation then becomes `{transformation_name}_{table_name}`
         :type tables: List[str], optional
-        :param field_config: List of extra configuration per field of the transformation
-        :type field_config: List[FieldConfig], optional
+        :param schema: List of extra configuration per field of the transformation
+        :type schema: List[FieldConfig], optional
         :param force_cache_refresh: whether or not we need to use the cache in the pii service
         :type force_cache_refresh: bool, optional
         """
@@ -150,6 +113,7 @@ class Transformation(QueryBase):
             encrypt=encrypt,
             static=static,
             destination_data_mart=destination_data_mart,
+            schema=schema or [],
         )
         self.has_output = has_output
         self.destination_table = destination_table
@@ -166,7 +130,6 @@ class Transformation(QueryBase):
         self.parsing_dependencies = parsing_dependencies or []
         self.destroy_table = destroy_table
         self.tables = tables
-        self.fields_config = fields_config or []
         self.force_cache_refresh = force_cache_refresh
 
     @classmethod
@@ -206,9 +169,7 @@ class Transformation(QueryBase):
             ],
             destroy_table=d.get("DESTROY_TABLE", False),
             tables=d.get("TABLES"),
-            fields_config=[
-                FieldConfig.from_dict(x) for x in d.get("FIELDS_CONFIG") or []
-            ],
+            schema=[FieldConfig.from_dict(x) for x in d.get("SCHEMA") or []],
             force_cache_refresh=d.get("FORCE_CACHE_REFRESH", False),
         )
 
@@ -244,7 +205,7 @@ class Transformation(QueryBase):
             "DESTROY_TABLE": self.destroy_table,
             "TABLES": self.tables,
             "KIND": self.kind,
-            "FIELDS_CONFIG": [config.to_dict() for config in self.fields_config],
+            "SCHEMA": [config.to_dict() for config in self.schema],
             "FORCE_CACHE_REFRESH": self.force_cache_refresh,
         }
 
@@ -273,6 +234,7 @@ class Transformation(QueryBase):
             and self.destroy_table == other.destroy_table
             and self.tables == other.tables
             and self.kind == other.kind
-            and self.fields_config == other.fields_config
+            and self.schema == other.schema
             and self.force_cache_refresh == other.force_cache_refresh
+            and self.schema == other.schema
         )
