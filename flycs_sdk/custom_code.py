@@ -76,6 +76,7 @@ class CustomCode:
         dependencies: List[Dependency] = None,
         requirements: List[str] = None,
         func_kwargs: Dict[str, object] = None,
+        run_before_keyset: bool = False,
     ):
         """Represent a custom Airflow code that needs to be injected into a DAG.
 
@@ -93,6 +94,8 @@ class CustomCode:
         :type requirements: List[str]
         :param func_kwargs: List of kwargs areguments for a customer operator
         :type func_kwargs: Dict[str:object]
+        :param run_before_keyset: override dependencies and only use the explicitly defined dependencies
+        :type run_before_keyset: bool
         """
         self.name = name
         self.version = version
@@ -100,6 +103,7 @@ class CustomCode:
         self.dependencies = dependencies or []
         self.requirements = requirements or []
         self.func_kwargs = func_kwargs or {}
+        self.run_before_keyset = run_before_keyset or False
 
         self._ensure_builder_signature(operator_builder)
         self._validate_requirements()
