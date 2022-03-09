@@ -110,10 +110,10 @@ class FieldConfig:
         :rtype: FieldConfig
         """
         return FieldConfig(
-            name=d.get("NAME", d["name"]),
+            name=d.get("NAME", d.get("name")),
             decrypt=d.get("DECRYPT", d.get("decrypt", False)),
-            type=d.get("TYPE", d["type"]),
-            mode=d.get("MODE", d["mode"]),
+            type=d.get("TYPE", d.get("type")),
+            mode=d.get("MODE", d.get("mode")),
             fields=[
                 FieldConfig.from_dict(field)
                 for field in d.get("FIELDS", d.get("fields")) or []
