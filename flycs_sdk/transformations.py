@@ -91,6 +91,7 @@ class Transformation(QueryBase):
         destroy_table: Optional[bool] = False,
         tables: Optional[List[dict]] = None,
         fields_config: Optional[List[FieldConfig]] = None,
+        run_before_keyset: bool = False,
     ):
         """Class representing a transformation.
 
@@ -139,6 +140,8 @@ class Transformation(QueryBase):
         :type tables: List[str], optional
         :param field_config: List of extra configuration per field of the transformation
         :type field_config: List[FieldConfig], optional
+        :param run_before_keyset: override dependencies and only use the explicitly defined dependencies
+        :type run_before_keyset: bool
         """
         super().__init__(
             name=name,
@@ -164,6 +167,7 @@ class Transformation(QueryBase):
         self.destroy_table = destroy_table
         self.tables = tables
         self.fields_config = fields_config or []
+        self.run_before_keyset = run_before_keyset or False
 
     @classmethod
     def from_dict(cls, d: dict):
