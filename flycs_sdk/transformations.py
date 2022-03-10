@@ -167,7 +167,7 @@ class Transformation(QueryBase):
         self.destroy_table = destroy_table
         self.tables = tables
         self.fields_config = fields_config or []
-        self.run_before_keyset = run_before_keyset or False
+        self.run_before_keyset = run_before_keyset
 
     @classmethod
     def from_dict(cls, d: dict):
