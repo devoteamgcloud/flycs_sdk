@@ -209,6 +209,7 @@ class Transformation(QueryBase):
             fields_config=[
                 FieldConfig.from_dict(x) for x in d.get("FIELDS_CONFIG") or []
             ],
+            run_before_keyset=d.get("RUN_BEFORE_KEYSET"),
         )
 
     def to_dict(self) -> dict:
@@ -244,6 +245,7 @@ class Transformation(QueryBase):
             "TABLES": self.tables,
             "KIND": self.kind,
             "FIELDS_CONFIG": [config.to_dict() for config in self.fields_config],
+            "RUN_BEFORE_KEYSET": self.run_before_keyset,
         }
 
     def __eq__(self, other):
@@ -272,4 +274,5 @@ class Transformation(QueryBase):
             and self.tables == other.tables
             and self.kind == other.kind
             and self.fields_config == other.fields_config
+            and self.run_before_keyset == other.run_before_keyset
         )

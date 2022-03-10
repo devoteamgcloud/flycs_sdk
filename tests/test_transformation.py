@@ -1,3 +1,4 @@
+from pickle import FALSE
 from flycs_sdk.custom_code import Dependency
 from flycs_sdk.transformations import (
     FieldConfig,
@@ -101,6 +102,7 @@ class TestTranformations:
                 {"FIELD_NAME": "field1", "DECRYPT": False,},
                 {"FIELD_NAME": "field2", "DECRYPT": True,},
             ],
+            "RUN_BEFORE_KEYSET": False,
         }
 
     def test_from_dict(self, my_transformation):
