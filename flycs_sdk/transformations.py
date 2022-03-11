@@ -91,7 +91,8 @@ class Transformation(QueryBase):
         destroy_table: Optional[bool] = False,
         tables: Optional[List[dict]] = None,
         fields_config: Optional[List[FieldConfig]] = None,
-        run_before_keyset: bool = False,
+        run_before_keyset: Optional[bool] = False,
+        trigger_rule: Optional[str] = None,
     ):
         """Class representing a transformation.
 
@@ -142,6 +143,8 @@ class Transformation(QueryBase):
         :type field_config: List[FieldConfig], optional
         :param run_before_keyset: override dependencies and only use the explicitly defined dependencies
         :type run_before_keyset: bool
+        :param trigger_rule: set a trigger rule for the task
+        :type trigger_rule: str
         """
         super().__init__(
             name=name,
@@ -168,6 +171,7 @@ class Transformation(QueryBase):
         self.tables = tables
         self.fields_config = fields_config or []
         self.run_before_keyset = run_before_keyset
+        self.trigger_rule = trigger_rule
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -210,6 +214,7 @@ class Transformation(QueryBase):
                 FieldConfig.from_dict(x) for x in d.get("FIELDS_CONFIG") or []
             ],
             run_before_keyset=d.get("RUN_BEFORE_KEYSET"),
+            trigger_rule=d.get("TRIGGER_RULE"),
         )
 
     def to_dict(self) -> dict:
@@ -246,6 +251,7 @@ class Transformation(QueryBase):
             "KIND": self.kind,
             "FIELDS_CONFIG": [config.to_dict() for config in self.fields_config],
             "RUN_BEFORE_KEYSET": self.run_before_keyset,
+            "TRIGGER_RULE": self.trigger_rule,
         }
 
     def __eq__(self, other):
@@ -275,4 +281,5 @@ class Transformation(QueryBase):
             and self.kind == other.kind
             and self.fields_config == other.fields_config
             and self.run_before_keyset == other.run_before_keyset
+            and self.trigger_rule == other.trigger_rule
         )

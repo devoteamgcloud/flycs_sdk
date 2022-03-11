@@ -29,6 +29,7 @@ transformation_fields_config = [
     FieldConfig(field_name="field2", decrypt=True),
 ]
 transformation_run_before_keyset = False
+transformation_trigger_rule = "all_success"
 
 
 class TestTranformations:
@@ -52,6 +53,7 @@ class TestTranformations:
             destroy_table=transformation_destroy_table,
             fields_config=transformation_fields_config,
             run_before_keyset=transformation_run_before_keyset,
+            trigger_rule=transformation_trigger_rule,
         )
 
     def test_init(self, my_transformation):
@@ -103,6 +105,7 @@ class TestTranformations:
                 {"FIELD_NAME": "field2", "DECRYPT": True,},
             ],
             "RUN_BEFORE_KEYSET": False,
+            "TRIGGER_RULE": "all_success",
         }
 
     def test_from_dict(self, my_transformation):
