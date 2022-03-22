@@ -1,6 +1,23 @@
 Changelog
 =========
 
+## v0.10.2 (2022-03-22)
+
+### New - Dev|pkg|test|doc
+
+* Allow to define schema directly on Transformations and Views. [vasilis.milios@randstad.com]
+
+  User can now define the schema of a Transformation or a View directly on
+  the object itself.
+
+  Internally we have added a new class QueryBaseWithSchema that is a new layer in the QueryBase class hireachy. It is
+  used on both transformations and views chield class.
+
+### Changes - Dev|pkg|test|doc
+
+* Add support for python3.10. [Christophe de Carvalho]
+
+
 ## v0.10.1 (2022-02-22)
 
 ### Changes - Dev|pkg|test|doc
