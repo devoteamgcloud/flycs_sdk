@@ -30,7 +30,7 @@ transformation_fields_config = [
 ]
 transformation_run_before_keyset = False
 transformation_trigger_rule = "all_success"
-transformation_keysets_used = "keyset_1"
+transformation_keysets_used = ["keyset_1"]
 
 
 class TestTranformations:
@@ -110,7 +110,7 @@ class TestTranformations:
             ],
             "RUN_BEFORE_KEYSET": False,
             "TRIGGER_RULE": "all_success",
-            "KEYSETS_USED": "keyset_1",
+            "KEYSETS_USED": ["keyset_1"],
         }
 
     def test_from_dict(self, my_transformation):
