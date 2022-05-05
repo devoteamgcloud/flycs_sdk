@@ -49,7 +49,7 @@ class View(QueryBase):
         self.destination_table = None
         self.dependencies = []
         self.parsing_dependencies = []
-        self.keysets_used = keysets_used or []
+        self.keysets_used = keysets_used
 
     @classmethod
     def from_dict(cls, d: dict):
