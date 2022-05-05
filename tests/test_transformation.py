@@ -30,7 +30,6 @@ transformation_fields_config = [
 ]
 transformation_run_before_keyset = False
 transformation_trigger_rule = "all_success"
-transformation_keysets_used = "keyset_1"
 
 
 class TestTranformations:
@@ -55,7 +54,6 @@ class TestTranformations:
             fields_config=transformation_fields_config,
             run_before_keyset=transformation_run_before_keyset,
             trigger_rule=transformation_trigger_rule,
-            keysets_used=transformation_keysets_used,
         )
 
     def test_init(self, my_transformation):
@@ -77,8 +75,6 @@ class TestTranformations:
         assert my_transformation.destroy_table == transformation_destroy_table
         assert my_transformation.fields_config == transformation_fields_config
         assert my_transformation.run_before_keyset == transformation_run_before_keyset
-        assert my_transformation.trigger_rule == transformation_trigger_rule
-        assert my_transformation.keysets_used == transformation_keysets_used
 
     def test_to_dict(self, my_transformation):
         assert my_transformation.to_dict() == {
@@ -110,7 +106,6 @@ class TestTranformations:
             ],
             "RUN_BEFORE_KEYSET": False,
             "TRIGGER_RULE": "all_success",
-            "KEYSETS_USED": "keyset_1",
         }
 
     def test_from_dict(self, my_transformation):
