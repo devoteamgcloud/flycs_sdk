@@ -175,7 +175,7 @@ class Transformation(QueryBase):
         self.fields_config = fields_config or []
         self.run_before_keyset = run_before_keyset
         self.trigger_rule = trigger_rule
-        self.keysets_used = keysets_used or []
+        self.keysets_used = keysets_used
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -219,7 +219,7 @@ class Transformation(QueryBase):
             ],
             run_before_keyset=d.get("RUN_BEFORE_KEYSET"),
             trigger_rule=d.get("TRIGGER_RULE"),
-            keysets_used=d.get("KEYSETS_USED", []),
+            keysets_used=d.get("KEYSETS_USED"),
         )
 
     def to_dict(self) -> dict:
