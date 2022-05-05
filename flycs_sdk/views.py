@@ -1,6 +1,6 @@
 """Module containing view classes."""
 
-from typing import Optional
+from typing import Optional, List
 
 from flycs_sdk.custom_code import Dependency
 from flycs_sdk.query_base import QueryBase
@@ -20,6 +20,7 @@ class View(QueryBase):
         encrypt: Optional[bool] = None,
         static: Optional[bool] = True,
         destination_data_mart: Optional[str] = None,
+        keysets_used: Optional[List[str]] = None,
     ):
         """Create a View object.
 
@@ -33,6 +34,8 @@ class View(QueryBase):
         :type description: Optional[str], optional
         :param encrypt: if set to False, disable automatic encryption of the result of the query
         :type encrypt: Optional[bool]
+        :param keysets_used: List of keysets used in the transformation
+        :type keysets_used: List[str]
         """
         super().__init__(
             name=name,
@@ -46,6 +49,7 @@ class View(QueryBase):
         self.destination_table = None
         self.dependencies = []
         self.parsing_dependencies = []
+        self.keysets_used = keysets_used or []
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -70,6 +74,7 @@ class View(QueryBase):
         view.parsing_dependencies = [
             Dependency.from_dict(x) for x in d.get("PARSING_DEPENDS_ON") or []
         ]
+        view.keysets_used = d.get("KEYSETS_USED", [])
         return view
 
     def to_dict(self) -> dict:
@@ -91,6 +96,7 @@ class View(QueryBase):
             "DESTINATION_DATA_MART": self.destination_data_mart,
             "DEPENDS_ON": [d.to_dict() for d in self.dependencies],
             "PARSING_DEPENDS_ON": [d.to_dict() for d in self.parsing_dependencies],
+            "KEYSETS_USED": self.keysets_used,
         }
 
     def __eq__(self, o) -> bool:
@@ -107,4 +113,5 @@ class View(QueryBase):
             and self.destination_data_mart == o.destination_data_mart
             and self.dependencies == o.dependencies
             and self.parsing_dependencies == o.parsing_dependencies
+            and self.keysets_used == o.keysets_used
         )
