@@ -38,7 +38,6 @@ class TestView:
             "DESTINATION_DATA_MART": None,
             "DEPENDS_ON": [],
             "PARSING_DEPENDS_ON": [],
-            "KEYSETS_USED": None,
         }
 
     def test_serialize_deserialize(self, my_view):
