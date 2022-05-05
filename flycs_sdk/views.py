@@ -68,7 +68,7 @@ class View(QueryBase):
             encrypt=d.get("ENCRYPT", None),
             static=d.get("STATIC", True),
             destination_data_mart=d.get("DESTINATION_DATA_MART"),
-            keysets_used=d.get("KEYSETS_USED", []),
+            keysets_used=d.get("KEYSETS_USED"),
         )
         view.destination_table = d.get("DESTINATION_TABLE")
         view.dependencies = [Dependency.from_dict(x) for x in d.get("DEPENDS_ON") or []]
