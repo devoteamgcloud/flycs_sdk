@@ -30,6 +30,7 @@ transformation_fields_config = [
 transformation_run_before_keyset = False
 transformation_trigger_rule = "all_success"
 transformation_keysets_used = ["keyset_1"]
+transformation_execution_timeout_in_minutes = 10
 
 
 class TestTranformations:
@@ -55,6 +56,7 @@ class TestTranformations:
             run_before_keyset=transformation_run_before_keyset,
             trigger_rule=transformation_trigger_rule,
             keysets_used=transformation_keysets_used,
+            execution_timeout_in_minutes=transformation_execution_timeout_in_minutes,
         )
 
     def test_init(self, my_transformation):
@@ -78,6 +80,10 @@ class TestTranformations:
         assert my_transformation.run_before_keyset == transformation_run_before_keyset
         assert my_transformation.trigger_rule == transformation_trigger_rule
         assert my_transformation.keysets_used == transformation_keysets_used
+        assert (
+            my_transformation.execution_timeout_in_minutes
+            == transformation_execution_timeout_in_minutes
+        )
 
     def test_to_dict(self, my_transformation):
         assert my_transformation.to_dict() == {
@@ -110,6 +116,7 @@ class TestTranformations:
             "RUN_BEFORE_KEYSET": False,
             "TRIGGER_RULE": "all_success",
             "KEYSETS_USED": ["keyset_1"],
+            "EXECUTION_TIMEOUT_IN_MINUTES": 10,
         }
 
     def test_from_dict(self, my_transformation):

@@ -93,6 +93,7 @@ class Transformation(QueryBase):
         fields_config: Optional[List[FieldConfig]] = None,
         run_before_keyset: Optional[bool] = False,
         trigger_rule: Optional[str] = None,
+        execution_timeout_in_minutes: Optional[int] = None,
         keysets_used: Optional[List[str]] = None,
     ):
         """Class representing a transformation.
@@ -146,6 +147,8 @@ class Transformation(QueryBase):
         :type run_before_keyset: bool
         :param trigger_rule: set a trigger rule for the task
         :type trigger_rule: str
+        :param execution_timeout_in_minutes: set an sla in minutes for the transformation
+        :type execution_timeout_in_minutes: in
         :param keysets_used: List of keysets used in the transformation
         :type keysets_used: List[str]
         """
@@ -175,6 +178,7 @@ class Transformation(QueryBase):
         self.fields_config = fields_config or []
         self.run_before_keyset = run_before_keyset
         self.trigger_rule = trigger_rule
+        self.execution_timeout_in_minutes = execution_timeout_in_minutes
         self.keysets_used = keysets_used or []
 
     @classmethod
@@ -219,6 +223,7 @@ class Transformation(QueryBase):
             ],
             run_before_keyset=d.get("RUN_BEFORE_KEYSET"),
             trigger_rule=d.get("TRIGGER_RULE"),
+            execution_timeout_in_minutes=d.get("EXECUTION_TIMEOUT_IN_MINUTES"),
             keysets_used=d.get("KEYSETS_USED", []),
         )
 
@@ -257,6 +262,7 @@ class Transformation(QueryBase):
             "FIELDS_CONFIG": [config.to_dict() for config in self.fields_config],
             "RUN_BEFORE_KEYSET": self.run_before_keyset,
             "TRIGGER_RULE": self.trigger_rule,
+            "EXECUTION_TIMEOUT_IN_MINUTES": self.execution_timeout_in_minutes,
             "KEYSETS_USED": self.keysets_used,
         }
 
@@ -288,5 +294,6 @@ class Transformation(QueryBase):
             and self.fields_config == other.fields_config
             and self.run_before_keyset == other.run_before_keyset
             and self.trigger_rule == other.trigger_rule
+            and self.execution_timeout_in_minutes == other.execution_timeout_in_minutes
             and self.keysets_used == other.keysets_used
         )

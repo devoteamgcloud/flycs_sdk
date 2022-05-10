@@ -77,6 +77,7 @@ class CustomCode:
         requirements: List[str] = None,
         func_kwargs: Dict[str, object] = None,
         run_before_keyset: bool = False,
+        execution_timeout_in_minutes: int = None,
     ):
         """Represent a custom Airflow code that needs to be injected into a DAG.
 
@@ -96,6 +97,8 @@ class CustomCode:
         :type func_kwargs: Dict[str:object]
         :param run_before_keyset: override dependencies and only use the explicitly defined dependencies
         :type run_before_keyset: bool
+        :param execution_timeout_in_minutes: set an sla in minutes for the transformation
+        :type execution_timeout_in_minutes: in
         """
         self.name = name
         self.version = version
@@ -104,6 +107,7 @@ class CustomCode:
         self.requirements = requirements or []
         self.func_kwargs = func_kwargs or {}
         self.run_before_keyset = run_before_keyset or False
+        self.execution_timeout_in_minutes = execution_timeout_in_minutes or None
 
         self._ensure_builder_signature(operator_builder)
         self._validate_requirements()
