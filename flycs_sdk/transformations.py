@@ -319,7 +319,9 @@ class Transformation(QueryBase):
             "FIELDS_CONFIG": [config.to_dict() for config in self.fields_config],
             "RUN_BEFORE_KEYSET": self.run_before_keyset,
             "TRIGGER_RULE": self.trigger_rule,
-            "EXECUTION_TIMEOUT": self.execution_timeout.to_dict(),
+            "EXECUTION_TIMEOUT": self.execution_timeout.to_dict()
+            if self.execution_timeout
+            else None,
             "KEYSETS_USED": self.keysets_used,
         }
 
