@@ -2,7 +2,6 @@
 
 from enum import Enum
 from typing import List, Optional
-
 from flycs_sdk.custom_code import Dependency
 from flycs_sdk.query_base import QueryBase
 
@@ -20,6 +19,17 @@ class SchemaUpdateOptions(Enum):
     """Schema update options."""
 
     ALLOW_FIELD_ADDITION = "ALLOW_FIELD_ADDITION"
+
+
+class ExecutionTimeoutOptions(Enum):
+    """Schema update options."""
+
+    MICROSECONDS = "microsecond "
+    SECONDS = "seconds"
+    MINUTES = "minutes"
+    HOURS = "hours"
+    DAYS = "days"
+    WEEKS = "weeks"
 
 
 class FieldConfig:
@@ -60,6 +70,44 @@ class FieldConfig:
         return self.field_name == other.field_name and self.decrypt == other.decrypt
 
 
+class ExecutionTimeout:
+    """ExecutionTimeout allows to configure special options timeout execution."""
+
+    def __init__(self, delta_type: str, delta: int):
+        """Create ExecutionTimeout object.
+
+        :param delta_type: name of delta type MICROSECODNS, SECONDS, MINUTES, HOURS, DAYS OR WEEKS
+        :type delta_type: ExecutionTimeoutOptions
+        :param delta: total delta
+        :type decrypt: int
+        """
+        self.delta_type = delta_type
+        self.delta = delta
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        """Create a ExecutionTimeout object form a dictionnary created with the to_dict method.
+
+        :param d: source dictionary
+        :type d: dict
+        :return: ExecutionTimeout object
+        :rtype: ExecutionTimeout
+        """
+        return ExecutionTimeout(delta_type=d["DELTA_TYPE"], delta=d["DELTA"])
+
+    def to_dict(self) -> dict:
+        """Serialize the Transformation to a dictionary object.
+
+        :return: the ExecutionTimeout as a dictionary object.
+        :rtype: Dict
+        """
+        return {"DELTA_TYPE": self.delta_type, "DELTA": self.delta}
+
+    def __eq__(self, other):
+        """Implement __eq__ method."""
+        return self.delta_type == other.delta_type and self.delta == other.delta
+
+
 class Transformation(QueryBase):
     """Transformations are the lowest unit inside of a data pipeline. It is a single task implemented as a SQL query."""
 
@@ -93,7 +141,7 @@ class Transformation(QueryBase):
         fields_config: Optional[List[FieldConfig]] = None,
         run_before_keyset: Optional[bool] = False,
         trigger_rule: Optional[str] = None,
-        execution_timeout_in_minutes: Optional[int] = None,
+        execution_timeout: Optional[ExecutionTimeout] = None,
         keysets_used: Optional[List[str]] = None,
     ):
         """Class representing a transformation.
@@ -178,7 +226,7 @@ class Transformation(QueryBase):
         self.fields_config = fields_config or []
         self.run_before_keyset = run_before_keyset
         self.trigger_rule = trigger_rule
-        self.execution_timeout_in_minutes = execution_timeout_in_minutes
+        self.execution_timeout = execution_timeout or None
         self.keysets_used = keysets_used or []
 
     @classmethod
@@ -223,7 +271,16 @@ class Transformation(QueryBase):
             ],
             run_before_keyset=d.get("RUN_BEFORE_KEYSET"),
             trigger_rule=d.get("TRIGGER_RULE"),
-            execution_timeout_in_minutes=d.get("EXECUTION_TIMEOUT_IN_MINUTES"),
+            execution_timeout=(
+                ExecutionTimeout(
+                    ExecutionTimeoutOptions(
+                        (d.get("EXECUTION_TIMEOUT").get("DELTA_TYPE")),
+                        d.get("EXECUTION_TIMEOUT").get("DELTA"),
+                    )
+                    if d.get("EXECUTION_TIMEOUT")
+                    else None
+                )
+            ),
             keysets_used=d.get("KEYSETS_USED", []),
         )
 
@@ -262,7 +319,7 @@ class Transformation(QueryBase):
             "FIELDS_CONFIG": [config.to_dict() for config in self.fields_config],
             "RUN_BEFORE_KEYSET": self.run_before_keyset,
             "TRIGGER_RULE": self.trigger_rule,
-            "EXECUTION_TIMEOUT_IN_MINUTES": self.execution_timeout_in_minutes,
+            "EXECUTION_TIMEOUT": self.execution_timeout.to_dict(),
             "KEYSETS_USED": self.keysets_used,
         }
 
@@ -294,6 +351,6 @@ class Transformation(QueryBase):
             and self.fields_config == other.fields_config
             and self.run_before_keyset == other.run_before_keyset
             and self.trigger_rule == other.trigger_rule
-            and self.execution_timeout_in_minutes == other.execution_timeout_in_minutes
+            and self.execution_timeout == other.execution_timeout
             and self.keysets_used == other.keysets_used
         )
