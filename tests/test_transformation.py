@@ -1,4 +1,3 @@
-from pickle import FALSE
 from flycs_sdk.custom_code import Dependency
 from flycs_sdk.transformations import (
     FieldConfig,
