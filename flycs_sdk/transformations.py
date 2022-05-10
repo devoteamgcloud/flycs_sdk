@@ -21,15 +21,15 @@ class SchemaUpdateOptions(Enum):
     ALLOW_FIELD_ADDITION = "ALLOW_FIELD_ADDITION"
 
 
-class ExecutionTimeoutOptions(Enum):
-    """Schema update options."""
+class DeltaTimeOptions(Enum):
+    """Execution Timeout options."""
 
-    MICROSECONDS = "microsecond "
-    SECONDS = "seconds"
-    MINUTES = "minutes"
-    HOURS = "hours"
-    DAYS = "days"
-    WEEKS = "weeks"
+    MICROSECONDS = "MICROSECONDS "
+    SECONDS = "SECONDS"
+    MINUTES = "MINUTES"
+    HOURS = "HOURS"
+    DAYS = "DAYS"
+    WEEKS = "WEEKS"
 
 
 class FieldConfig:
@@ -77,7 +77,7 @@ class ExecutionTimeout:
         """Create ExecutionTimeout object.
 
         :param delta_type: name of delta type MICROSECODNS, SECONDS, MINUTES, HOURS, DAYS OR WEEKS
-        :type delta_type: ExecutionTimeoutOptions
+        :type delta_type: DeltaTime
         :param delta: total delta
         :type decrypt: int
         """
@@ -273,13 +273,13 @@ class Transformation(QueryBase):
             trigger_rule=d.get("TRIGGER_RULE"),
             execution_timeout=(
                 ExecutionTimeout(
-                    ExecutionTimeoutOptions(
-                        (d.get("EXECUTION_TIMEOUT").get("DELTA_TYPE")),
-                        d.get("EXECUTION_TIMEOUT").get("DELTA"),
-                    )
-                    if d.get("EXECUTION_TIMEOUT")
-                    else None
+                    DeltaTimeOptions(d.get("EXECUTION_TIMEOUT").get("DELTA_TYPE")).name,
+                    d.get("EXECUTION_TIMEOUT").get("DELTA"),
                 )
+                if d.get("EXECUTION_TIMEOUT")
+                and d.get("EXECUTION_TIMEOUT").get("DELTA_TYPE")
+                and d.get("EXECUTION_TIMEOUT").get("DELTA")
+                else None
             ),
             keysets_used=d.get("KEYSETS_USED", []),
         )
