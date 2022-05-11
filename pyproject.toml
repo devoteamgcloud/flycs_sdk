@@ -22,7 +22,7 @@ packages = [
   {include = "tests", format = "sdist"},
 ]
 readme = "README.rst"
-version = "0.10.2"
+version = "0.10.3"
 
 [tool.poetry.dependencies]
 chardet = "^4.0.0"
