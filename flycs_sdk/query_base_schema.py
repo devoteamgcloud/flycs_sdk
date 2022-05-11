@@ -32,7 +32,7 @@ BQ_DATA_TYPES = {
     "RECORD",
     "STRUCT",
 }
-BQ_MODES = {"NULLABLE", "REPEATED"}
+BQ_MODES = {"NULLABLE", "REPEATED", "REQUIRED"}
 
 
 class UnsupportedType(Exception):
