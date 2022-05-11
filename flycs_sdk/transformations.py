@@ -276,9 +276,9 @@ class Transformation(QueryBase):
                     DeltaTimeOptions(d.get("EXECUTION_TIMEOUT").get("DELTA_TYPE")).name,
                     d.get("EXECUTION_TIMEOUT").get("DELTA"),
                 )
-                if d.get("EXECUTION_TIMEOUT")
-                and d.get("EXECUTION_TIMEOUT").get("DELTA_TYPE")
-                and d.get("EXECUTION_TIMEOUT").get("DELTA")
+                if d.get("EXECUTION_TIMEOUT", {})
+                and d.get("EXECUTION_TIMEOUT", {}).get("DELTA_TYPE", None)
+                and d.get("EXECUTION_TIMEOUT", {}).get("DELTA", None)
                 else None
             ),
             keysets_used=d.get("KEYSETS_USED", []),
