@@ -273,10 +273,12 @@ class Transformation(QueryBase):
             trigger_rule=d.get("TRIGGER_RULE"),
             execution_timeout=(
                 ExecutionTimeout(
-                    DeltaTimeOptions(d.get("EXECUTION_TIMEOUT").get("DELTA_TYPE")).name,
-                    d.get("EXECUTION_TIMEOUT").get("DELTA"),
+                    DeltaTimeOptions(
+                        dict(d.get("EXECUTION_TIMEOUT")).get("DELTA_TYPE")
+                    ).name,
+                    dict(d.get("EXECUTION_TIMEOUT")).get("DELTA"),
                 )
-                if d.get("EXECUTION_TIMEOUT", {})
+                if dict(d.get("EXECUTION_TIMEOUT", {}))
                 and d.get("EXECUTION_TIMEOUT", {}).get("DELTA_TYPE", None)
                 and d.get("EXECUTION_TIMEOUT", {}).get("DELTA", None)
                 else None
