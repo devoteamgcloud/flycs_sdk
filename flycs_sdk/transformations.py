@@ -278,7 +278,7 @@ class Transformation(QueryBase):
                     ).name,
                     dict(d.get("EXECUTION_TIMEOUT")).get("DELTA"),
                 )
-                if dict(d.get("EXECUTION_TIMEOUT", {}))
+                if d.get("EXECUTION_TIMEOUT")
                 and d.get("EXECUTION_TIMEOUT", {}).get("DELTA_TYPE", None)
                 and d.get("EXECUTION_TIMEOUT", {}).get("DELTA", None)
                 else None
