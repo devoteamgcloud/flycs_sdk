@@ -275,7 +275,7 @@ class Transformation(QueryBase):
                 ExecutionTimeout(
                     DeltaTimeOptions(
                         dict(d.get("EXECUTION_TIMEOUT")).get("DELTA_TYPE")
-                    ).name,
+                    ).value,
                     dict(d.get("EXECUTION_TIMEOUT")).get("DELTA"),
                 )
                 if d.get("EXECUTION_TIMEOUT")
