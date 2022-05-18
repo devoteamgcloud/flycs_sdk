@@ -5,6 +5,8 @@ from .custom_code import CustomCode
 from enum import Enum
 from .transformations import Transformation
 from .views import View
+from .functions import Function
+from .procedures import StoredProcedure
 
 
 class ConflictingNameError(ValueError):
@@ -126,6 +128,16 @@ class Entity:
         :type view: View
         """
         self._insert_into_stage_config(stage, view)
+
+    def add_routine(self, stage: str, routine: Union[StoredProcedure, Function]):
+        """Insert a View into the stage_config of the entity.
+
+        :param stage: the name of the stage where to insert the transformation
+        :type stage: str
+        :param routine: the StoredProcedure or Function object to insert
+        :type routine: StoredProcedure or Function
+        """
+        self._insert_into_stage_config(stage, routine)
 
     def to_dict(self) -> Dict:
         """

@@ -55,7 +55,7 @@ class Function(QueryBase):
         query: str,
         version: str,
         argument_list: List[Argument],
-        return_type: Optional[str],
+        return_type: Optional[str] = None,
         language: Optional[str] = "sql",
         description: Optional[str] = None,
         static: Optional[bool] = True,
