@@ -92,7 +92,9 @@ class Entity:
         """
         return self.stage_config[stage]
 
-    def _insert_into_stage_config(self, stage: str, obj: Union[Transformation, View]):
+    def _insert_into_stage_config(
+        self, stage: str, obj: Union[Transformation, View, Function, StoredProcedure]
+    ):
         if stage not in self.stage_config:
             self.stage_config[stage] = {}
         if obj.name in self.stage_config[stage]:
