@@ -132,7 +132,7 @@ class Entity:
         self._insert_into_stage_config(stage, view)
 
     def add_routine(self, stage: str, routine: Union[StoredProcedure, Function]):
-        """Insert a View into the stage_config of the entity.
+        """Insert a Function or Procedure into the stage_config of the entity.
 
         :param stage: the name of the stage where to insert the object
         :type stage: str
