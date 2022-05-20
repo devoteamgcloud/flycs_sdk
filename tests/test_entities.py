@@ -16,6 +16,8 @@ from flycs_sdk.entities import (
 )
 from flycs_sdk.transformations import Transformation
 from flycs_sdk.views import View
+from flycs_sdk.functions import Function, Argument as FuncArg
+from flycs_sdk.procedures import StoredProcedure, Argument as ProcArg
 
 entity_name = "test"
 entity_version = "1.0.0"
@@ -77,6 +79,40 @@ class TestEntity:
 
         with pytest.raises(ConflictingNameError):
             entity.add_view("staging", view)
+
+    def test_add_function(self):
+        entity = Entity(entity_name, entity_version)
+        func_arg = (FuncArg(name="argIN", type="INTEGER"),)
+        function = Function(
+            "my_function",
+            "argIN * 2",
+            "1.0.0",
+            argument_list=[func_arg],
+            return_type="INTEGER",
+        )
+        entity.add_routine("staging", function)
+        assert entity.stage_config == {"staging": {function.name: function.version}}
+        assert entity.transformations == {"staging": {function.name: function}}
+
+        with pytest.raises(ConflictingNameError):
+            entity.add_view("staging", function)
+
+    def test_add_procedure(self):
+        entity = Entity(entity_name, entity_version)
+        procedure_arg_in = (ProcArg(name="argIN", type="INTEGER", mode="IN"),)
+        procedure_arg_out = (ProcArg(name="argOUT", type="INTGER", mode="OUT"),)
+        procedure = StoredProcedure(
+            "my_procedure",
+            "BEGIN SET argOUT = argIN + argOUT; END",
+            "1.0.0",
+            argument_list=[procedure_arg_in, procedure_arg_out],
+        )
+        entity.add_routine("staging", procedure)
+        assert entity.stage_config == {"staging": {procedure.name: procedure.version}}
+        assert entity.transformations == {"staging": {procedure.name: procedure}}
+
+        with pytest.raises(ConflictingNameError):
+            entity.add_view("staging", procedure)
 
     def test_to_dict(self, my_entity):
         assert not DeepDiff(
