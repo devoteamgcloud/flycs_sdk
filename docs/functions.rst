@@ -69,7 +69,7 @@ Example definition of a SQL UDF function called "simple_mult_func" in YAML:
         TYPE: INTEGER
     RETURN_TYPE: INTEGER
 
-The functions definition must be places into a folder called `functions` in contrast with transformation that must be places into a `queries` folder.
+The functions definition must be created into a folder called `functions` in contrast with transformation that must be created into a `queries` folder.
 Here is an example tree from a flycs repository:
 
 
@@ -146,7 +146,7 @@ Example definition of the previous javascript function using python SDK:
     )
 
 
-Example of a transformation that use the function "simple_mult_func" defined in the staging stage :
+Example of a transformation that uses the function "simple_mult_func" defined in the staging stage :
 
 .. code-block:: yaml
 
