@@ -4,12 +4,14 @@ Functions
 
 Flycs lets you define BigQuery functions. These functions will be created in BigQuery during the CI/CD pipeline and usable in your transformations.
 
-Example definition of a function in YAML:
+.. note::
+   Javascript functions using external code libraries are not supported.
+
+Example definition of a javascript UDF function called "func_decode_html" in YAML:
 
 .. code-block:: yaml
 
     QUERY: |
-    LANGUAGE js AS '''
         if (name === null) {
         return null
         }
@@ -38,7 +40,6 @@ Example definition of a function in YAML:
         name=name.split('&#212;').join("Ô");
         name=name.split('&#228;').join("ä");
         return name;
-    ''';
 
     VERSION: 1.0.0
     DESCRIPTION: "A function used to decode HTML entities"
@@ -49,8 +50,22 @@ Example definition of a function in YAML:
       TYPE: STRING
     RETURN_TYPE: STRING
 
+Example definition of a SQL UDF function called "simple_mult_func" in YAML:
 
-The functions definition must be places into a folder called `functions` in contrast with transformation that must be places into a `queries` folder.
+.. code-block:: yaml
+
+    QUERY: |
+      arg_IN * 2
+
+    VERSION: 1.0.0
+    DESCRIPTION: "A function used to multiply the input by 2"
+    KIND: function
+    ARGUMENT_LIST:
+      - NAME: arg_IN
+        TYPE: INTEGER
+    RETURN_TYPE: INTEGER
+
+The functions definition must be created into a folder called `functions` in contrast with transformation that must be created into a `queries` folder.
 Here is an example tree from a flycs repository:
 
 
@@ -72,6 +87,8 @@ Here is an example tree from a flycs repository:
         │       ├── simple_copy.yaml
         │       └── time_test.yaml
         └── functions
+        │   └── staging
+                └── simple_mult_func.yaml
         │   └── data_warehouse
         │       └── func_decode_html.yaml
         └── views
@@ -79,7 +96,7 @@ Here is an example tree from a flycs repository:
                 └── view_simple_copy.yaml
 
 
-Example definition of a function using python SDK:
+Example definition of the previous javascript function using python SDK:
 
 .. code-block:: python
 
@@ -88,7 +105,6 @@ Example definition of a function using python SDK:
     my_function = Function(
         name="func_decode_html",
         query="""
-        LANGUAGE js AS '''
             if (name === null) {
             return null
             }
@@ -124,3 +140,16 @@ Example definition of a function using python SDK:
         language="javascript",
         destination_data_mart=None, # only required when creating a function in a data_mart project,
     )
+
+
+Example of a transformation that uses the function "simple_mult_func" defined in the staging stage :
+
+.. code-block:: yaml
+
+    QUERY: |
+      SELECT val, self.staging.simple_mult_func(val) AS result
+      FROM UNNEST([1,2,3,4]) AS val;
+
+    VERSION: 1.0.0
+
+    STATIC: true
