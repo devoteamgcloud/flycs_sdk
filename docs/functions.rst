@@ -5,11 +5,7 @@ Functions
 Flycs lets you define BigQuery functions. These functions will be created in BigQuery during the CI/CD pipeline and usable in your transformations.
 
 .. note::
-   Javascript functions using external code libraries are currently not supported.
-
-   If you still want to use javascript UDF importing external packages in your Flycs
-   transformation, you can create them in the raw dataset & reference it from this dataset.
-   **(Works only when PII module is deactivated !)**
+   Javascript functions using external code libraries are not supported.
 
 Example definition of a javascript UDF function called "func_decode_html" in YAML:
 
