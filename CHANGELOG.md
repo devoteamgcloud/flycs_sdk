@@ -1,9 +1,21 @@
 Changelog
 =========
 
-## (unreleased)
+## v0.12.0 (2022-06-30)
+
+### New - Dev|pkg|test|doc
+
+* Add SQL UDF example function & correct javascript UDF example [FLYCS-984] (#38) [Yannis Argyrakis]
+
+  * new: usr: Add SQL UDF example function & correct javascript UDF example
+
+* Add add_routine() function to add Function & StoredProcedure object to an Entity [FLYCS-985] (#37) [Yannis Argyrakis]
+
+  * new: usr: Implement add_routine() function in Entity object to add StoredProcedure & Function
 
 ### Changes - Dev|pkg|test|doc
+
+* Drop support for python 3.6 and 3.7. [Christophe de Carvalho]
 
 * Upgrade black version to 22.3.0. [Christophe de Carvalho]
 
