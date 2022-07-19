@@ -19,6 +19,7 @@ from flycs_sdk.triggers import PubSubTrigger
 
 pipeline_name = "test"
 pipeline_version = "1.0.0"
+pipeline_description = "This is my test pipeline"
 pipeline_schedule = "* 12 * * *"
 pipeline_kind = PipelineKind.VANILLA
 pipeline_start_time = datetime.fromtimestamp(1606923514, tz=timezone.utc)
@@ -39,6 +40,7 @@ class TestPipeline:
         return Pipeline(
             name=pipeline_name,
             version=pipeline_version,
+            description=pipeline_description,
             schedule=pipeline_schedule,
             kind=pipeline_kind,
             start_time=pipeline_start_time,
@@ -50,6 +52,7 @@ class TestPipeline:
         return Pipeline(
             name=pipeline_name,
             version=pipeline_version,
+            description=pipeline_description,
             schedule=pipeline_schedule,
             kind=pipeline_kind,
             start_time=pipeline_start_time,
@@ -57,9 +60,10 @@ class TestPipeline:
             entities=[],
         )
 
-    def test_init(self, my_pipeline):
+    def test_init(self, my_pipeline: Pipeline):
         assert my_pipeline.name == pipeline_name
         assert my_pipeline.version == pipeline_version
+        assert my_pipeline.description == pipeline_description
         assert my_pipeline.schedule == pipeline_schedule
         assert my_pipeline.start_time == pipeline_start_time
         assert my_pipeline.kind == pipeline_kind
@@ -85,9 +89,10 @@ class TestPipeline:
             entities=[],
         )
 
-    def test_init_pubsub(self, my_pipeline_pubsub):
+    def test_init_pubsub(self, my_pipeline_pubsub: Pipeline):
         assert my_pipeline_pubsub.name == pipeline_name
         assert my_pipeline_pubsub.version == pipeline_version
+        assert my_pipeline_pubsub.description == pipeline_description
         assert my_pipeline_pubsub.schedule == pipeline_schedule
         assert my_pipeline_pubsub.start_time == pipeline_start_time
         assert my_pipeline_pubsub.kind == pipeline_kind
@@ -127,6 +132,7 @@ class TestPipeline:
         expected = {
             "name": pipeline_name,
             "version": pipeline_version,
+            "description": pipeline_description,
             "schedule": pipeline_schedule,
             "kind": pipeline_kind.value,
             "start_time": "2020-12-02T15:38:34+0000",
@@ -159,6 +165,7 @@ class TestPipeline:
         expected = {
             "name": pipeline_name,
             "version": pipeline_version,
+            "description": pipeline_description,
             "schedule": pipeline_schedule,
             "kind": pipeline_kind.value,
             "start_time": "2020-12-02T15:38:34+0000",
@@ -247,6 +254,7 @@ class TestParametrizedPipeline(TestPipeline):
         return ParametrizedPipeline(
             name=pipeline_name,
             version=pipeline_version,
+            description=pipeline_description,
             schedule=pipeline_schedule,
             kind=pipeline_kind,
             start_time=pipeline_start_time,
@@ -270,6 +278,7 @@ class TestParametrizedPipeline(TestPipeline):
             {
                 "name": "test_nl_be",
                 "version": "1.0.0",
+                "description": pipeline_description,
                 "schedule": "* 12 * * *",
                 "start_time": "2020-12-02T15:38:34+0000",
                 "trigger": None,
@@ -297,6 +306,7 @@ class TestParametrizedPipeline(TestPipeline):
             {
                 "name": "test_nl_en",
                 "version": "1.0.0",
+                "description": pipeline_description,
                 "schedule": "* 12 * * *",
                 "start_time": "2020-12-02T15:38:34+0000",
                 "trigger": None,
@@ -324,6 +334,7 @@ class TestParametrizedPipeline(TestPipeline):
             {
                 "name": "test_fr_be",
                 "version": "1.0.0",
+                "description": pipeline_description,
                 "schedule": "* 12 * * *",
                 "start_time": "2020-12-02T15:38:34+0000",
                 "trigger": None,
@@ -351,6 +362,7 @@ class TestParametrizedPipeline(TestPipeline):
             {
                 "name": "test_fr_en",
                 "version": "1.0.0",
+                "description": pipeline_description,
                 "schedule": "* 12 * * *",
                 "start_time": "2020-12-02T15:38:34+0000",
                 "trigger": None,
