@@ -61,9 +61,9 @@ class FieldConfig:
         name: str,
         type: str,
         mode: str,
-        is_encrypted: bool = False,
-        has_pii: bool = False,
-        is_transformed: bool = False,
+        is_encrypted: bool = None,
+        has_pii: bool = None,
+        is_transformed: bool = None,
         keyset_name: str = None,
         keyset_column_id: List[str] = None,
         original_type: str = None,
@@ -125,11 +125,21 @@ class FieldConfig:
         :return: FieldConfig object
         :rtype: FieldConfig
         """
+        # Backwards compatibility
+        is_encrypted_final = None
+        decrypt = d.get("DECRYPT", d.get("decrypt"))
+        is_encrypted = d.get("IS_ENCRYPTED", d.get("is_encrypted"))
+
+        if is_encrypted is not None:
+            is_encrypted_final = is_encrypted
+        elif decrypt is not None:
+            is_encrypted_final = not decrypt
+
         return FieldConfig(
             name=d.get("NAME", d.get("name")),
             type=d.get("TYPE", d.get("type")),
             mode=d.get("MODE", d.get("mode")),
-            is_encrypted=d.get("IS_ENCRYPTED", d.get("is_encrypted", False)),
+            is_encrypted=is_encrypted_final,
             has_pii=d.get("HAS_PII", d.get("has_pii", False)),
             is_transformed=d.get("IS_TRANSFORMED", d.get("is_transformed", False)),
             keyset_name=d.get("KEYSET_NAME", d.get("keyset_name")),

@@ -87,7 +87,7 @@ class Pipeline:
         obj = cls(
             name=d["name"],
             version=d["version"],
-            description=d["description"],
+            description=d.get("description"),
             schedule=d.get("schedule"),
             start_time=_parse_datetime(d["start_time"])
             if d.get("start_time")
