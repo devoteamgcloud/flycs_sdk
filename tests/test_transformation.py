@@ -25,8 +25,18 @@ transformation_dependencies = [Dependency("entity1", "staging", "deps")]
 transformation_parsing_dependencies = []
 transformation_destroy_table = False
 transformation_fields_config = [
-    FieldConfig(name="field1", decrypt=False, type="STRING", mode="NULLABLE"),
-    FieldConfig(name="field2", decrypt=True, type="DATE", mode="NULLABLE"),
+    FieldConfig(name="field1", is_encrypted=False, type="STRING", mode="NULLABLE"),
+    FieldConfig(
+        name="field2",
+        is_encrypted=True,
+        has_pii=True,
+        keyset_name="keyset_name",
+        keyset_column_id=["keyset_column"],
+        original_type="DATE",
+        type="BYTES",
+        mode="NULLABLE",
+        derives_from=["raw_field"],
+    ),
 ]
 transformation_force_cache_refresh = True
 
@@ -103,16 +113,28 @@ class TestTranformations:
             "SCHEMA": [
                 {
                     "NAME": "field1",
-                    "DECRYPT": False,
                     "TYPE": "STRING",
                     "MODE": "NULLABLE",
+                    "IS_ENCRYPTED": False,
+                    "HAS_PII": False,
+                    "IS_TRANSFORMED": False,
+                    "KEYSET_NAME": None,
+                    "KEYSET_COLUMN_ID": None,
+                    "ORIGINAL_TYPE": None,
+                    "DERIVES_FROM": None,
                     "FIELDS": [],
                 },
                 {
                     "NAME": "field2",
-                    "DECRYPT": True,
-                    "TYPE": "DATE",
+                    "TYPE": "BYTES",
                     "MODE": "NULLABLE",
+                    "IS_ENCRYPTED": True,
+                    "HAS_PII": True,
+                    "IS_TRANSFORMED": False,
+                    "KEYSET_NAME": "keyset_name",
+                    "KEYSET_COLUMN_ID": ["keyset_column"],
+                    "ORIGINAL_TYPE": "DATE",
+                    "DERIVES_FROM": ["raw_field"],
                     "FIELDS": [],
                 },
             ],

@@ -8,21 +8,29 @@ from flycs_sdk.transformations import FieldConfig
 class TestFieldConfig:
     def test_invalid_type(self):
         with pytest.raises(UnsupportedType):
-            FieldConfig(name="field1", decrypt=False, type="STRING3", mode="NULLABLE")
+            FieldConfig(
+                name="field1", is_encrypted=False, type="STRING3", mode="NULLABLE"
+            )
 
     def test_invalid_mode(self):
         with pytest.raises(UnsupportedMode):
-            FieldConfig(name="field1", decrypt=False, type="STRING", mode="NULLABLEz")
+            FieldConfig(
+                name="field1", is_encrypted=False, type="STRING", mode="NULLABLEz"
+            )
 
     def test_record_type(self):
         with pytest.raises(UnsupportedType):
-            FieldConfig(name="field1", decrypt=False, type="STRUCT", mode="NULLABLE")
+            FieldConfig(
+                name="field1", is_encrypted=False, type="STRUCT", mode="NULLABLE"
+            )
         with pytest.raises(UnsupportedType):
-            FieldConfig(name="field1", decrypt=False, type="RECORD", mode="NULLABLE")
+            FieldConfig(
+                name="field1", is_encrypted=False, type="RECORD", mode="NULLABLE"
+            )
         with pytest.raises(UnsupportedType):
             FieldConfig(
                 name="field1",
-                decrypt=False,
+                is_encrypted=False,
                 type="STRING",
                 mode="NULLABLE",
                 fields=[
@@ -32,7 +40,7 @@ class TestFieldConfig:
 
         FieldConfig(
             name="top_level",
-            decrypt=False,
+            is_encrypted=False,
             type="RECORD",
             mode="NULLABLE",
             fields=[

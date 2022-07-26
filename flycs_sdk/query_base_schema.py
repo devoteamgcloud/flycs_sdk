@@ -61,22 +61,34 @@ class FieldConfig:
         name: str,
         type: str,
         mode: str,
-        decrypt=False,
+        is_encrypted: bool = False,
+        has_pii: bool = False,
+        is_transformed: bool = False,
+        keyset_name: str = None,
+        keyset_column_id: List[str] = None,
+        original_type: str = None,
+        derives_from: List[str] = None,
         fields: Optional[List] = None,
     ):
         """Create FieldConfig object.
 
         :param name: name of the field to configure
         :type name: str
-        :param decrypt: whether this field should be decrypted automatically or not
-        :type decrypt: bool
+        :param is_encrypted: whether this field should is encrypted or not
+        :type is_encrypted: bool
         :param fields: in case type is record, contains the field of the record
         :type fields: list
         """
         self.name = name
         self.type = type
         self.mode = mode
-        self.decrypt = decrypt
+        self.is_encrypted = is_encrypted
+        self.has_pii = has_pii
+        self.is_transformed = is_transformed
+        self.keyset_name = keyset_name
+        self.keyset_column_id = keyset_column_id
+        self.original_type = original_type
+        self.derives_from = derives_from
         self.fields = fields or []
         self._validate()
 
@@ -84,6 +96,10 @@ class FieldConfig:
         if self.type not in BQ_DATA_TYPES:
             raise UnsupportedType(
                 f"Unsupported type: {self.type} is not a supported type in BigQuery. Type should be one of: {BQ_DATA_TYPES}"
+            )
+        if self.original_type is not None and self.original_type not in BQ_DATA_TYPES:
+            raise UnsupportedType(
+                f"Unsupported original type: {self.original_type} is not a supported type in BigQuery. Type should be one of: {BQ_DATA_TYPES}"
             )
         if len(self.fields) > 0 and self.type not in ["RECORD", "STRUCT"]:
             raise UnsupportedType(
@@ -102,7 +118,7 @@ class FieldConfig:
 
     @classmethod
     def from_dict(cls, d: dict):
-        """Create a FieldConfig object form a dictionnary created with the to_dict method.
+        """Create a FieldConfig object form a dictionary created with the to_dict method.
 
         :param d: source dictionary
         :type d: dict
@@ -111,9 +127,15 @@ class FieldConfig:
         """
         return FieldConfig(
             name=d.get("NAME", d.get("name")),
-            decrypt=d.get("DECRYPT", d.get("decrypt", False)),
             type=d.get("TYPE", d.get("type")),
             mode=d.get("MODE", d.get("mode")),
+            is_encrypted=d.get("IS_ENCRYPTED", d.get("is_encrypted", False)),
+            has_pii=d.get("HAS_PII", d.get("has_pii", False)),
+            is_transformed=d.get("IS_TRANSFORMED", d.get("is_transformed", False)),
+            keyset_name=d.get("KEYSET_NAME", d.get("keyset_name")),
+            keyset_column_id=d.get("KEYSET_COLUMN_ID", d.get("keyset_column_id")),
+            original_type=d.get("ORIGINAL_TYPE", d.get("original_type")),
+            derives_from=d.get("DERIVES_FROM", d.get("derives_from")),
             fields=[
                 FieldConfig.from_dict(field)
                 for field in d.get("FIELDS", d.get("fields")) or []
@@ -128,9 +150,15 @@ class FieldConfig:
         """
         return {
             "NAME": self.name,
-            "DECRYPT": self.decrypt,
             "TYPE": self.type,
             "MODE": self.mode,
+            "IS_ENCRYPTED": self.is_encrypted,
+            "HAS_PII": self.has_pii,
+            "IS_TRANSFORMED": self.is_transformed,
+            "KEYSET_NAME": self.keyset_name,
+            "KEYSET_COLUMN_ID": self.keyset_column_id,
+            "ORIGINAL_TYPE": self.original_type,
+            "DERIVES_FROM": self.derives_from,
             "FIELDS": [f.to_dict() for f in self.fields or []],
         }
 
@@ -140,7 +168,7 @@ class FieldConfig:
             self.name == other.name
             and self.mode == other.mode
             and self.type == other.type
-            and self.decrypt == other.decrypt
+            and self.is_encrypted == other.is_encrypted
             and self.fields == other.fields
         )
 
