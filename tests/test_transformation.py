@@ -28,6 +28,7 @@ transformation_fields_config = [
     FieldConfig(name="field1", is_encrypted=False, type="STRING", mode="NULLABLE"),
     FieldConfig(
         name="field2",
+        description="Test description",
         is_encrypted=True,
         has_pii=True,
         keyset_name="keyset_name",
@@ -116,6 +117,7 @@ class TestTranformations:
                     "NAME": "field1",
                     "TYPE": "STRING",
                     "MODE": "NULLABLE",
+                    "DESCRIPTION": None,
                     "IS_ENCRYPTED": False,
                     "HAS_PII": None,
                     "IS_TRANSFORMED": None,
@@ -129,6 +131,7 @@ class TestTranformations:
                     "NAME": "field2",
                     "TYPE": "BYTES",
                     "MODE": "NULLABLE",
+                    "DESCRIPTION": "Test description",
                     "IS_ENCRYPTED": True,
                     "HAS_PII": True,
                     "IS_TRANSFORMED": None,

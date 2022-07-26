@@ -61,12 +61,13 @@ class FieldConfig:
         name: str,
         type: str,
         mode: str,
-        is_encrypted: bool = None,
-        has_pii: bool = None,
-        is_transformed: bool = None,
-        keyset_name: str = None,
+        description: Optional[str] = None,
+        is_encrypted: Optional[bool] = None,
+        has_pii: Optional[bool] = None,
+        is_transformed: Optional[bool] = None,
+        keyset_name: Optional[str] = None,
         keyset_column_id: List[str] = None,
-        original_type: str = None,
+        original_type: Optional[str] = None,
         derives_from: List[str] = None,
         fields: Optional[List] = None,
     ):
@@ -82,6 +83,7 @@ class FieldConfig:
         self.name = name
         self.type = type
         self.mode = mode
+        self.description = description
         self.is_encrypted = is_encrypted
         self.has_pii = has_pii
         self.is_transformed = is_transformed
@@ -139,6 +141,7 @@ class FieldConfig:
             name=d.get("NAME", d.get("name")),
             type=d.get("TYPE", d.get("type")),
             mode=d.get("MODE", d.get("mode")),
+            description=d.get("DESCRIPTION", d.get("description")),
             is_encrypted=is_encrypted_final,
             has_pii=d.get("HAS_PII", d.get("has_pii", False)),
             is_transformed=d.get("IS_TRANSFORMED", d.get("is_transformed", False)),
@@ -162,6 +165,7 @@ class FieldConfig:
             "NAME": self.name,
             "TYPE": self.type,
             "MODE": self.mode,
+            "DESCRIPTION": self.description,
             "IS_ENCRYPTED": self.is_encrypted,
             "HAS_PII": self.has_pii,
             "IS_TRANSFORMED": self.is_transformed,
@@ -178,7 +182,14 @@ class FieldConfig:
             self.name == other.name
             and self.mode == other.mode
             and self.type == other.type
+            and self.description == other.description
             and self.is_encrypted == other.is_encrypted
+            and self.has_pii == other.has_pii
+            and self.is_transformed == other.is_transformed
+            and self.keyset_name == other.keyset_name
+            and self.keyset_column_id == other.keyset_column_id
+            and self.original_type == other.original_type
+            and self.derives_from == other.derives_from
             and self.fields == other.fields
         )
 
