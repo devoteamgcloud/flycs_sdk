@@ -12,6 +12,7 @@ class QueryBase(ABC):
         name: str,
         query: str,
         version: str,
+        description: Optional[str] = None,
         encrypt: Optional[bool] = None,
         static: Optional[bool] = True,
         destination_data_mart: Optional[str] = None,
@@ -34,6 +35,7 @@ class QueryBase(ABC):
         self.name = name
         self.query = query
         self.version = version
+        self.description = description
         self.encrypt = encrypt
         self.static = static
         self.destination_data_mart = destination_data_mart

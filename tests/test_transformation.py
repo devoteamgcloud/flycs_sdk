@@ -91,6 +91,7 @@ class TestTranformations:
             "NAME": "my_tranformation",
             "QUERY": "SELECT * FROM TABLE;",
             "VERSION": "1.0.0",
+            "DESCRIPTION": None,
             "ENCRYPT": None,
             "STATIC": False,
             "HAS_OUTPUT": False,

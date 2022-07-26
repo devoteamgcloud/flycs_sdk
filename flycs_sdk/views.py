@@ -42,12 +42,12 @@ class View(QueryBaseWithSchema):
             name=name,
             query=query,
             version=version,
+            description=description,
             encrypt=encrypt,
             static=static,
             destination_data_mart=destination_data_mart,
             schema=schema,
         )
-        self.description = description
         self.destination_table = None
         self.dependencies = []
         self.parsing_dependencies = []

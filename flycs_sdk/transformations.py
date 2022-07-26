@@ -33,6 +33,7 @@ class Transformation(QueryBaseWithSchema):
         name: str,
         query: str,
         version: str,
+        description: Optional[str] = None,
         encrypt: Optional[bool] = None,
         static: Optional[bool] = True,
         has_output: Optional[bool] = False,
@@ -110,6 +111,7 @@ class Transformation(QueryBaseWithSchema):
             name=name,
             query=query,
             version=version,
+            description=description,
             encrypt=encrypt,
             static=static,
             destination_data_mart=destination_data_mart,
@@ -145,6 +147,7 @@ class Transformation(QueryBaseWithSchema):
             name=d.get("NAME", ""),
             query=d["QUERY"],
             version=d["VERSION"],
+            description=d.get("DESCRIPTION", d.get("description")),
             encrypt=d.get("ENCRYPT", None),
             static=d.get("STATIC", True),
             has_output=d.get("HAS_OUTPUT", True),
@@ -184,6 +187,7 @@ class Transformation(QueryBaseWithSchema):
             "NAME": self.name,
             "QUERY": self.query,
             "VERSION": self.version,
+            "DESCRIPTION": self.description,
             "ENCRYPT": self.encrypt,
             "STATIC": self.static,
             "HAS_OUTPUT": self.has_output,
@@ -215,6 +219,7 @@ class Transformation(QueryBaseWithSchema):
             self.name == other.name
             and self.query == other.query
             and self.version == other.version
+            and self.description == other.description
             and self.static == other.static
             and self.encrypt == other.encrypt
             and self.has_output == other.has_output

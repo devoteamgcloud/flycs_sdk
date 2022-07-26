@@ -191,6 +191,7 @@ class QueryBaseWithSchema(QueryBase):
         name: str,
         query: str,
         version: str,
+        description: str = None,
         schema: Optional[List[FieldConfig]] = None,
         encrypt: Optional[bool] = None,
         static: Optional[bool] = True,
@@ -211,13 +212,16 @@ class QueryBaseWithSchema(QueryBase):
         :param destination_data_mart: Alias of the table to use for data mart
         :type destination_data_mart: str
         """
-        self.name = name
-        self.query = query
-        self.version = version
+        super().__init__(
+            name=name,
+            query=query,
+            version=version,
+            description=description,
+            static=static,
+            destination_data_mart=destination_data_mart,
+        )
         self.schema = schema or []
         self.encrypt = encrypt
-        self.static = static
-        self.destination_data_mart = destination_data_mart
 
     @classmethod
     @abstractmethod

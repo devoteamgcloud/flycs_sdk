@@ -82,6 +82,7 @@ class Function(QueryBase):
             name=name,
             query=query,
             version=version,
+            description=description,
             static=static,
             destination_data_mart=destination_data_mart,
         )
@@ -89,7 +90,6 @@ class Function(QueryBase):
         self.dependencies = []
         self.parsing_dependencies = []
         self.argument_list = argument_list
-        self.description = description
         self.return_type = return_type
         self.language = language
 
