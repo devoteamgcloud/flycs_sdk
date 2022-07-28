@@ -16,6 +16,7 @@ class QueryBase(ABC):
         encrypt: Optional[bool] = None,
         static: Optional[bool] = True,
         destination_data_mart: Optional[str] = None,
+        destination_table: Optional[str] = None,
     ):
         """Create a QueryBase object.
 
@@ -39,6 +40,7 @@ class QueryBase(ABC):
         self.encrypt = encrypt
         self.static = static
         self.destination_data_mart = destination_data_mart
+        self.destination_table = destination_table
 
     @classmethod
     @abstractmethod

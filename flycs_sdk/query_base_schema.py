@@ -207,6 +207,7 @@ class QueryBaseWithSchema(QueryBase):
         encrypt: Optional[bool] = None,
         static: Optional[bool] = True,
         destination_data_mart: Optional[str] = None,
+        destination_table: Optional[str] = None,
     ):
         """Create a QueryBase object.
 
@@ -230,6 +231,7 @@ class QueryBaseWithSchema(QueryBase):
             description=description,
             static=static,
             destination_data_mart=destination_data_mart,
+            destination_table=destination_table,
         )
         self.schema = schema or []
         self.encrypt = encrypt

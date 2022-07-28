@@ -63,6 +63,7 @@ class StoredProcedure(QueryBase):
         description: Optional[str] = None,
         static: Optional[bool] = True,
         destination_data_mart: Optional[str] = None,
+        destination_table: Optional[str] = None,
     ):
         """Create a stored_procedure object.
 
@@ -88,8 +89,8 @@ class StoredProcedure(QueryBase):
             description=description,
             static=static,
             destination_data_mart=destination_data_mart,
+            destination_table=destination_table,
         )
-        self.destination_table = None
         self.dependencies = []
         self.parsing_dependencies = []
         self.argument_list = argument_list
@@ -115,8 +116,8 @@ class StoredProcedure(QueryBase):
             argument_list=[Argument.from_dict(a) for a in d.get("ARGUMENT_LIST") or []],
             return_type=d.get("RETURN_TYPE"),
             language=d.get("LANGUAGE", "sql"),
+            destination_table=d.get("DESTINATION_TABLE"),
         )
-        stored_procedure.destination_table = d.get("DESTINATION_TABLE")
         stored_procedure.dependencies = [
             Dependency.from_dict(x) for x in d.get("DEPENDS_ON") or []
         ]

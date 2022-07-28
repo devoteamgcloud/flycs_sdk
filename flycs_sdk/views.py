@@ -22,6 +22,7 @@ class View(QueryBaseWithSchema):
         destination_data_mart: Optional[str] = None,
         force_cache_refresh: Optional[bool] = False,
         schema: Optional[List[FieldConfig]] = None,
+        destination_table: Optional[str] = None,
     ):
         """Create a View object.
 
@@ -47,8 +48,8 @@ class View(QueryBaseWithSchema):
             static=static,
             destination_data_mart=destination_data_mart,
             schema=schema,
+            destination_table=destination_table,
         )
-        self.destination_table = None
         self.dependencies = []
         self.parsing_dependencies = []
         self.force_cache_refresh = force_cache_refresh
@@ -71,8 +72,8 @@ class View(QueryBaseWithSchema):
             static=d.get("STATIC", True),
             destination_data_mart=d.get("DESTINATION_DATA_MART"),
             schema=[FieldConfig.from_dict(x) for x in d.get("SCHEMA") or []],
+            destination_table=d.get("DESTINATION_TABLE"),
         )
-        view.destination_table = d.get("DESTINATION_TABLE")
         view.dependencies = [Dependency.from_dict(x) for x in d.get("DEPENDS_ON") or []]
         view.parsing_dependencies = [
             Dependency.from_dict(x) for x in d.get("PARSING_DEPENDS_ON") or []
