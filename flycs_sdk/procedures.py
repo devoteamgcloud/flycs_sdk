@@ -1,4 +1,4 @@
-"""Module containing Function classes."""
+"""Module containing stored_procedure classes."""
 
 from typing import Optional, List
 
@@ -7,18 +7,21 @@ from flycs_sdk.query_base import QueryBase
 
 
 class Argument:
-    """Class representing a function Argument."""
+    """Class representing a Stored Procedure Argument."""
 
-    def __init__(self, name: str, type: str):
+    def __init__(self, name: str, type: str, mode: Optional[str]):
         """Create an Argument object.
 
         :param name: name of the argument
         :type name: str
         :param type: the SQL type of the argument
         :type type: str
+        :param type: the SQL mode of the argumment (IN , OUT or INOUT)
+        :type mode: str
         """
         self.name = name
         self.type = type
+        self.mode = mode
 
     def to_dict(self) -> dict:
         """
@@ -26,7 +29,7 @@ class Argument:
 
         :return: the Argument as a dictionary object.
         """
-        return {"NAME": self.name, "TYPE": self.type}
+        return {"NAME": self.name, "TYPE": self.type, "MODE": self.mode}
 
     @classmethod
     def from_dict(cls, a):
@@ -37,17 +40,17 @@ class Argument:
         :return: Argument
         :rtype: Argument
         """
-        return cls(name=a["NAME"], type=a["TYPE"])
+        return cls(name=a["NAME"], type=a["TYPE"], mode=a["MODE"])
 
     def __eq__(self, o) -> bool:
         """Implement __eq__ method."""
-        return self.name == o.name and self.type == o.type
+        return self.name == o.name and self.type == o.type and self.mode == o.type
 
 
-class Function(QueryBase):
-    """Class representing a Function configuration."""
+class StoredProcedure(QueryBase):
+    """Class representing a Stored Procedure configuration."""
 
-    kind = "function"
+    kind = "stored_procedure"
 
     def __init__(
         self,
@@ -62,21 +65,21 @@ class Function(QueryBase):
         destination_data_mart: Optional[str] = None,
         destination_table: Optional[str] = None,
     ):
-        """Create a Function object.
+        """Create a stored_procedure object.
 
-        :param name: name of the function
+        :param name: name of the Stored Procedure
         :type name: str
-        :param query: SQL body of the function
+        :param query: SQL body of the Stored Procedure
         :type query: str
-        :param version: version of the function
+        :param version: version of the Stored Procedure
         :type version: str
-        :param argument_list: the list of arguments of the function
+        :param argument_list: the list of arguments of the Stored Procedure
         :type argument_list: List[Argument]
-        :param return_type: the SQL return type of the function
+        :param return_type: the SQL return type of the Stored Procedure
         :type return_type: Optional[str]
-        :param language: the language of the function, defaults to sql
+        :param language: the language of the Stored Procedure, defaults to sql
         :type language: Optional[str]
-        :param description: description of the function, defaults to None
+        :param description: description of the Stored Procedure, defaults to None
         :type description: Optional[str], optional
         """
         super().__init__(
@@ -96,14 +99,14 @@ class Function(QueryBase):
 
     @classmethod
     def from_dict(cls, d: dict):
-        """Create a Function object from a dictionary created with the to_dict method.
+        """Create a Stored Procedure object from a dictionary created with the to_dict method.
 
         :param d: source dictionary
         :type d: dict
-        :return: Function
-        :rtype: Function
+        :return: StoredProcedure
+        :rtype: StoredProcedure
         """
-        function = cls(
+        stored_procedure = cls(
             name=d.get("NAME", ""),
             query=d["QUERY"],
             version=d["VERSION"],
@@ -115,19 +118,19 @@ class Function(QueryBase):
             language=d.get("LANGUAGE", "sql"),
             destination_table=d.get("DESTINATION_TABLE"),
         )
-        function.dependencies = [
+        stored_procedure.dependencies = [
             Dependency.from_dict(x) for x in d.get("DEPENDS_ON") or []
         ]
-        function.parsing_dependencies = [
+        stored_procedure.parsing_dependencies = [
             Dependency.from_dict(x) for x in d.get("PARSING_DEPENDS_ON") or []
         ]
-        return function
+        return stored_procedure
 
     def to_dict(self) -> dict:
         """
-        Serialize the Function to a dictionary object.
+        Serialize the Stored Procedure to a dictionary object.
 
-        :return: the Function as a dictionary object.
+        :return: the Stored Procedure as a dictionary object.
         :rtype: Dict
         """
         return {

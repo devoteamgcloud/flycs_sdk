@@ -1,4 +1,4 @@
-"""This module contains base class for any "query" object (Transformation, views,...)."""
+"""This module contains base class for any "query" object (Transformation, views, procedures, functions, ...)."""
 
 from abc import ABC, abstractmethod
 from typing import Optional
@@ -12,9 +12,11 @@ class QueryBase(ABC):
         name: str,
         query: str,
         version: str,
+        description: Optional[str] = None,
         encrypt: Optional[bool] = None,
         static: Optional[bool] = True,
         destination_data_mart: Optional[str] = None,
+        destination_table: Optional[str] = None,
     ):
         """Create a QueryBase object.
 
@@ -34,9 +36,11 @@ class QueryBase(ABC):
         self.name = name
         self.query = query
         self.version = version
+        self.description = description
         self.encrypt = encrypt
         self.static = static
         self.destination_data_mart = destination_data_mart
+        self.destination_table = destination_table
 
     @classmethod
     @abstractmethod

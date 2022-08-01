@@ -9,6 +9,8 @@ Welcome to Flycs SDK's documentation!
    installation
    usage
    views
+   functions
+   stored_procedures
    triggers
    custom_operators
    modules

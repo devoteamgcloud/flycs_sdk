@@ -7,6 +7,7 @@ view_name = "my_view"
 view_version = "1.0.0"
 view_query = "SELECT * FROM TABLE;"
 view_description = "this is my view"
+view_force_cache_refresh = True
 
 
 class TestView:
@@ -17,6 +18,7 @@ class TestView:
             query=view_query,
             version=view_version,
             description=view_description,
+            force_cache_refresh=view_force_cache_refresh,
         )
 
     def test_init(self, my_view: View):
@@ -24,6 +26,7 @@ class TestView:
         assert my_view.query == view_query
         assert my_view.version == view_version
         assert my_view.description == view_description
+        assert my_view.force_cache_refresh == view_force_cache_refresh
 
     def test_to_dict(self, my_view: View):
         assert my_view.to_dict() == {
@@ -39,6 +42,8 @@ class TestView:
             "DEPENDS_ON": [],
             "PARSING_DEPENDS_ON": [],
             "KEYSETS_USED": [],
+            "FORCE_CACHE_REFRESH": view_force_cache_refresh,
+            "SCHEMA": [],
         }
 
     def test_serialize_deserialize(self, my_view):

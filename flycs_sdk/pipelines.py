@@ -33,6 +33,7 @@ class Pipeline:
         self,
         name: str,
         version: str,
+        description: Optional[str] = None,
         entities: List[
             Union[
                 Entity, BaseLayerEntity, ParametrizedEntity, ParametrizedBaseLayerEntity
@@ -65,6 +66,7 @@ class Pipeline:
         self.name = name
         if _is_valid_version(version):
             self.version = version
+        self.description = description
         self.schedule = schedule  # TODO: validate format
         self.kind = kind
         if _is_valid_start_time(start_time):
@@ -85,6 +87,7 @@ class Pipeline:
         obj = cls(
             name=d["name"],
             version=d["version"],
+            description=d.get("description"),
             schedule=d.get("schedule"),
             start_time=_parse_datetime(d["start_time"])
             if d.get("start_time")
@@ -127,6 +130,7 @@ class Pipeline:
         return {
             "name": self.name,
             "version": self.version,
+            "description": self.description,
             "schedule": schedule,
             "start_time": _format_datetime(self.start_time)
             if self.start_time
@@ -142,6 +146,7 @@ class Pipeline:
         return (
             self.name == other.name
             and self.version == other.version
+            and self.description == other.description
             and self.schedule == other.schedule
             and self.kind.value == other.kind.value
             and self.start_time == other.start_time
@@ -157,6 +162,7 @@ class ParametrizedPipeline:
         self,
         name: str,
         version: str,
+        description: Optional[str] = None,
         entities: List[Union[ParametrizedEntity, ParametrizedBaseLayerEntity]] = None,
         schedule: Optional[str] = None,
         kind: PipelineKind = PipelineKind.VANILLA,
@@ -185,6 +191,7 @@ class ParametrizedPipeline:
         self.name = name
         if _is_valid_version(version):
             self.version = version
+        self.description = description
         self._schedule = schedule  # TODO: validate format
         self.kind = kind
         if _is_valid_start_time(start_time):
@@ -215,7 +222,8 @@ class ParametrizedPipeline:
         self._start_time = value
 
     def add_entity(
-        self, entity: Union[ParametrizedEntity, ParametrizedBaseLayerEntity],
+        self,
+        entity: Union[ParametrizedEntity, ParametrizedBaseLayerEntity],
     ):
         """
         Add entity to the list of entities contained in this pipeline.
@@ -244,6 +252,7 @@ class ParametrizedPipeline:
             Pipeline(
                 name=_parametrized_name(self.name, p),
                 version=self.version,
+                description=self.description,
                 schedule=self.schedule,
                 entities=self.entities,
                 kind=self.kind,
@@ -284,6 +293,7 @@ class ParametrizedPipeline:
             {
                 "name": _parametrized_name(self.name, p),
                 "version": self.version,
+                "description": self.description,
                 "schedule": schedule,
                 "start_time": _format_datetime(self.start_time)
                 if self.start_time

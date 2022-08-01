@@ -5,6 +5,8 @@ from .custom_code import CustomCode
 from enum import Enum
 from .transformations import Transformation
 from .views import View
+from .functions import Function
+from .procedures import StoredProcedure
 
 
 class ConflictingNameError(ValueError):
@@ -32,6 +34,7 @@ class Entity:
         kind: Optional[EntityKind] = None,
         stage_config: Optional[Dict[str, Dict[str, str]]] = None,
         custom_operators: Optional[Dict[str, List[CustomCode]]] = None,
+        location: Optional[str] = None,
     ):
         """
         Create an Entity object.
@@ -45,6 +48,8 @@ class Entity:
                                  of CustomCode objects allowing to inject custom Airflow operator
                                  into the pipeline as value
         :type custom_operators: list
+        :param location: The location where to create the associated dataset. This field is optional and only required when you want to
+                  manually overwrite the default dataset location configure in the environmen
         """
         self.name = name
         self.version = version
@@ -52,6 +57,7 @@ class Entity:
         self.stage_config = stage_config or {}
         self.transformations = {}
         self.custom_operators = custom_operators or {}
+        self.location = location
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -69,6 +75,7 @@ class Entity:
             version=d["version"],
             kind=EntityKind(d["kind"]) if d.get("kind") is not None else None,
             stage_config=stage_config,
+            location=d.get("location"),
         )
 
     @property
@@ -85,7 +92,9 @@ class Entity:
         """
         return self.stage_config[stage]
 
-    def _insert_into_stage_config(self, stage: str, obj: Union[Transformation, View]):
+    def _insert_into_stage_config(
+        self, stage: str, obj: Union[Transformation, View, Function, StoredProcedure]
+    ):
         if stage not in self.stage_config:
             self.stage_config[stage] = {}
         if obj.name in self.stage_config[stage]:
@@ -122,6 +131,16 @@ class Entity:
         """
         self._insert_into_stage_config(stage, view)
 
+    def add_routine(self, stage: str, routine: Union[StoredProcedure, Function]):
+        """Insert a Function or Procedure into the stage_config of the entity.
+
+        :param stage: the name of the stage where to insert the object
+        :type stage: str
+        :param routine: the StoredProcedure or Function object to insert
+        :type routine: StoredProcedure or Function
+        """
+        self._insert_into_stage_config(stage, routine)
+
     def to_dict(self) -> Dict:
         """
         Serialize the entity to a dictionary object.
@@ -138,6 +157,7 @@ class Entity:
             ]
             if self.stage_config is not None
             else [],
+            "location": self.location,
         }
 
     def __eq__(self, other):
@@ -147,6 +167,7 @@ class Entity:
             and self.version == other.version
             and self.stage_config == other.stage_config
             and self.kind == other.kind
+            and self.location == other.location
         )
 
 
@@ -315,6 +336,7 @@ class ParametrizedEntity:
         kind: Optional[EntityKind] = None,
         stage_config: Optional[Dict[str, Dict[str, str]]] = None,
         custom_operators: Optional[Dict[str, List[CustomCode]]] = None,
+        location: Optional[str] = None,
     ):
         """
         Create a ParametrizedEntity object.
@@ -328,6 +350,11 @@ class ParametrizedEntity:
         :param kind: the kind of the entity
         :param stage_config: a dictionary with the name of the stage as key and a dictionary of query names
         and their versions as value.
+        :param custom_operators: a dictionary with the name of the stage as key and a list
+                                 of CustomCode objects allowing to inject custom Airflow operator
+                                 into the pipeline as value
+        :param location: The location where to create the associated dataset. This field is optional and only required when you want to
+                  manually overwrite the default dataset location configure in the environmen
         """
         self.name = name
         self.version = version
@@ -335,6 +362,7 @@ class ParametrizedEntity:
         self.stage_config = stage_config or {}
         self.transformations = {}
         self.custom_operators = custom_operators or {}
+        self.location = location
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -351,6 +379,7 @@ class ParametrizedEntity:
             version=d["version"],
             kind=EntityKind(d["kind"]) if d.get("kind") is not None else None,
             stage_config=stage_config,
+            location=d.get("location"),
         )
 
     @property
@@ -385,6 +414,7 @@ class ParametrizedEntity:
                 {"name": stage, "versions": self.get_stage_versions(stage, parameters)}
                 for stage in self.stage_config.keys()
             ],
+            "location": self.location,
         }
 
     def __eq__(self, other):
@@ -394,6 +424,7 @@ class ParametrizedEntity:
             and self.version == other.version
             and self.stage_config == other.stage_config
             and self.kind == other.kind
+            and self.location == other.location
         )
 
 

@@ -1,14 +1,16 @@
+import pytest
+
 from flycs_sdk.custom_code import Dependency
+from flycs_sdk.query_base_schema import UnsupportedMode, UnsupportedType
 from flycs_sdk.transformations import (
-    FieldConfig,
+    SchemaUpdateOptions,
     Transformation,
     WriteDisposition,
     SchemaUpdateOptions,
-    FieldConfig,
     DeltaTimeOptions,
     ExecutionTimeout,
 )
-import pytest
+from flycs_sdk.query_base_schema import FieldConfig
 
 transformation_name = "my_tranformation"
 transformation_query = "SELECT * FROM TABLE;"
@@ -26,13 +28,25 @@ transformation_dependencies = [Dependency("entity1", "staging", "deps")]
 transformation_parsing_dependencies = []
 transformation_destroy_table = False
 transformation_fields_config = [
-    FieldConfig(field_name="field1", decrypt=False),
-    FieldConfig(field_name="field2", decrypt=True),
+    FieldConfig(name="field1", is_encrypted=False, type="STRING", mode="NULLABLE"),
+    FieldConfig(
+        name="field2",
+        description="Test description",
+        is_encrypted=True,
+        has_pii=True,
+        keyset_name="keyset_name",
+        keyset_column_id=["keyset_column"],
+        original_type="DATE",
+        type="BYTES",
+        mode="NULLABLE",
+        derives_from=["raw_field"],
+    ),
 ]
 transformation_run_before_keyset = False
 transformation_trigger_rule = "all_success"
 transformation_keysets_used = ["keyset_1"]
 transformation_execution_timeout = ExecutionTimeout(DeltaTimeOptions.MINUTES.name, 15)
+transformation_force_cache_refresh = True
 
 
 class TestTranformations:
@@ -54,11 +68,12 @@ class TestTranformations:
             dependencies=transformation_dependencies,
             parsing_dependencies=transformation_parsing_dependencies,
             destroy_table=transformation_destroy_table,
-            fields_config=transformation_fields_config,
             run_before_keyset=transformation_run_before_keyset,
             trigger_rule=transformation_trigger_rule,
             keysets_used=transformation_keysets_used,
             execution_timeout=transformation_execution_timeout,
+            schema=transformation_fields_config,
+            force_cache_refresh=transformation_force_cache_refresh,
         )
 
     def test_init(self, my_transformation):
@@ -78,17 +93,21 @@ class TestTranformations:
         )
         assert my_transformation.dependencies == transformation_dependencies
         assert my_transformation.destroy_table == transformation_destroy_table
-        assert my_transformation.fields_config == transformation_fields_config
         assert my_transformation.run_before_keyset == transformation_run_before_keyset
         assert my_transformation.trigger_rule == transformation_trigger_rule
         assert my_transformation.keysets_used == transformation_keysets_used
         assert my_transformation.execution_timeout == transformation_execution_timeout
+        assert my_transformation.schema == transformation_fields_config
+        assert (
+            my_transformation.force_cache_refresh == transformation_force_cache_refresh
+        )
 
     def test_to_dict(self, my_transformation):
         assert my_transformation.to_dict() == {
             "NAME": "my_tranformation",
             "QUERY": "SELECT * FROM TABLE;",
             "VERSION": "1.0.0",
+            "DESCRIPTION": None,
             "ENCRYPT": None,
             "STATIC": False,
             "HAS_OUTPUT": False,
@@ -108,14 +127,41 @@ class TestTranformations:
             "DESTROY_TABLE": False,
             "TABLES": None,
             "KIND": "transformation",
-            "FIELDS_CONFIG": [
-                {"FIELD_NAME": "field1", "DECRYPT": False,},
-                {"FIELD_NAME": "field2", "DECRYPT": True,},
+            "SCHEMA": [
+                {
+                    "NAME": "field1",
+                    "TYPE": "STRING",
+                    "MODE": "NULLABLE",
+                    "DESCRIPTION": None,
+                    "IS_ENCRYPTED": False,
+                    "HAS_PII": None,
+                    "IS_TRANSFORMED": None,
+                    "KEYSET_NAME": None,
+                    "KEYSET_COLUMN_ID": None,
+                    "ORIGINAL_TYPE": None,
+                    "DERIVES_FROM": None,
+                    "FIELDS": [],
+                },
+                {
+                    "NAME": "field2",
+                    "TYPE": "BYTES",
+                    "MODE": "NULLABLE",
+                    "DESCRIPTION": "Test description",
+                    "IS_ENCRYPTED": True,
+                    "HAS_PII": True,
+                    "IS_TRANSFORMED": None,
+                    "KEYSET_NAME": "keyset_name",
+                    "KEYSET_COLUMN_ID": ["keyset_column"],
+                    "ORIGINAL_TYPE": "DATE",
+                    "DERIVES_FROM": ["raw_field"],
+                    "FIELDS": [],
+                },
             ],
             "RUN_BEFORE_KEYSET": False,
             "TRIGGER_RULE": "all_success",
             "KEYSETS_USED": ["keyset_1"],
             "EXECUTION_TIMEOUT": {"DELTA_TYPE": "MINUTES", "DELTA": 15},
+            "FORCE_CACHE_REFRESH": transformation_force_cache_refresh,
         }
 
     def test_from_dict(self, my_transformation):

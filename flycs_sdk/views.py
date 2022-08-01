@@ -1,12 +1,12 @@
 """Module containing view classes."""
 
-from typing import Optional, List
+from typing import List, Optional
 
 from flycs_sdk.custom_code import Dependency
-from flycs_sdk.query_base import QueryBase
+from flycs_sdk.query_base_schema import QueryBaseWithSchema, FieldConfig
 
 
-class View(QueryBase):
+class View(QueryBaseWithSchema):
     """Class representing a View configuration."""
 
     kind = "view"
@@ -21,6 +21,9 @@ class View(QueryBase):
         static: Optional[bool] = True,
         destination_data_mart: Optional[str] = None,
         keysets_used: Optional[List[str]] = None,
+        force_cache_refresh: Optional[bool] = False,
+        schema: Optional[List[FieldConfig]] = None,
+        destination_table: Optional[str] = None,
     ):
         """Create a View object.
 
@@ -36,20 +39,24 @@ class View(QueryBase):
         :type encrypt: Optional[bool]
         :param keysets_used: List of keysets used in the transformation
         :type keysets_used: List[str]
+        :param force_cache_refresh: whether or not we need to use the cache in the pii service
+        :type force_cache_refresh: bool, optional
         """
         super().__init__(
             name=name,
             query=query,
             version=version,
+            description=description,
             encrypt=encrypt,
             static=static,
             destination_data_mart=destination_data_mart,
+            schema=schema,
+            destination_table=destination_table,
         )
-        self.description = description
-        self.destination_table = None
         self.dependencies = []
         self.parsing_dependencies = []
         self.keysets_used = keysets_used or []
+        self.force_cache_refresh = force_cache_refresh
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -68,13 +75,15 @@ class View(QueryBase):
             encrypt=d.get("ENCRYPT", None),
             static=d.get("STATIC", True),
             destination_data_mart=d.get("DESTINATION_DATA_MART"),
+            schema=[FieldConfig.from_dict(x) for x in d.get("SCHEMA") or []],
+            destination_table=d.get("DESTINATION_TABLE"),
         )
-        view.destination_table = d.get("DESTINATION_TABLE")
         view.dependencies = [Dependency.from_dict(x) for x in d.get("DEPENDS_ON") or []]
         view.parsing_dependencies = [
             Dependency.from_dict(x) for x in d.get("PARSING_DEPENDS_ON") or []
         ]
         view.keysets_used = d.get("KEYSETS_USED", [])
+        view.force_cache_refresh = d.get("FORCE_CACHE_REFRESH", False)
         return view
 
     def to_dict(self) -> dict:
@@ -97,6 +106,8 @@ class View(QueryBase):
             "DEPENDS_ON": [d.to_dict() for d in self.dependencies],
             "PARSING_DEPENDS_ON": [d.to_dict() for d in self.parsing_dependencies],
             "KEYSETS_USED": self.keysets_used,
+            "FORCE_CACHE_REFRESH": self.force_cache_refresh,
+            "SCHEMA": [config.to_dict() for config in self.schema],
         }
 
     def __eq__(self, o) -> bool:
@@ -114,4 +125,6 @@ class View(QueryBase):
             and self.dependencies == o.dependencies
             and self.parsing_dependencies == o.parsing_dependencies
             and self.keysets_used == o.keysets_used
+            and self.force_cache_refresh == o.force_cache_refresh
+            and self.schema == o.schema
         )

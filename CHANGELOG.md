@@ -1,6 +1,118 @@
 Changelog
 =========
 
+## v0.12.0 (2022-06-30)
+
+### New - Dev|pkg|test|doc
+
+* Add SQL UDF example function & correct javascript UDF example [FLYCS-984] (#38) [Yannis Argyrakis]
+
+  * new: usr: Add SQL UDF example function & correct javascript UDF example
+
+* Add add_routine() function to add Function & StoredProcedure object to an Entity [FLYCS-985] (#37) [Yannis Argyrakis]
+
+  * new: usr: Implement add_routine() function in Entity object to add StoredProcedure & Function
+
+### Changes - Dev|pkg|test|doc
+
+* Drop support for python 3.6 and 3.7. [Christophe de Carvalho]
+
+* Upgrade black version to 22.3.0. [Christophe de Carvalho]
+
+### Fix - Dev|pkg|test|doc
+
+* Add missing mode REQUIRED for field schema. [Christophe de Carvalho]
+
+
+## v0.10.3 (2022-05-11)
+
+### Changes - Dev|pkg|test|doc
+
+* Upgrade black version to 22.3.0. [Christophe de Carvalho]
+
+### Fix - Dev|pkg|test|doc
+
+* Add missing mode REQUIRED for field schema. [Christophe de Carvalho]
+
+
+## v0.10.2 (2022-03-22)
+
+### New - Dev|pkg|test|doc
+
+* Allow to define schema directly on Transformations and Views. [vasilis.milios@randstad.com]
+
+  User can now define the schema of a Transformation or a View directly on
+  the object itself.
+
+  Internally we have added a new class QueryBaseWithSchema that is a new layer in the QueryBase class hireachy. It is
+  used on both transformations and views chield class.
+
+### Changes - Dev|pkg|test|doc
+
+* Add support for python3.10. [Christophe de Carvalho]
+
+
+## v0.10.1 (2022-02-22)
+
+### Changes - Dev|pkg|test|doc
+
+* Upgrade libraries to latest version supported. [Christophe de Carvalho]
+
+
+## v0.11.0 (2022-02-07)
+
+### New - Dev|pkg|test|doc
+
+* Documentation added for stored procedures in Flycs SDK & typo correction of functions doc. [Yannis Argyrakis]
+
+* Add procedure query type. [Yannis Argyrakis]
+
+* Add FORCE_CACHE_REFRESH attribute to views and transformations. [JordyHeusdensDT]
+
+* Document how to create BigQuery functions. [Christophe de Carvalho]
+
+* Add location field on Entity class. [Christophe de Carvalho]
+
+  This fiels allow user to manually overwrite the default location of the
+  associated dataset.
+
+* Document how to create BigQuery functions. [Christophe de Carvalho]
+
+### Changes - Dev|pkg|test|doc
+
+* Upgrade black formatter version. [Christophe de Carvalho]
+
+* Do not give default value for PERSIST_BACKUP field. [Christophe de Carvalho]
+
+  If the user does not specify a value, then the airflow-deployment code
+  default behavior is used. So we should not enforce a default value here
+  in the SDK cause it overwrite the default behavior in airflow-deployment
+
+### Fix - Dev|pkg|test|doc
+
+* Upgrade documentation with latest methods available in SDK. [Christophe de Carvalho]
+
+
+## v0.10.0 (2021-11-09)
+
+### New - Dev|pkg|test|doc
+
+* Add location field on Entity class. [Christophe de Carvalho]
+
+  This fiels allow user to manually overwrite the default location of the
+  associated dataset.
+
+### Changes - Dev|pkg|test|doc
+
+* Upgrade black formatter version. [Christophe de Carvalho]
+
+* Do not give default value for PERSIST_BACKUP field. [Christophe de Carvalho]
+
+  If the user does not specify a value, then the airflow-deployment code
+  default behavior is used. So we should not enforce a default value here
+  in the SDK cause it overwrite the default behavior in airflow-deployment
+
+
 ## v0.8.1 (2021-07-26)
 
 ### New - Dev|pkg|test|doc
