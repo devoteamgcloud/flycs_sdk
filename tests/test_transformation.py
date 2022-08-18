@@ -89,6 +89,7 @@ class TestTranformations:
             "PERSIST_BACKUP": True,
             "WRITE_DISPOSITION": "WRITE_APPEND",
             "TIME_PARTITIONING": None,
+            "RANGE_PARTITIONING": None,
             "CLUSTER_FIELDS": ["field1", "field2"],
             "PARTITION_EXPIRATION": None,
             "REQUIRED_PARTITION_FILTER": False,
