@@ -81,7 +81,7 @@ class Transformation(QueryBaseWithSchema):
         :type write_disposition: WriteDisposition, optional
         :param time_partitioning: An dictionary with the time partition configuration, defaults to None
         :type time_partitioning: dict, optional
-        :param range_partitioning: A dictionary with the range partition configuration , defaults to None
+        :param range_partitioning: A dictionary with the range partition configuration , defaults to None (time_partitioning must be None)
         :type range_partitioning: dict, optional
         :param cluster_fields: An ordered list of the columns you want to cluster on., defaults to None
         :type cluster_fields: List[str], optional
