@@ -7,6 +7,7 @@ from flycs_sdk.transformations import (
     SchemaUpdateOptions,
     Transformation,
     WriteDisposition,
+    MultiPartitioningDefinitionError,
 )
 
 transformation_name = "my_tranformation"
@@ -19,6 +20,7 @@ transformation_keep_old_columns = True
 transformation_persist_backup = True
 transformation_write_disposition = WriteDisposition.APPEND
 transformation_time_partitioning = None
+transformation_range_partitioning = None
 transformation_cluster_fields = ["field1", "field2"]
 transformation_schema_update_options = [SchemaUpdateOptions.ALLOW_FIELD_ADDITION]
 transformation_dependencies = [Dependency("entity1", "staging", "deps")]
@@ -45,6 +47,7 @@ class TestTranformations:
             persist_backup=transformation_persist_backup,
             write_disposition=transformation_write_disposition,
             time_partitioning=transformation_time_partitioning,
+            range_partitioning=transformation_range_partitioning,
             cluster_fields=transformation_cluster_fields,
             schema_update_options=transformation_schema_update_options,
             dependencies=transformation_dependencies,
@@ -64,6 +67,7 @@ class TestTranformations:
         assert my_transformation.destination_table == transformation_destination_table
         assert my_transformation.write_disposition == transformation_write_disposition
         assert my_transformation.time_partitioning == transformation_time_partitioning
+        assert my_transformation.range_partitioning == transformation_range_partitioning
         assert my_transformation.cluster_fields == transformation_cluster_fields
         assert (
             my_transformation.schema_update_options
@@ -89,6 +93,7 @@ class TestTranformations:
             "PERSIST_BACKUP": True,
             "WRITE_DISPOSITION": "WRITE_APPEND",
             "TIME_PARTITIONING": None,
+            "RANGE_PARTITIONING": None,
             "CLUSTER_FIELDS": ["field1", "field2"],
             "PARTITION_EXPIRATION": None,
             "REQUIRED_PARTITION_FILTER": False,
@@ -122,3 +127,31 @@ class TestTranformations:
     def test_from_dict(self, my_transformation):
         loaded = Transformation.from_dict(my_transformation.to_dict())
         assert loaded == my_transformation
+
+    def test_mul_partitioning_def_error(self):
+        with pytest.raises(MultiPartitioningDefinitionError):
+            transfo = Transformation(
+                name=transformation_name,
+                query=transformation_query,
+                version=transformation_version,
+                static=transformation_static,
+                has_output=transformation_has_output,
+                destination_table=transformation_destination_table,
+                keep_old_columns=transformation_keep_old_columns,
+                persist_backup=transformation_persist_backup,
+                write_disposition=transformation_write_disposition,
+                time_partitioning={"field": "field1", "type": "DAY"},
+                range_partitioning={
+                    "field": "field2",
+                    "start": 0,
+                    "end": 100,
+                    "interval": 10,
+                },
+                cluster_fields=transformation_cluster_fields,
+                schema_update_options=transformation_schema_update_options,
+                dependencies=transformation_dependencies,
+                parsing_dependencies=transformation_parsing_dependencies,
+                destroy_table=transformation_destroy_table,
+                schema=transformation_fields_config,
+                force_cache_refresh=transformation_force_cache_refresh,
+            )
