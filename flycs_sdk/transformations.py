@@ -23,8 +23,14 @@ class SchemaUpdateOptions(Enum):
     ALLOW_FIELD_ADDITION = "ALLOW_FIELD_ADDITION"
 
 
+class MultiPartitioningDefinitionError(Exception):
+    """Raised when trying to create a Transformation object with time partitioning & range partitioning."""
+
+    pass
+
+
 class Transformation(QueryBaseWithSchema):
-    """Transformations are the lowest unit inside of a data pipeline. It is a single task implemented as a SQL query."""
+    """Transformations are the lowest unit inside a data pipeline. It is a single task implemented as a SQL query."""
 
     kind = "transformation"
 
@@ -123,6 +129,10 @@ class Transformation(QueryBaseWithSchema):
         self.keep_old_columns = keep_old_columns
         self.persist_backup = persist_backup
         self.write_disposition = write_disposition
+        if time_partitioning and range_partitioning:
+            raise MultiPartitioningDefinitionError(
+                "Defining time partitioning & range partitioning is not allowed, you must choose one option between them."
+            )
         self.time_partitioning = time_partitioning
         self.range_partitioning = range_partitioning
         self.cluster_fields = cluster_fields
