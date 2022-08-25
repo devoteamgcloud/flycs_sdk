@@ -62,6 +62,7 @@ class Transformation(QueryBaseWithSchema):
         tables: Optional[List[dict]] = None,
         schema: Optional[List[FieldConfig]] = None,
         force_cache_refresh: Optional[bool] = False,
+        keysets_used: Optional[List[str]] = None,
     ):
         """Class representing a transformation.
 
@@ -114,6 +115,8 @@ class Transformation(QueryBaseWithSchema):
         :type schema: List[FieldConfig], optional
         :param force_cache_refresh: whether or not we need to use the cache in the pii service
         :type force_cache_refresh: bool, optional
+        :param keysets_used: List of keysets used in the transformation
+        :type keysets_used: List[str]
         """
         super().__init__(
             name=name,
@@ -145,6 +148,7 @@ class Transformation(QueryBaseWithSchema):
         self.destroy_table = destroy_table
         self.tables = tables
         self.force_cache_refresh = force_cache_refresh
+        self.keysets_used = keysets_used
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -186,6 +190,7 @@ class Transformation(QueryBaseWithSchema):
             tables=d.get("TABLES"),
             schema=[FieldConfig.from_dict(x) for x in d.get("SCHEMA") or []],
             force_cache_refresh=d.get("FORCE_CACHE_REFRESH", False),
+            keysets_used=d.get("KEYSETS_USED"),
         )
 
     def to_dict(self) -> dict:
@@ -223,6 +228,7 @@ class Transformation(QueryBaseWithSchema):
             "KIND": self.kind,
             "SCHEMA": [config.to_dict() for config in self.schema],
             "FORCE_CACHE_REFRESH": self.force_cache_refresh,
+            "KEYSETS_USED": self.keysets_used,
         }
 
     def __eq__(self, other):
@@ -254,4 +260,5 @@ class Transformation(QueryBaseWithSchema):
             and self.schema == other.schema
             and self.force_cache_refresh == other.force_cache_refresh
             and self.schema == other.schema
+            and self.keysets_used == other.keysets_used
         )

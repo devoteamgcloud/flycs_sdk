@@ -31,6 +31,7 @@ transformation_fields_config = [
     FieldConfig(name="field2", decrypt=True, type="DATE", mode="NULLABLE"),
 ]
 transformation_force_cache_refresh = True
+transformation_keysets_used = "keyset_1"
 
 
 class TestTranformations:
@@ -55,6 +56,7 @@ class TestTranformations:
             destroy_table=transformation_destroy_table,
             schema=transformation_fields_config,
             force_cache_refresh=transformation_force_cache_refresh,
+            keysets_used=transformation_keysets_used
         )
 
     def test_init(self, my_transformation):
@@ -79,6 +81,7 @@ class TestTranformations:
         assert (
             my_transformation.force_cache_refresh == transformation_force_cache_refresh
         )
+        assert my_transformation.keysets_used == transformation_keysets_used
 
     def test_to_dict(self, my_transformation):
         assert my_transformation.to_dict() == {
@@ -122,6 +125,7 @@ class TestTranformations:
                 },
             ],
             "FORCE_CACHE_REFRESH": transformation_force_cache_refresh,
+            "KEYSETS_USED": "keyset_1"
         }
 
     def test_from_dict(self, my_transformation):
