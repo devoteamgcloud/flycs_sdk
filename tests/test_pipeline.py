@@ -23,6 +23,12 @@ pipeline_schedule = "* 12 * * *"
 pipeline_kind = PipelineKind.VANILLA
 pipeline_start_time = datetime.fromtimestamp(1606923514, tz=timezone.utc)
 pipeline_pubsub_topic = "my_topic"
+env_schedule = {
+    "sbx": pipeline_schedule,
+    "tst": pipeline_schedule,
+    "acc": pipeline_schedule,
+    "prd": None,
+}
 
 
 class TestPipeline:
@@ -54,6 +60,17 @@ class TestPipeline:
             kind=pipeline_kind,
             start_time=pipeline_start_time,
             trigger=PubSubTrigger(pipeline_pubsub_topic),
+            entities=[],
+        )
+
+    @pytest.fixture
+    def my_pipeline_env(self, my_entity):
+        return Pipeline(
+            name=pipeline_name,
+            version=pipeline_version,
+            schedule=env_schedule,
+            kind=pipeline_kind,
+            start_time=pipeline_start_time,
             entities=[],
         )
 
@@ -93,6 +110,14 @@ class TestPipeline:
         assert my_pipeline_pubsub.kind == pipeline_kind
         assert my_pipeline_pubsub.entities == []
         assert my_pipeline_pubsub.trigger.topic == pipeline_pubsub_topic
+
+    def test_init_env(self, my_pipeline_env):
+        assert my_pipeline_env.name == pipeline_name
+        assert my_pipeline_env.version == pipeline_version
+        assert my_pipeline_env.schedule == env_schedule
+        assert my_pipeline_env.start_time == pipeline_start_time
+        assert my_pipeline_env.kind == pipeline_kind
+        assert my_pipeline_env.entities == []
 
     def test_invalid_start_time(self):
         with pytest.raises(TypeError):
@@ -189,6 +214,38 @@ class TestPipeline:
         }
         assert expected == actual
 
+    def test_to_dict_env(self, my_pipeline_env, my_entity):
+        my_pipeline_env.add_entity(my_entity)
+        actual = my_pipeline_env.to_dict()
+        expected = {
+            "name": pipeline_name,
+            "version": pipeline_version,
+            "schedule": env_schedule,
+            "kind": pipeline_kind.value,
+            "start_time": "2020-12-02T15:38:34+0000",
+            "trigger": None,
+            "params": {},
+            "entities": [
+                {
+                    "name": "entity1",
+                    "version": "1.0.0",
+                    "kind": None,
+                    "stage_config": [
+                        {
+                            "name": "raw",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                        {
+                            "name": "staging",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                    ],
+                    "location": None,
+                }
+            ],
+        }
+        assert expected == actual
+
     def test_serialize_deserialize(self, my_pipeline, my_entity):
         my_pipeline.add_entity(my_entity)
         p1 = my_pipeline
@@ -214,6 +271,16 @@ class TestPipeline:
         for d in serialized:
             loaded = Pipeline.from_dict(d)
             if isinstance(my_pipeline_pubsub, ParametrizedPipeline):
+                assert loaded.params  # ensure the params area loaded
+
+    def test_serialize_deserialize_env(self, my_pipeline_env, my_entity):
+        my_pipeline_env.add_entity(my_entity)
+        serialized = my_pipeline_env.to_dict()
+        if not isinstance(serialized, list):
+            serialized = [serialized]
+        for d in serialized:
+            loaded = Pipeline.from_dict(d)
+            if isinstance(my_pipeline_env, ParametrizedPipeline):
                 assert loaded.params  # ensure the params area loaded
 
     def test_parse_datetime(self):
