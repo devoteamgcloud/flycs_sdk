@@ -82,7 +82,7 @@ class FieldConfig:
         """
         self.name = name
         self.type = type
-        self.mode = mode
+        self.mode = mode or "NULLABLE"
         self.description = description
         self.is_encrypted = is_encrypted
         self.has_pii = has_pii
