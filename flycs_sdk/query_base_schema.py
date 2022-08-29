@@ -95,7 +95,7 @@ class FieldConfig:
         self._validate()
 
     def _validate(self):
-        if self.type not in BQ_DATA_TYPES:
+        if self.type is not None and self.type not in BQ_DATA_TYPES:
             raise UnsupportedType(
                 f"Unsupported type: {self.type} is not a supported type in BigQuery. Type should be one of: {BQ_DATA_TYPES}"
             )
