@@ -97,11 +97,11 @@ class FieldConfig:
     def _validate(self):
         if self.type not in BQ_DATA_TYPES:
             raise UnsupportedType(
-                f"Unsupported type: {self.type} is not a supported type in BigQuery. Type should be one of: {BQ_DATA_TYPES}"
+                f"Unsupported type of field {self.name}: {self.type} is not a supported type in BigQuery. Type should be one of: {BQ_DATA_TYPES}"
             )
         if self.original_type is not None and self.original_type not in BQ_DATA_TYPES:
             raise UnsupportedType(
-                f"Unsupported original type: {self.original_type} is not a supported type in BigQuery. Type should be one of: {BQ_DATA_TYPES}"
+                f"Unsupported original type of field {self.name}: {self.original_type} is not a supported type in BigQuery. Type should be one of: {BQ_DATA_TYPES}"
             )
         if len(self.fields) > 0 and self.type not in ["RECORD", "STRUCT"]:
             raise UnsupportedType(
