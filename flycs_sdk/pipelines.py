@@ -1,7 +1,8 @@
 """Module containing pipeline classes."""
 
+import pytz
 import itertools
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Union, Tuple, Optional
 
@@ -86,7 +87,9 @@ class Pipeline:
             name=d["name"],
             version=d["version"],
             schedule=d.get("schedule"),
-            start_time=_parse_datetime(d["start_time"])
+            start_time=_parse_datetime(
+                d["start_time"], d.get("schedule_timezone", "UTC")
+            )
             if d.get("start_time")
             else None,
             kind=PipelineKind(d["kind"]),
@@ -326,8 +329,10 @@ def _is_valid_start_time(start_time: Optional[datetime]) -> bool:
     if not isinstance(start_time, datetime):
         raise TypeError("start_time must be a valid datetime object")
 
-    if start_time.tzinfo != timezone.utc:
-        raise ValueError("start_time timezone must be UTC")
+    if start_time.tzname() not in pytz.all_timezones:
+        raise ValueError(
+            "start_time timezone is invalid , please refers to https://en.wikipedia.org/wiki/List_of_tz_database_time_zones to see available time zones."
+        )
 
     return True
 
@@ -347,12 +352,19 @@ def _format_datetime(t: datetime) -> str:
     return t.strftime(_time_format)
 
 
-def _parse_datetime(tstr: str) -> datetime:
+def _parse_datetime(tstr: str, timezone: Optional[str] = "UTC") -> datetime:
 
     # ensure we always have the UTC timezone information
     if not tstr.endswith("+0000"):
         tstr += "+0000"
-    return datetime.strptime(tstr, _time_format)
+    dt = datetime.strptime(tstr, _time_format)
+    new_dt = None
+    if timezone in pytz.all_timezones:
+        new_dt = dt.replace(tzinfo=pytz.timezone(timezone))
+    else:
+        # TODO : Raise an error if timezone is Unknown
+        pass
+    return new_dt
 
 
 def format_target_pipeline(p: Pipeline) -> str:
