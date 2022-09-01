@@ -56,7 +56,7 @@ class TestTranformations:
             destroy_table=transformation_destroy_table,
             schema=transformation_fields_config,
             force_cache_refresh=transformation_force_cache_refresh,
-            keysets_used=transformation_keysets_used
+            keysets_used=transformation_keysets_used,
         )
 
     def test_init(self, my_transformation):
@@ -125,7 +125,7 @@ class TestTranformations:
                 },
             ],
             "FORCE_CACHE_REFRESH": transformation_force_cache_refresh,
-            "KEYSETS_USED": "keyset_1"
+            "KEYSETS_USED": "keyset_1",
         }
 
     def test_from_dict(self, my_transformation):
