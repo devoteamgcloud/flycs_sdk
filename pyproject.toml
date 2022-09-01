@@ -27,7 +27,7 @@ python = ">=3.8,<3.11"
 requirements-parser = "^0.5.0"
 "ruamel.yaml" = "^0.17.0"
 semver = "2.13.0"
-
+pendulum="^2.1.1"
 [tool.poetry.dev-dependencies]
 black = "22.3.0"
 bump2version = "*"

@@ -1,6 +1,7 @@
 """Module containing pipeline classes."""
 
 import pytz
+import pendulum
 import itertools
 from datetime import datetime
 from enum import Enum
@@ -87,9 +88,7 @@ class Pipeline:
             name=d["name"],
             version=d["version"],
             schedule=d.get("schedule"),
-            start_time=_parse_datetime(
-                d["start_time"], d.get("schedule_timezone", "UTC")
-            )
+            start_time=_parse_datetime(d["start_time"], d.get("timezone", "UTC"))
             if d.get("start_time")
             else None,
             kind=PipelineKind(d["kind"]),
@@ -131,9 +130,7 @@ class Pipeline:
             "name": self.name,
             "version": self.version,
             "schedule": schedule,
-            "start_time": _format_datetime(self.start_time)
-            if self.start_time
-            else None,
+            "start_time": f"{self.start_time}" if self.start_time else None,
             "trigger": self.trigger.to_dict() if self.trigger else None,
             "kind": self.kind.value,
             "params": self.params,
@@ -283,15 +280,13 @@ class ParametrizedPipeline:
         schedule = self.schedule
         if isinstance(self.schedule, ParametrizedPipeline):
             schedule = format_target_pipeline(self.schedule)
-
+        print(self.start_time)
         return [
             {
                 "name": _parametrized_name(self.name, p),
                 "version": self.version,
                 "schedule": schedule,
-                "start_time": _format_datetime(self.start_time)
-                if self.start_time
-                else None,
+                "start_time": f"{self.start_time}" if self.start_time else None,
                 "trigger": self.trigger.to_dict() if self.trigger else None,
                 "kind": self.kind.value,
                 "params": p,
@@ -345,7 +340,7 @@ def _is_valid_trigger(trigger: PipelineTrigger) -> bool:
 
 # sine we support python3.6 we cannot use datetime fromisoformat and isoformat methods
 # instead we use this
-_time_format = "%Y-%m-%dT%H:%M:%S%z"
+_time_format = "YYYY-MM-DDTHH:mm:ss"
 
 
 def _format_datetime(t: datetime) -> str:
@@ -353,18 +348,20 @@ def _format_datetime(t: datetime) -> str:
 
 
 def _parse_datetime(tstr: str, timezone: Optional[str] = "UTC") -> datetime:
-
-    # ensure we always have the UTC timezone information
-    if not tstr.endswith("+0000"):
-        tstr += "+0000"
-    dt = datetime.strptime(tstr, _time_format)
-    new_dt = None
-    if timezone in pytz.all_timezones:
-        new_dt = dt.replace(tzinfo=pytz.timezone(timezone))
-    else:
-        # TODO : Raise an error if timezone is Unknown
-        pass
-    return new_dt
+    """Parse a pendulum datetime with its specific timezone from a string date."""
+    if "+" in tstr:
+        tstr = tstr.split("+")[0]
+        DeprecationWarning(
+            "Adding +0000 to specify timezone is decrepated. Now use format start_time format like 2021-09-18T00:00:00. To specify the timezone use 'timezone' attribute"
+        )
+    try:
+        tmz = pendulum.timezone(timezone)
+        dt = pendulum.from_format(tstr, _time_format, tz=tmz)
+        return dt
+    except:
+        raise Exception(
+            "Wrong pendulum datetime configuration, please make sur you're using one of the following timezone name : https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
+        )
 
 
 def format_target_pipeline(p: Pipeline) -> str:
