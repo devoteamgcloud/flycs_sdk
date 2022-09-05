@@ -280,7 +280,6 @@ class ParametrizedPipeline:
         schedule = self.schedule
         if isinstance(self.schedule, ParametrizedPipeline):
             schedule = format_target_pipeline(self.schedule)
-        print(self.start_time)
         return [
             {
                 "name": _parametrized_name(self.name, p),

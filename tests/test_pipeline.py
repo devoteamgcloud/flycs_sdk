@@ -5,9 +5,7 @@
 from datetime import datetime, timezone, timedelta
 
 import pytest
-import pytz
 import pendulum
-from deepdiff import DeepDiff
 from flycs_sdk.entities import Entity, ParametrizedEntity
 from flycs_sdk.pipelines import (
     Pipeline,
