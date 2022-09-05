@@ -323,7 +323,7 @@ def _is_valid_start_time(start_time: Optional[datetime]) -> bool:
     if not isinstance(start_time, datetime):
         raise TypeError("start_time must be a valid datetime object")
 
-    if start_time.tzname() not in pytz.all_timezones:
+    if start_time.timezone_name not in pytz.all_timezones:
         raise ValueError(
             "start_time timezone is invalid , please refers to https://en.wikipedia.org/wiki/List_of_tz_database_time_zones to see available time zones."
         )
