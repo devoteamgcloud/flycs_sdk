@@ -124,6 +124,7 @@ class TestTranformations:
                     "FIELDS": [],
                 },
             ],
+            "RUN_BEFORE_KEYSET": False,
             "FORCE_CACHE_REFRESH": transformation_force_cache_refresh,
             "KEYSETS_USED": "keyset_1",
         }
