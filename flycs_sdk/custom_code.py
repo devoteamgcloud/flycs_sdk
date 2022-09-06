@@ -1,7 +1,7 @@
 """Module containing class used to inject custom Airflow operator into pipelines definitions."""
 
 import inspect
-from typing import Callable, List
+from typing import Callable, Dict, List
 
 from requirements.requirement import Requirement
 
@@ -75,6 +75,8 @@ class CustomCode:
         operator_builder: Callable,
         dependencies: List[Dependency] = None,
         requirements: List[str] = None,
+        func_kwargs: Dict[str, object] = None,
+        run_before_keyset: bool = False,
     ):
         """Represent a custom Airflow code that needs to be injected into a DAG.
 
@@ -90,19 +92,26 @@ class CustomCode:
         :param requirements: list of python package required by this code, use the same format as normal python requirements.txt files.
                              These package will be installed on the composer instance.
         :type requirements: List[str]
+        :param func_kwargs: List of kwargs areguments for a customer operator
+        :type func_kwargs: Dict[str:object]
+        :param run_before_keyset: override dependencies and only use the explicitly defined dependencies
+        :type run_before_keyset: bool
         """
         self.name = name
         self.version = version
         self.operator_builder = operator_builder
         self.dependencies = dependencies or []
         self.requirements = requirements or []
+        self.func_kwargs = func_kwargs or {}
+        self.run_before_keyset = run_before_keyset or False
 
         self._ensure_builder_signature(operator_builder)
         self._validate_requirements()
 
     def _ensure_builder_signature(self, f: Callable):
         signature = inspect.Signature.from_callable(f)
-        if ["dag", "env"] != list(signature.parameters.keys()):
+        signature_parameters = list(signature.parameters.keys())
+        if "dag" not in signature_parameters and "env" not in signature_parameters:
             raise WrongSignatureError(
                 f"the builder function of the custom code {self.name}_{self.version} does not accept the mandatory ('dag', 'env', 'user') arguments"
             )
