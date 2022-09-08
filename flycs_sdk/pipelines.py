@@ -359,8 +359,10 @@ def _parse_datetime(tstr: str, timezone: Optional[str] = "UTC") -> pendulum.Date
     """Parse a pendulum datetime with its specific timezone from a string date."""
     if "+" in tstr:
         tstr = tstr.split("+")[0]
-        DeprecationWarning(
-            "Adding +0000 to specify timezone is decrepated. Now use format start_time format like 2021-09-18T00:00:00. To specify the timezone use 'timezone' attribute"
+        print(
+            DeprecationWarning(
+                "Adding +0000 to specify timezone is decrepated. Now use format start_time format like 2021-09-18T00:00:00. To specify the timezone use 'timezone' attribute"
+            )
         )
     try:
         tmz = pendulum.timezone(timezone)
