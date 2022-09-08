@@ -42,7 +42,7 @@ class Pipeline:
         ] = None,
         schedule: Optional[str] = None,
         kind: PipelineKind = PipelineKind.VANILLA,
-        start_time: Optional[datetime] = None,
+        start_time: Optional[Union[datetime, pendulum.DateTime]] = None,
         trigger: Optional[PipelineTrigger] = None,
         params: Optional[Dict[str, str]] = None,
     ):
@@ -160,7 +160,7 @@ class ParametrizedPipeline:
         entities: List[Union[ParametrizedEntity, ParametrizedBaseLayerEntity]] = None,
         schedule: Optional[str] = None,
         kind: PipelineKind = PipelineKind.VANILLA,
-        start_time: Optional[datetime] = None,
+        start_time: Optional[Union[datetime, pendulum.DateTime]] = None,
         trigger: Optional[PipelineTrigger] = None,
         parameters: Dict[str, List[str]] = None,
     ):
@@ -308,7 +308,9 @@ def _is_valid_version(version: str) -> bool:
     return True
 
 
-def _is_valid_start_time(start_time: Optional[datetime]) -> bool:
+def _is_valid_start_time(
+    start_time: Optional[Union[datetime, pendulum.DateTime]]
+) -> bool:
     """Test if start_time is a valid timestamp value.
 
     :param start_time: timestamp to validate
@@ -320,10 +322,17 @@ def _is_valid_start_time(start_time: Optional[datetime]) -> bool:
     if start_time is None:
         return True
 
-    if not isinstance(start_time, datetime):
-        raise TypeError("start_time must be a valid datetime object")
+    if not isinstance(start_time, datetime) and not isinstance(
+        start_time, pendulum.DateTime
+    ):
+        raise TypeError(
+            "start_time must be a valid datetime or pendulum.datetime object"
+        )
 
-    if start_time.timezone_name not in pytz.all_timezones:
+    if (
+        isinstance(start_time, pendulum.DateTime)
+        and start_time.timezone_name not in pytz.all_timezones
+    ):
         raise ValueError(
             "start_time timezone is invalid , please refers to https://en.wikipedia.org/wiki/List_of_tz_database_time_zones to see available time zones."
         )
@@ -346,7 +355,7 @@ def _format_datetime(t: datetime) -> str:
     return t.strftime(_time_format)
 
 
-def _parse_datetime(tstr: str, timezone: Optional[str] = "UTC") -> datetime:
+def _parse_datetime(tstr: str, timezone: Optional[str] = "UTC") -> pendulum.DateTime:
     """Parse a pendulum datetime with its specific timezone from a string date."""
     if "+" in tstr:
         tstr = tstr.split("+")[0]
