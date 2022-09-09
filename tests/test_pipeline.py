@@ -5,7 +5,7 @@
 from datetime import datetime, timezone, timedelta
 
 import pytest
-from deepdiff import DeepDiff
+import pendulum
 from flycs_sdk.entities import Entity, ParametrizedEntity
 from flycs_sdk.pipelines import (
     Pipeline,
@@ -21,7 +21,7 @@ pipeline_name = "test"
 pipeline_version = "1.0.0"
 pipeline_schedule = "* 12 * * *"
 pipeline_kind = PipelineKind.VANILLA
-pipeline_start_time = datetime.fromtimestamp(1606923514, tz=timezone.utc)
+pipeline_start_time = pendulum.from_format("2020-12-02T15:38:34", "YYYY-MM-DDTHH:mm:ss")
 pipeline_pubsub_topic = "my_topic"
 env_schedule = {
     "sbx": pipeline_schedule,
@@ -154,7 +154,8 @@ class TestPipeline:
             "version": pipeline_version,
             "schedule": pipeline_schedule,
             "kind": pipeline_kind.value,
-            "start_time": "2020-12-02T15:38:34+0000",
+            "start_time": "2020-12-02T15:38:34+00:00",
+            "timezone": "UTC",
             "trigger": None,
             "params": {},
             "entities": [
@@ -186,7 +187,8 @@ class TestPipeline:
             "version": pipeline_version,
             "schedule": pipeline_schedule,
             "kind": pipeline_kind.value,
-            "start_time": "2020-12-02T15:38:34+0000",
+            "start_time": "2020-12-02T15:38:34+00:00",
+            "timezone": "UTC",
             "trigger": {
                 "type": "pubsub",
                 "topic": "my_topic",
@@ -269,6 +271,7 @@ class TestPipeline:
         if not isinstance(serialized, list):
             serialized = [serialized]
         for d in serialized:
+            print(d)
             loaded = Pipeline.from_dict(d)
             if isinstance(my_pipeline_pubsub, ParametrizedPipeline):
                 assert loaded.params  # ensure the params area loaded
@@ -284,9 +287,14 @@ class TestPipeline:
                 assert loaded.params  # ensure the params area loaded
 
     def test_parse_datetime(self):
-        tstr = _format_datetime(pipeline_start_time)
-        parsed = _parse_datetime(tstr)
-        assert parsed == pipeline_start_time
+        tstr = "2021-09-18T00:00:00"
+        correct_dt = pendulum.datetime(
+            2021, 9, 18, 0, 0, 0, tz=pendulum.timezone("Europe/Brussels")
+        )
+        parsed = _parse_datetime(tstr, "Europe/Brussels")
+        print(f"{parsed}")
+        assert parsed.tzinfo == correct_dt.tzinfo
+        assert parsed == correct_dt
 
 
 pipeline_parameters = {"language": ["nl", "fr"], "country": ["be", "en"]}
@@ -338,7 +346,8 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_nl_be",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+0000",
+                "start_time": "2020-12-02T15:38:34+00:00",
+                "timezone": "UTC",
                 "trigger": None,
                 "kind": "vanilla",
                 "params": {"language": "nl", "country": "be"},
@@ -365,7 +374,8 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_nl_en",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+0000",
+                "start_time": "2020-12-02T15:38:34+00:00",
+                "timezone": "UTC",
                 "trigger": None,
                 "kind": "vanilla",
                 "params": {"language": "nl", "country": "en"},
@@ -392,7 +402,8 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_fr_be",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+0000",
+                "start_time": "2020-12-02T15:38:34+00:00",
+                "timezone": "UTC",
                 "trigger": None,
                 "kind": "vanilla",
                 "params": {"language": "fr", "country": "be"},
@@ -419,7 +430,8 @@ class TestParametrizedPipeline(TestPipeline):
                 "name": "test_fr_en",
                 "version": "1.0.0",
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+0000",
+                "start_time": "2020-12-02T15:38:34+00:00",
+                "timezone": "UTC",
                 "trigger": None,
                 "kind": "vanilla",
                 "params": {"language": "fr", "country": "en"},

@@ -60,6 +60,7 @@ class Transformation(QueryBaseWithSchema):
         parsing_dependencies: Optional[List[Dependency]] = None,
         destroy_table: Optional[bool] = False,
         tables: Optional[List[dict]] = None,
+        run_before_keyset: Optional[bool] = False,
         schema: Optional[List[FieldConfig]] = None,
         force_cache_refresh: Optional[bool] = False,
         keysets_used: Optional[List[str]] = None,
@@ -111,6 +112,8 @@ class Transformation(QueryBaseWithSchema):
         :param tables: If specified, this transformation will generate multiple BigQueryOperator during Airflow generation, one for each table name in this list.
                        The name of the transformation then becomes `{transformation_name}_{table_name}`
         :type tables: List[str], optional
+        :param run_before_keyset: overrides dependencies and runs the custom Operator before the keysets (keysets are Operators run before the Transformations when PII is activated)
+        :type run_before_keyset: bool
         :param schema: List of extra configuration per field of the transformation
         :type schema: List[FieldConfig], optional
         :param force_cache_refresh: whether or not we need to use the cache in the pii service
@@ -149,6 +152,7 @@ class Transformation(QueryBaseWithSchema):
         self.tables = tables
         self.force_cache_refresh = force_cache_refresh
         self.keysets_used = keysets_used
+        self.run_before_keyset = run_before_keyset
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -188,6 +192,7 @@ class Transformation(QueryBaseWithSchema):
             ],
             destroy_table=d.get("DESTROY_TABLE", False),
             tables=d.get("TABLES"),
+            run_before_keyset=d.get("RUN_BEFORE_KEYSET"),
             schema=[FieldConfig.from_dict(x) for x in d.get("SCHEMA") or []],
             force_cache_refresh=d.get("FORCE_CACHE_REFRESH", False),
             keysets_used=d.get("KEYSETS_USED"),
@@ -226,6 +231,7 @@ class Transformation(QueryBaseWithSchema):
             "DESTROY_TABLE": self.destroy_table,
             "TABLES": self.tables,
             "KIND": self.kind,
+            "RUN_BEFORE_KEYSET": self.run_before_keyset,
             "SCHEMA": [config.to_dict() for config in self.schema],
             "FORCE_CACHE_REFRESH": self.force_cache_refresh,
             "KEYSETS_USED": self.keysets_used,
@@ -257,6 +263,7 @@ class Transformation(QueryBaseWithSchema):
             and self.destroy_table == other.destroy_table
             and self.tables == other.tables
             and self.kind == other.kind
+            and self.run_before_keyset == other.run_before_keyset
             and self.schema == other.schema
             and self.force_cache_refresh == other.force_cache_refresh
             and self.schema == other.schema
