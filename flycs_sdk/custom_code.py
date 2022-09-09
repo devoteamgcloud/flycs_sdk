@@ -92,7 +92,7 @@ class CustomCode:
         :param requirements: list of python package required by this code, use the same format as normal python requirements.txt files.
                              These package will be installed on the composer instance.
         :type requirements: List[str]
-        :param func_kwargs: List of kwargs areguments for a customer operator
+        :param func_kwargs: List of key words arguments for a custom operator
         :type func_kwargs: Dict[str:object]
         :param run_before_keyset: override dependencies and only use the explicitly defined dependencies
         :type run_before_keyset: bool
