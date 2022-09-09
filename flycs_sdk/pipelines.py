@@ -131,6 +131,9 @@ class Pipeline:
             "version": self.version,
             "schedule": schedule,
             "start_time": f"{self.start_time}" if self.start_time else None,
+            "timezone": self.start_time.timezone_name
+            if isinstance(self.start_time, pendulum.DateTime)
+            else None,
             "trigger": self.trigger.to_dict() if self.trigger else None,
             "kind": self.kind.value,
             "params": self.params,
@@ -286,6 +289,9 @@ class ParametrizedPipeline:
                 "version": self.version,
                 "schedule": schedule,
                 "start_time": f"{self.start_time}" if self.start_time else None,
+                "timezone": self.start_time.timezone_name
+                if isinstance(self.start_time, pendulum.DateTime)
+                else None,
                 "trigger": self.trigger.to_dict() if self.trigger else None,
                 "kind": self.kind.value,
                 "params": p,
@@ -334,7 +340,7 @@ def _is_valid_start_time(
         and start_time.timezone_name not in pytz.all_timezones
     ):
         raise ValueError(
-            "start_time timezone is invalid , please refers to https://en.wikipedia.org/wiki/List_of_tz_database_time_zones to see available time zones."
+            f"timezone attribute {start_time.timezone_name} is invalid , please refers to https://en.wikipedia.org/wiki/List_of_tz_database_time_zones to see available time zones."
         )
 
     return True
@@ -369,8 +375,9 @@ def _parse_datetime(tstr: str, timezone: Optional[str] = "UTC") -> pendulum.Date
         dt = pendulum.from_format(tstr, _time_format, tz=tmz)
         return dt
     except:
-        raise Exception(
-            "Wrong pendulum datetime configuration, please make sur you're using one of the following timezone name : https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
+        raise ValueError(
+            "Wrong datetime configuration, please make sur you're using one of the following timezone name : https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
+            "E.g. start_time : '2022-09-06T10:00:00' ; timezone : 'Europe/Brussels' "
         )
 
 

@@ -112,7 +112,7 @@ class Transformation(QueryBaseWithSchema):
         :param tables: If specified, this transformation will generate multiple BigQueryOperator during Airflow generation, one for each table name in this list.
                        The name of the transformation then becomes `{transformation_name}_{table_name}`
         :type tables: List[str], optional
-        :param run_before_keyset: override dependencies and only use the explicitly defined dependencies
+        :param run_before_keyset: overrides dependencies and runs the custom Operator before the keysets (keysets are Operators run before the Transformations when PII is activated)
         :type run_before_keyset: bool
         :param schema: List of extra configuration per field of the transformation
         :type schema: List[FieldConfig], optional

@@ -92,9 +92,9 @@ class CustomCode:
         :param requirements: list of python package required by this code, use the same format as normal python requirements.txt files.
                              These package will be installed on the composer instance.
         :type requirements: List[str]
-        :param func_kwargs: List of kwargs areguments for a customer operator
+        :param func_kwargs: List of kwargs arguments for a customer operator. E.g {"key_int" : 10}
         :type func_kwargs: Dict[str:object]
-        :param run_before_keyset: override dependencies and only use the explicitly defined dependencies
+        :param run_before_keyset: overrides dependencies and runs the custom Operator before the keysets (keysets are Operators run before the Transformations when PII is activated)
         :type run_before_keyset: bool
         """
         self.name = name
