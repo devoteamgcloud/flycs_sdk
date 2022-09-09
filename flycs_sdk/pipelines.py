@@ -38,7 +38,7 @@ class Pipeline:
                 Entity, BaseLayerEntity, ParametrizedEntity, ParametrizedBaseLayerEntity
             ]
         ] = None,
-        schedule: Optional[str] = None,
+        schedule: Optional[Union[str, dict]] = None,
         kind: PipelineKind = PipelineKind.VANILLA,
         start_time: Optional[datetime] = None,
         trigger: Optional[PipelineTrigger] = None,
@@ -158,7 +158,7 @@ class ParametrizedPipeline:
         name: str,
         version: str,
         entities: List[Union[ParametrizedEntity, ParametrizedBaseLayerEntity]] = None,
-        schedule: Optional[str] = None,
+        schedule: Optional[Union[str, dict]] = None,
         kind: PipelineKind = PipelineKind.VANILLA,
         start_time: Optional[datetime] = None,
         trigger: Optional[PipelineTrigger] = None,
