@@ -93,3 +93,47 @@ Parameterized pipeline and entity also allow to introduce custom logic. Here is 
 
 .. literalinclude:: examples/parametrize_pipeline.py
   :language: python
+
+How to set up different schedule based on the environment the DAG is running ?
+##################################################################
+You can schedule your pipeline with a different cron job syntax based on the environment it will be running. The environment available are the following : **sbx** (sandbox), **tst** (test), **acc** (acceptance), **prd** (production).
+To define the schedule for each environment , you must use a dictionary object :
+
+.. code-block:: python
+
+    import pendulum
+
+    from flycs_sdk.pipelines import Pipeline, PipelineKind
+    from .entities import entity_demo
+
+    demo_python = Pipeline(
+        name="demo_python_env_scheduled",
+        version="1.0.0",
+        schedule={"sbx":"30 10 * * *", "tst":"@daily" , "acc":"@daily" , "prd" : "@weekly"},
+        entities=[entity_demo],
+        kind=PipelineKind.VANILLA,
+        start_time = pendulum.now(tz="Europe/Brussels")
+    )
+
+How to make a Timezone aware DAG ?
+#######################################################
+To make your DAG pipeline running in a specific timezone you first need to make sure you pick a timezone name defined in `this Timezone list <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>`_.
+Using the python-sdk you have to use the pendulum package library :
+
+.. code-block:: python
+
+    import pendulum
+
+    from flycs_sdk.pipelines import Pipeline, PipelineKind
+    from .entities import entity_demo
+
+    demo_python = Pipeline(
+        name="demo_python",
+        version="1.0.0",
+        schedule="10 10 * * *",
+        entities=[entity_demo],
+        kind=PipelineKind.VANILLA,
+        start_time = pendulum.now(tz="Europe/Brussels")
+    )
+
+NB : By default, using a datetime object for python Pipeline instead of a pendulum object will consider the DAG is running in UTC timezone.

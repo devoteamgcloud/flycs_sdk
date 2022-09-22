@@ -8,13 +8,14 @@ The supported type of triggers are:
 - `PubSub topic`
 - `Google Cloud Storage`
 - `Other pipeline`
+- `Multiple Other pipelines`
 
-PubSub topic
+`PubSub topic`
 ############
 
 This triggers creates a subscription to the topic and then waits for any message to come. One a message is received, the rest of the pipeline is executed.
 
-The PubSub trigger has 2 property you can configure:
+The PubSub trigger has 2 properties you can configure:
 
 - **topic**: The full path to a pubsub topic. The topic MUST exist before the pipeline with the trigger is executed.
 - **subscription_project**: Optional property that let you choose in which project the subscription to the topic will be created.
@@ -186,4 +187,79 @@ Same example with the python SDK:
         kind=PipelineKind.VANILLA,
         start_time=datetime.now(tz=timezone.utc)
         schedule=master, # Here we pass the master Pipeline object directly into the `schedule` field.
+    )
+
+`Multiple Other pipelines`
+################
+
+This trigger is used when you want a child pipeline to be triggered by multiple parents pipelines. Using this trigger will actually used sensor on the child pipeline to wait for all the parents pipelines to finish.
+
+This feature use ExternalSensor on the child pipeline. The schedule period of it will be automatically computed to run at the wider cron job scheduled of the list of the parents pipelines.
+
+E.g : Having pipeline_A running 30 9 * * * (every day UTC at 9.30) and pipeline_B running \*/30 * * * * (every 30 minutes) with a child pipeline_C depending on both A and B. Then, the pipeline_C will be scheduled with the cron configuration 30 9 * * \*.
+
+Using yaml definition :
+
+.. code-block:: yaml
+
+    # parent pipeline_A
+    name: pipeline_A
+    kind: vanilla
+    version: 1.0.0
+    entities:
+        ... # removed for brevity
+    schedule: "30 9 * * *"
+    start_time: "2021-01-01T00:00:00"
+
+    # parent pipeline_B
+    name: pipeline_B
+    kind: vanilla
+    version: 1.0.0
+    entities:
+        ... # removed for brevity
+    schedule: "*/30 * * * *"
+    start_time: "2021-01-01T00:00:00"
+
+    # child pipeline_C
+    name: pipeline_C
+    kind: vanilla
+    version: 1.0.0
+    entities:
+        ... # removed for brevity
+    schedule: ["pipeline_A","pipeline_B"]
+    start_time: "2021-01-01T00:00:00" # /!\ start_time of all the parents pipeline (A & B) must be the same as the pipeline_C
+
+
+Using python pdk :
+
+
+.. code-block:: python
+
+    now_datetime = datetime.now(tz=timezone.utc)
+
+    pipeline_A = Pipeline(
+        name="pipeline_A",
+        version="1.0.0",
+        entities=[entity],
+        kind=PipelineKind.VANILLA,
+        start_time=now_datetime,
+        schedule="30 9 * * *",
+    )
+
+    pipeline_B = Pipeline(
+        name="pipeline_B",
+        version="1.0.0",
+        entities=[entity],
+        kind=PipelineKind.VANILLA,
+        start_time=now_datetime,
+        schedule="*/30 * * * *",
+    )
+
+    pipeline_C = Pipeline(
+        name="pipeline_C",
+        version="1.0.0",
+        entities=[entity],
+        kind=PipelineKind.VANILLA,
+        start_time=now_datetime,
+        schedule=[pipeline_A, pipeline_B], # Here we pass the list of parents pipelines objects.
     )
