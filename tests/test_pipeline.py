@@ -224,7 +224,8 @@ class TestPipeline:
             "version": pipeline_version,
             "schedule": env_schedule,
             "kind": pipeline_kind.value,
-            "start_time": "2020-12-02T15:38:34+0000",
+            "start_time": "2020-12-02T15:38:34+00:00",
+            "timezone": "UTC",
             "trigger": None,
             "params": {},
             "entities": [
