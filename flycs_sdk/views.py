@@ -22,6 +22,7 @@ class View(QueryBaseWithSchema):
         destination_data_mart: Optional[str] = None,
         force_cache_refresh: Optional[bool] = False,
         schema: Optional[List[FieldConfig]] = None,
+        keysets_used: Optional[List[str]] = None,
     ):
         """Create a View object.
 
@@ -37,6 +38,8 @@ class View(QueryBaseWithSchema):
         :type encrypt: Optional[bool]
         :param force_cache_refresh: whether or not we need to use the cache in the pii service
         :type force_cache_refresh: bool, optional
+        :param keysets_used: List of keysets used in the transformation
+        :type keysets_used: List[str]
         """
         super().__init__(
             name=name,
@@ -52,6 +55,7 @@ class View(QueryBaseWithSchema):
         self.dependencies = []
         self.parsing_dependencies = []
         self.force_cache_refresh = force_cache_refresh
+        self.keysets_used = keysets_used or []
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -78,6 +82,7 @@ class View(QueryBaseWithSchema):
             Dependency.from_dict(x) for x in d.get("PARSING_DEPENDS_ON") or []
         ]
         view.force_cache_refresh = d.get("FORCE_CACHE_REFRESH", False)
+        view.keysets_used = d.get("KEYSETS_USED", [])
         return view
 
     def to_dict(self) -> dict:
@@ -101,6 +106,7 @@ class View(QueryBaseWithSchema):
             "PARSING_DEPENDS_ON": [d.to_dict() for d in self.parsing_dependencies],
             "FORCE_CACHE_REFRESH": self.force_cache_refresh,
             "SCHEMA": [config.to_dict() for config in self.schema],
+            "KEYSETS_USED": self.keysets_used,
         }
 
     def __eq__(self, o) -> bool:
@@ -119,4 +125,5 @@ class View(QueryBaseWithSchema):
             and self.parsing_dependencies == o.parsing_dependencies
             and self.force_cache_refresh == o.force_cache_refresh
             and self.schema == o.schema
+            and self.keysets_used == o.keysets_used
         )
