@@ -44,6 +44,7 @@ class Pipeline:
         start_time: Optional[datetime] = None,
         trigger: Optional[PipelineTrigger] = None,
         params: Optional[Dict[str, str]] = None,
+        dag_params: Optional[Dict[str, str]] = None,
     ):
         """
         Create a Pipeline object.
@@ -62,6 +63,8 @@ class Pipeline:
         :type trigger: PipelineTrigger, optional
         :param params: parameters that can be used as template input data for the queries of this pipelines
         :type params: dict, optional
+        :param dag_params: parameters that can be used to override the dag parameters
+        :type dag_params: dict, optional
         """
         self.name = name
         if _is_valid_version(version):
@@ -74,6 +77,7 @@ class Pipeline:
         self.trigger = trigger if _is_valid_trigger(trigger) else None
         self.entities = entities or []
         self.params = params or {}
+        self.dag_params = dag_params or {}
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -94,6 +98,7 @@ class Pipeline:
             else None,
             kind=PipelineKind(d["kind"]),
             params=d.get("params", {}),
+            dag_params=d.get("dag_params", {}),
             entities=[Entity.from_dict(e) for e in d["entities"]],
         )
 
@@ -138,6 +143,7 @@ class Pipeline:
             "trigger": self.trigger.to_dict() if self.trigger else None,
             "kind": self.kind.value,
             "params": self.params,
+            "dag_params": self.dag_params,
             "entities": [e.to_dict() for e in self.entities],
         }
 

@@ -138,6 +138,7 @@ class TestPipeline:
             "start_time": "2020-12-02T15:38:34+0000",
             "trigger": None,
             "params": {},
+            "dag_params": {},
             "entities": [
                 {
                     "name": "entity1",
@@ -175,6 +176,7 @@ class TestPipeline:
                 "subscription_project": None,
             },
             "params": {},
+            "dag_params": {},
             "entities": [
                 {
                     "name": "entity1",
