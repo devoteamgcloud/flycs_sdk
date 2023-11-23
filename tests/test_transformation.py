@@ -76,7 +76,6 @@ class TestTranformations:
             execution_timeout=transformation_execution_timeout,
             schema=transformation_fields_config,
             force_cache_refresh=transformation_force_cache_refresh,
-            keysets_used=transformation_keysets_used,
         )
 
     def test_init(self, my_transformation):
