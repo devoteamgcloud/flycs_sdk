@@ -9,6 +9,7 @@ from flycs_sdk.transformations import (
     SchemaUpdateOptions,
     DeltaTimeOptions,
     ExecutionTimeout,
+    MultiPartitioningDefinitionError,
 )
 from flycs_sdk.query_base_schema import FieldConfig
 
@@ -167,3 +168,31 @@ class TestTranformations:
     def test_from_dict(self, my_transformation):
         loaded = Transformation.from_dict(my_transformation.to_dict())
         assert loaded == my_transformation
+
+    def test_mul_partitioning_def_error(self):
+        with pytest.raises(MultiPartitioningDefinitionError):
+            transfo = Transformation(
+                name=transformation_name,
+                query=transformation_query,
+                version=transformation_version,
+                static=transformation_static,
+                has_output=transformation_has_output,
+                destination_table=transformation_destination_table,
+                keep_old_columns=transformation_keep_old_columns,
+                persist_backup=transformation_persist_backup,
+                write_disposition=transformation_write_disposition,
+                time_partitioning={"field": "field1", "type": "DAY"},
+                range_partitioning={
+                    "field": "field2",
+                    "start": 0,
+                    "end": 100,
+                    "interval": 10,
+                },
+                cluster_fields=transformation_cluster_fields,
+                schema_update_options=transformation_schema_update_options,
+                dependencies=transformation_dependencies,
+                parsing_dependencies=transformation_parsing_dependencies,
+                destroy_table=transformation_destroy_table,
+                schema=transformation_fields_config,
+                force_cache_refresh=transformation_force_cache_refresh,
+            )

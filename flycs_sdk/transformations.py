@@ -71,6 +71,12 @@ class ExecutionTimeout:
         return self.delta_type == other.delta_type and self.delta == other.delta
 
 
+class MultiPartitioningDefinitionError(Exception):
+    """Raised when trying to create a Transformation object with time partitioning & range partitioning."""
+
+    pass
+
+
 class Transformation(QueryBaseWithSchema):
     """Transformations are the lowest unit inside of a data pipeline. It is a single task implemented as a SQL query."""
 
