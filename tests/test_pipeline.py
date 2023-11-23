@@ -237,6 +237,8 @@ class TestPipeline:
             "timezone": "UTC",
             "trigger": None,
             "params": {},
+            "dag_params": {},
+            "description": None,
             "entities": [
                 {
                     "name": "entity1",

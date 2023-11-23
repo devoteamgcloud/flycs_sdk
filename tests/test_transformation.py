@@ -47,7 +47,6 @@ transformation_trigger_rule = "all_success"
 transformation_keysets_used = ["keyset_1"]
 transformation_execution_timeout = ExecutionTimeout(DeltaTimeOptions.MINUTES.name, 15)
 transformation_force_cache_refresh = True
-transformation_keysets_used = "keyset_1"
 
 
 class TestTranformations:
