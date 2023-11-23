@@ -41,8 +41,6 @@ class View(QueryBaseWithSchema):
         :type keysets_used: List[str]
         :param force_cache_refresh: whether or not we need to use the cache in the pii service
         :type force_cache_refresh: bool, optional
-        :param keysets_used: List of keysets used in the transformation
-        :type keysets_used: List[str]
         """
         super().__init__(
             name=name,
@@ -59,7 +57,6 @@ class View(QueryBaseWithSchema):
         self.parsing_dependencies = []
         self.keysets_used = keysets_used or []
         self.force_cache_refresh = force_cache_refresh
-        self.keysets_used = keysets_used or []
 
     @classmethod
     def from_dict(cls, d: dict):
@@ -112,7 +109,6 @@ class View(QueryBaseWithSchema):
             "KEYSETS_USED": self.keysets_used,
             "FORCE_CACHE_REFRESH": self.force_cache_refresh,
             "SCHEMA": [config.to_dict() for config in self.schema],
-            "KEYSETS_USED": self.keysets_used,
         }
 
     def __eq__(self, o) -> bool:
