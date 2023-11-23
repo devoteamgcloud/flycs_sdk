@@ -5,7 +5,7 @@
 from datetime import datetime, timezone, timedelta
 
 import pytest
-from deepdiff import DeepDiff
+import pendulum
 from flycs_sdk.entities import Entity, ParametrizedEntity
 from flycs_sdk.pipelines import (
     Pipeline,
@@ -22,8 +22,14 @@ pipeline_version = "1.0.0"
 pipeline_description = "This is my test pipeline"
 pipeline_schedule = "* 12 * * *"
 pipeline_kind = PipelineKind.VANILLA
-pipeline_start_time = datetime.fromtimestamp(1606923514, tz=timezone.utc)
+pipeline_start_time = pendulum.from_format("2020-12-02T15:38:34", "YYYY-MM-DDTHH:mm:ss")
 pipeline_pubsub_topic = "my_topic"
+env_schedule = {
+    "sbx": pipeline_schedule,
+    "tst": pipeline_schedule,
+    "acc": pipeline_schedule,
+    "prd": None,
+}
 
 
 class TestPipeline:
@@ -60,7 +66,18 @@ class TestPipeline:
             entities=[],
         )
 
-    def test_init(self, my_pipeline: Pipeline):
+    @pytest.fixture
+    def my_pipeline_env(self, my_entity):
+        return Pipeline(
+            name=pipeline_name,
+            version=pipeline_version,
+            schedule=env_schedule,
+            kind=pipeline_kind,
+            start_time=pipeline_start_time,
+            entities=[],
+        )
+
+    def test_init(self, my_pipeline):
         assert my_pipeline.name == pipeline_name
         assert my_pipeline.version == pipeline_version
         assert my_pipeline.description == pipeline_description
@@ -99,6 +116,14 @@ class TestPipeline:
         assert my_pipeline_pubsub.entities == []
         assert my_pipeline_pubsub.trigger.topic == pipeline_pubsub_topic
 
+    def test_init_env(self, my_pipeline_env):
+        assert my_pipeline_env.name == pipeline_name
+        assert my_pipeline_env.version == pipeline_version
+        assert my_pipeline_env.schedule == env_schedule
+        assert my_pipeline_env.start_time == pipeline_start_time
+        assert my_pipeline_env.kind == pipeline_kind
+        assert my_pipeline_env.entities == []
+
     def test_invalid_start_time(self):
         with pytest.raises(TypeError):
             Pipeline(
@@ -135,7 +160,8 @@ class TestPipeline:
             "description": pipeline_description,
             "schedule": pipeline_schedule,
             "kind": pipeline_kind.value,
-            "start_time": "2020-12-02T15:38:34+0000",
+            "start_time": "2020-12-02T15:38:34+00:00",
+            "timezone": "UTC",
             "trigger": None,
             "params": {},
             "dag_params": {},
@@ -169,7 +195,8 @@ class TestPipeline:
             "description": pipeline_description,
             "schedule": pipeline_schedule,
             "kind": pipeline_kind.value,
-            "start_time": "2020-12-02T15:38:34+0000",
+            "start_time": "2020-12-02T15:38:34+00:00",
+            "timezone": "UTC",
             "trigger": {
                 "type": "pubsub",
                 "topic": "my_topic",
@@ -177,6 +204,39 @@ class TestPipeline:
             },
             "params": {},
             "dag_params": {},
+            "entities": [
+                {
+                    "name": "entity1",
+                    "version": "1.0.0",
+                    "kind": None,
+                    "stage_config": [
+                        {
+                            "name": "raw",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                        {
+                            "name": "staging",
+                            "versions": {"table_1": "1.0.0", "table_2": "1.0.0"},
+                        },
+                    ],
+                    "location": None,
+                }
+            ],
+        }
+        assert expected == actual
+
+    def test_to_dict_env(self, my_pipeline_env, my_entity):
+        my_pipeline_env.add_entity(my_entity)
+        actual = my_pipeline_env.to_dict()
+        expected = {
+            "name": pipeline_name,
+            "version": pipeline_version,
+            "schedule": env_schedule,
+            "kind": pipeline_kind.value,
+            "start_time": "2020-12-02T15:38:34+00:00",
+            "timezone": "UTC",
+            "trigger": None,
+            "params": {},
             "entities": [
                 {
                     "name": "entity1",
@@ -221,14 +281,30 @@ class TestPipeline:
         if not isinstance(serialized, list):
             serialized = [serialized]
         for d in serialized:
+            print(d)
             loaded = Pipeline.from_dict(d)
             if isinstance(my_pipeline_pubsub, ParametrizedPipeline):
                 assert loaded.params  # ensure the params area loaded
 
+    def test_serialize_deserialize_env(self, my_pipeline_env, my_entity):
+        my_pipeline_env.add_entity(my_entity)
+        serialized = my_pipeline_env.to_dict()
+        if not isinstance(serialized, list):
+            serialized = [serialized]
+        for d in serialized:
+            loaded = Pipeline.from_dict(d)
+            if isinstance(my_pipeline_env, ParametrizedPipeline):
+                assert loaded.params  # ensure the params area loaded
+
     def test_parse_datetime(self):
-        tstr = _format_datetime(pipeline_start_time)
-        parsed = _parse_datetime(tstr)
-        assert parsed == pipeline_start_time
+        tstr = "2021-09-18T00:00:00"
+        correct_dt = pendulum.datetime(
+            2021, 9, 18, 0, 0, 0, tz=pendulum.timezone("Europe/Brussels")
+        )
+        parsed = _parse_datetime(tstr, "Europe/Brussels")
+        print(f"{parsed}")
+        assert parsed.tzinfo == correct_dt.tzinfo
+        assert parsed == correct_dt
 
 
 pipeline_parameters = {"language": ["nl", "fr"], "country": ["be", "en"]}
@@ -282,7 +358,8 @@ class TestParametrizedPipeline(TestPipeline):
                 "version": "1.0.0",
                 "description": pipeline_description,
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+0000",
+                "start_time": "2020-12-02T15:38:34+00:00",
+                "timezone": "UTC",
                 "trigger": None,
                 "kind": "vanilla",
                 "params": {"language": "nl", "country": "be"},
@@ -310,7 +387,8 @@ class TestParametrizedPipeline(TestPipeline):
                 "version": "1.0.0",
                 "description": pipeline_description,
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+0000",
+                "start_time": "2020-12-02T15:38:34+00:00",
+                "timezone": "UTC",
                 "trigger": None,
                 "kind": "vanilla",
                 "params": {"language": "nl", "country": "en"},
@@ -338,7 +416,8 @@ class TestParametrizedPipeline(TestPipeline):
                 "version": "1.0.0",
                 "description": pipeline_description,
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+0000",
+                "start_time": "2020-12-02T15:38:34+00:00",
+                "timezone": "UTC",
                 "trigger": None,
                 "kind": "vanilla",
                 "params": {"language": "fr", "country": "be"},
@@ -366,7 +445,8 @@ class TestParametrizedPipeline(TestPipeline):
                 "version": "1.0.0",
                 "description": pipeline_description,
                 "schedule": "* 12 * * *",
-                "start_time": "2020-12-02T15:38:34+0000",
+                "start_time": "2020-12-02T15:38:34+00:00",
+                "timezone": "UTC",
                 "trigger": None,
                 "kind": "vanilla",
                 "params": {"language": "fr", "country": "en"},

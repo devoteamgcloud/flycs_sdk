@@ -1,12 +1,10 @@
 import pytest
 
 from flycs_sdk.custom_code import Dependency
-from flycs_sdk.query_base_schema import UnsupportedMode, UnsupportedType
 from flycs_sdk.transformations import (
     SchemaUpdateOptions,
     Transformation,
     WriteDisposition,
-    SchemaUpdateOptions,
     DeltaTimeOptions,
     ExecutionTimeout,
     MultiPartitioningDefinitionError,
@@ -23,6 +21,7 @@ transformation_keep_old_columns = True
 transformation_persist_backup = True
 transformation_write_disposition = WriteDisposition.APPEND
 transformation_time_partitioning = None
+transformation_range_partitioning = None
 transformation_cluster_fields = ["field1", "field2"]
 transformation_schema_update_options = [SchemaUpdateOptions.ALLOW_FIELD_ADDITION]
 transformation_dependencies = [Dependency("entity1", "staging", "deps")]
@@ -48,6 +47,7 @@ transformation_trigger_rule = "all_success"
 transformation_keysets_used = ["keyset_1"]
 transformation_execution_timeout = ExecutionTimeout(DeltaTimeOptions.MINUTES.name, 15)
 transformation_force_cache_refresh = True
+transformation_keysets_used = "keyset_1"
 
 
 class TestTranformations:
@@ -64,6 +64,7 @@ class TestTranformations:
             persist_backup=transformation_persist_backup,
             write_disposition=transformation_write_disposition,
             time_partitioning=transformation_time_partitioning,
+            range_partitioning=transformation_range_partitioning,
             cluster_fields=transformation_cluster_fields,
             schema_update_options=transformation_schema_update_options,
             dependencies=transformation_dependencies,
@@ -75,6 +76,7 @@ class TestTranformations:
             execution_timeout=transformation_execution_timeout,
             schema=transformation_fields_config,
             force_cache_refresh=transformation_force_cache_refresh,
+            keysets_used=transformation_keysets_used,
         )
 
     def test_init(self, my_transformation):
@@ -87,6 +89,7 @@ class TestTranformations:
         assert my_transformation.destination_table == transformation_destination_table
         assert my_transformation.write_disposition == transformation_write_disposition
         assert my_transformation.time_partitioning == transformation_time_partitioning
+        assert my_transformation.range_partitioning == transformation_range_partitioning
         assert my_transformation.cluster_fields == transformation_cluster_fields
         assert (
             my_transformation.schema_update_options
@@ -102,6 +105,7 @@ class TestTranformations:
         assert (
             my_transformation.force_cache_refresh == transformation_force_cache_refresh
         )
+        assert my_transformation.keysets_used == transformation_keysets_used
 
     def test_to_dict(self, my_transformation):
         assert my_transformation.to_dict() == {
@@ -117,6 +121,7 @@ class TestTranformations:
             "PERSIST_BACKUP": True,
             "WRITE_DISPOSITION": "WRITE_APPEND",
             "TIME_PARTITIONING": None,
+            "RANGE_PARTITIONING": None,
             "CLUSTER_FIELDS": ["field1", "field2"],
             "PARTITION_EXPIRATION": None,
             "REQUIRED_PARTITION_FILTER": False,

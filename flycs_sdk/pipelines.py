@@ -1,7 +1,9 @@
 """Module containing pipeline classes."""
 
+import pytz
+import pendulum
 import itertools
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Union, Tuple, Optional
 
@@ -39,9 +41,9 @@ class Pipeline:
                 Entity, BaseLayerEntity, ParametrizedEntity, ParametrizedBaseLayerEntity
             ]
         ] = None,
-        schedule: Optional[str] = None,
+        schedule: Optional[Union[str, dict]] = None,
         kind: PipelineKind = PipelineKind.VANILLA,
-        start_time: Optional[datetime] = None,
+        start_time: Optional[Union[datetime, pendulum.DateTime]] = None,
         trigger: Optional[PipelineTrigger] = None,
         params: Optional[Dict[str, str]] = None,
         dag_params: Optional[Dict[str, str]] = None,
@@ -93,7 +95,7 @@ class Pipeline:
             version=d["version"],
             description=d.get("description"),
             schedule=d.get("schedule"),
-            start_time=_parse_datetime(d["start_time"])
+            start_time=_parse_datetime(d["start_time"], d.get("timezone", "UTC"))
             if d.get("start_time")
             else None,
             kind=PipelineKind(d["kind"]),
@@ -137,8 +139,9 @@ class Pipeline:
             "version": self.version,
             "description": self.description,
             "schedule": schedule,
-            "start_time": _format_datetime(self.start_time)
-            if self.start_time
+            "start_time": f"{self.start_time}" if self.start_time else None,
+            "timezone": self.start_time.timezone_name
+            if isinstance(self.start_time, pendulum.DateTime)
             else None,
             "trigger": self.trigger.to_dict() if self.trigger else None,
             "kind": self.kind.value,
@@ -170,9 +173,9 @@ class ParametrizedPipeline:
         version: str,
         description: Optional[str] = None,
         entities: List[Union[ParametrizedEntity, ParametrizedBaseLayerEntity]] = None,
-        schedule: Optional[str] = None,
+        schedule: Optional[Union[str, dict]] = None,
         kind: PipelineKind = PipelineKind.VANILLA,
-        start_time: Optional[datetime] = None,
+        start_time: Optional[Union[datetime, pendulum.DateTime]] = None,
         trigger: Optional[PipelineTrigger] = None,
         parameters: Dict[str, List[str]] = None,
     ):
@@ -294,15 +297,15 @@ class ParametrizedPipeline:
         schedule = self.schedule
         if isinstance(self.schedule, ParametrizedPipeline):
             schedule = format_target_pipeline(self.schedule)
-
         return [
             {
                 "name": _parametrized_name(self.name, p),
                 "version": self.version,
                 "description": self.description,
                 "schedule": schedule,
-                "start_time": _format_datetime(self.start_time)
-                if self.start_time
+                "start_time": f"{self.start_time}" if self.start_time else None,
+                "timezone": self.start_time.timezone_name
+                if isinstance(self.start_time, pendulum.DateTime)
                 else None,
                 "trigger": self.trigger.to_dict() if self.trigger else None,
                 "kind": self.kind.value,
@@ -326,7 +329,9 @@ def _is_valid_version(version: str) -> bool:
     return True
 
 
-def _is_valid_start_time(start_time: Optional[datetime]) -> bool:
+def _is_valid_start_time(
+    start_time: Optional[Union[datetime, pendulum.DateTime]]
+) -> bool:
     """Test if start_time is a valid timestamp value.
 
     :param start_time: timestamp to validate
@@ -338,11 +343,20 @@ def _is_valid_start_time(start_time: Optional[datetime]) -> bool:
     if start_time is None:
         return True
 
-    if not isinstance(start_time, datetime):
-        raise TypeError("start_time must be a valid datetime object")
+    if not isinstance(start_time, datetime) and not isinstance(
+        start_time, pendulum.DateTime
+    ):
+        raise TypeError(
+            "start_time must be a valid datetime or pendulum.datetime object"
+        )
 
-    if start_time.tzinfo != timezone.utc:
-        raise ValueError("start_time timezone must be UTC")
+    if (
+        isinstance(start_time, pendulum.DateTime)
+        and start_time.timezone_name not in pytz.all_timezones
+    ):
+        raise ValueError(
+            f"timezone attribute {start_time.timezone_name} is invalid , please refers to https://en.wikipedia.org/wiki/List_of_tz_database_time_zones to see available time zones."
+        )
 
     return True
 
@@ -355,19 +369,31 @@ def _is_valid_trigger(trigger: PipelineTrigger) -> bool:
 
 # sine we support python3.6 we cannot use datetime fromisoformat and isoformat methods
 # instead we use this
-_time_format = "%Y-%m-%dT%H:%M:%S%z"
+_time_format = "YYYY-MM-DDTHH:mm:ss"
 
 
 def _format_datetime(t: datetime) -> str:
     return t.strftime(_time_format)
 
 
-def _parse_datetime(tstr: str) -> datetime:
-
-    # ensure we always have the UTC timezone information
-    if not tstr.endswith("+0000"):
-        tstr += "+0000"
-    return datetime.strptime(tstr, _time_format)
+def _parse_datetime(tstr: str, timezone: Optional[str] = "UTC") -> pendulum.DateTime:
+    """Parse a pendulum datetime with its specific timezone from a string date."""
+    if "+" in tstr:
+        tstr = tstr.split("+")[0]
+        print(
+            DeprecationWarning(
+                "Adding +0000 to specify timezone is decrepated. Now use format start_time format like 2021-09-18T00:00:00. To specify the timezone use 'timezone' attribute"
+            )
+        )
+    try:
+        tmz = pendulum.timezone(timezone)
+        dt = pendulum.from_format(tstr, _time_format, tz=tmz)
+        return dt
+    except:
+        raise ValueError(
+            "Wrong datetime configuration, please make sur you're using one of the following timezone name : https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
+            "E.g. start_time : '2022-09-06T10:00:00' ; timezone : 'Europe/Brussels' "
+        )
 
 
 def format_target_pipeline(p: Pipeline) -> str:
