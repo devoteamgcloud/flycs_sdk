@@ -43,6 +43,7 @@ class TestView:
             "PARSING_DEPENDS_ON": [],
             "KEYSETS_USED": [],
             "FORCE_CACHE_REFRESH": view_force_cache_refresh,
+            "KEYSETS_USED": [],
             "SCHEMA": [],
         }
 
